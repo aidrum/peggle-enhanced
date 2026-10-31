@@ -1,0 +1,1288 @@
+newPage
+trophyCount=1
+font=mini7
+timeStartKeyframe=0
+transInAlpha=b+0,1,0.01,5,#### m~###      U~P## ]#RHE
+color=0xff6221
+offsetY=15
+ 
+font=argontight9
+CONGRATULATIONS!
+color=0xcd5c1e
+blank=9
+font=mini7
+The Peggle Institute
+Board of Regents
+hereby grants
+blank=4
+color=0xff6221
+%user%
+blank=4
+color=0xcd5c1e
+the honorable title of
+blank=10
+color=0xff6221
+font=argontight9
+blank=-5
+MASTER  OF  PEGGLE
+blank=-2
+newPage
+timeStartKeyframe=500
+offsetY=40
+font=argontight9
+... but there are still
+more trophies to
+win!
+newPage
+trophyCount=2
+font=mini7
+timeStartKeyframe=0
+transInAlpha=b+0,1,0.01,5,#### m~###      U~P## ]#RHE
+color=0xff6221
+offsetY=3
+ 
+font=argontight9
+HURRAH!
+color=0xcd5c1e
+blank=9
+font=mini7
+The Peggle Institute
+Board of Regents
+hereby grants
+blank=4
+color=0xff6221
+%user%
+blank=4
+color=0xcd5c1e
+the honorable title of
+blank=10
+color=0xff6221
+font=argontight9
+blank=-5
+GRAND
+MASTER  OF  PEGGLE
+blank=-2
+newPage
+timeStartKeyframe=500
+offsetY=40
+font=argontight9
+... but two trophies
+still remain!
+newPage
+trophyCount=3
+font=mini7
+timeStartKeyframe=0
+transInAlpha=b+0,1,0.01,5,#### m~###      U~P## ]#RHE
+color=0xff6221
+offsetY=-2
+ 
+font=argontight9
+HOORAY!
+color=0xcd5c1e
+blank=9
+font=mini7
+The Peggle Institute
+Board of Regents
+hereby grants
+blank=4
+color=0xff6221
+%user%
+blank=4
+color=0xcd5c1e
+the honorable title of
+blank=10
+color=0xff6221
+font=argontight9
+blank=-5
+EXTREME  GRAND
+MASTER  OF  PEGGLE
+blank=-2
+newPage
+timeStartKeyframe=500
+offsetY=35
+font=argontight9
+... keep going,
+blank=4
+there is only ONE
+more trophy to win!
+newPage
+trophyCount=4
+font=mini7
+timeStartKeyframe=0
+transInAlpha=b+0,1,0.01,5,#### m~###      U~P## ]#RHE
+color=0xff6221
+offsetY=-5
+ 
+font=argontight9
+HUZZAH!
+color=0xcd5c1e
+blank=9
+font=mini7
+The Peggle Institute
+Board of Regents
+hereby grants
+blank=4
+color=0xff6221
+%user%
+blank=4
+color=0xcd5c1e
+the honorable title of
+blank=10
+color=0xff6221
+font=argontight9
+blank=-5
+ULTRA  EXTREME
+GRAND  MASTER
+OF  PEGGLE
+blank=-2
+newPage
+timeStartKeyframe=500
+offsetY=4
+font=argontight9
+transInAlpha=b+0,1,0.01,6,#### m~###      U~P## ]#RHE
+... you  have  won
+the  final  Peggle
+Nights  trophy!
+blank=10
+Now  go  forth  and
+share  your  glorious
+achievement  with  the
+world!
+keyframeAdd=100
+newPage
+trophyCount=5
+font=mini7
+timeStartKeyframe=0
+transInAlpha=b+0,1,0.01,5,#### m~###      U~P## ]#RHE
+color=0xff6221
+offsetY=35
+font=argontight9
+COR BLIMEY!!
+color=0xcd5c1e
+blank=9
+font=mini7
+You have found
+our EXTREME-ly
+SECRET SECRET
+credits!
+transInAlpha=b+0,1,0.01,5,#### m~###      U~P## ]#RHE
+newPage
+timeStartKeyframe=500
+offsetY=20
+The Peggle Institute
+Board of Regents
+hereby grants
+you the honorable title
+of
+blank=6
+color=0xff6221
+font=argontight9
+SUPER SUPREME
+SECRET SEEKER
+transInAlpha=b+0,1,0.01,7,#### m~###      U~P## ]#RHE
+newPage
+timeStartKeyframe=1050
+offsetY=40
+font=silk
+Please enjoy this
+blank=10
+font=argontight9
+VERY SHINY TROPHY!
+blank=2
+color=0xff6221
+transInAlpha=b+0,1,0.01,7,#### m~###      U~P## ]#RHE
+keyframeAdd=750
+newPage
+trophyId=-1
+trophyCount=-1
+timeStartKeyframe=300
+imageOnly=images/credits/creditcloud
+offsetY=95
+transInAlpha=full
+transInX=b#-1,0,0.01,11.5,#         ~~
+transInY=b+0,0.22,0.01,11,~j?k .#;xt        H#6}@M~e4I
+keyframeAdd=300
+newPage
+imageOnly=images/credits/creditcloud
+offsetX=126
+newPage
+imageOnly=images/credits/creditcloud
+offsetX=-126
+newPage
+imageOnly=images/credits/creditcloud
+offsetX=60
+offsetY=108
+transInX=b#-1.35,0.5,0.01,11.5,#         ~~
+newPage
+imageOnly=images/credits/creditcloud
+offsetX=186
+newPage
+imageOnly=images/credits/creditcloud
+offsetX=-66
+newPage
+imageOnly=images/credits/creditstars
+transInX=b#-1,-0.8,0.01,11.5,#         ~~
+transInY=none
+transInAlpha=b+0,1,0.01,11.5,#### .~###       Z~### ;####
+offsetX=0
+offsetY=0
+newPage
+imageOnly=images/credits/creditstars
+transInX=b#-1,-0.8,0.01,11.5,#         ~~
+offsetX=126
+offsetY=0
+keyframeAdd=470
+newPage
+imageOnly=images/credits/creditlogo
+timeStartKeyframe=70
+transInAlpha=full
+offsetX=0
+offsetY=-8
+transInX=b+-1,1,0.01,5.75,####   ,Q###      uQO{O
+transInY=b+-1,1,0.01,5.75,P###dR### @O### 2P###     NPOrz @#;=}
+keyframeAdd=590
+imageWidth=120
+imageHeight=20
+newPage
+font=argontight9
+timeStartKeyframe=0
+offsetX=3
+offsetY=46
+transInX=b+-1,1,0.01,3,####|P###        .P###u~PR7
+transInY=none
+color=0xff6221
+Producers
+newPage
+timeStartKeyframe=0
+font=mini7
+transInX=b+-1,1,0.01,3,~###|P###        .P###u#PR7
+color=0xcd5c1e
+addOffsetY=13
+Sukhbir Sidhu
+newPage
+timeStartKeyframe=0
+transInX=b+-1,1,0.01,3,####|P###        .P###u~PR7
+transInY=none
+addOffsetY=13
+Matthew Lee Johnston
+keyframeAdd=300
+newPage
+timeStartKeyframe=0
+blank=0
+imageOnly=images/credits/bjorn
+offsetX=0
+offsetY=0
+timePause=10
+transInX=emptyNone
+transInY=emptyNone
+transInAlpha=full
+newPage
+timeStartKeyframe=0
+timePause=8
+transInAlpha=full
+imageOnly=images/credits/bjorn2
+newPage
+timeStartKeyframe=8
+imageOnly=images/credits/bjorn
+newPage
+timeStartKeyframe=16
+imageOnly=images/credits/bjorn2
+newPage
+timeStartKeyframe=24
+imageOnly=images/credits/bjorn
+newPage
+timeStartKeyframe=32
+timePause=40
+imageOnly=images/credits/bjorn2
+keyframeAdd=80
+newPage
+timeStartKeyframe=0
+offsetX=3
+offsetY=45
+font=argontight9
+color=0xff6221
+Programmers
+color=0xcd5c1e
+transInX=b+0,1,0.01,3,####        ?#### b~f2B
+transInY=b#-1,0,0.01,0.5,#         ~~
+timePause=200
+keyframeAdd=60
+newPage
+timeStartKeyframe=0
+font=mini7
+addOffsetY=13
+color=0xcd5c1e
+font=mini7
+Brian Rothstein
+transInX=b+-1,0,0.01,3,~###        7~wSp j^>9Z
+transInY=b+0,1,0.01,3,~###   T#?A#    ]#'Ud nTf%/
+timePause=150
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Eric Tams
+addOffsetY=13
+transInXMult=-0.65
+timePause=110
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Jeremy Bilas
+transInXMult=0.2
+addOffsetY=10
+timePause=70
+keyframeAdd=300
+newPage
+timeStartKeyframe=0
+offsetX=0
+offsetY=0
+timePause=8
+transInX=none
+transInY=none
+transInAlpha=full
+transInXMult=1.0
+imageOnly=images/credits/cinder2
+newPage
+timeStartKeyframe=8
+imageOnly=images/credits/cinder1
+newPage
+timeStartKeyframe=16
+imageOnly=images/credits/cinder2
+newPage
+timeStartKeyframe=24
+imageOnly=images/credits/cinder1
+newPage
+timeStartKeyframe=32
+imageOnly=images/credits/cinder2
+newPage
+timeStartKeyframe=40
+imageOnly=images/credits/cinder1
+newPage
+timeStartKeyframe=48
+imageOnly=images/credits/cinder2
+newPage
+timeStartKeyframe=56
+imageOnly=images/credits/cinder1
+newPage
+timeStartKeyframe=64
+imageOnly=images/credits/cinder2
+timePause=20
+keyframeAdd=100
+newPage
+timeStartKeyframe=0
+offsetY=35
+font=argontight9
+color=0xff6221
+Artists
+color=0xcd5c1e
+transInX=b+0,1,0.01,3,####        ?#### b~f2B
+transInY=b+-0.1,1,0.01,3,~### T#P##A+###        .+Ok'
+timePause=200
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+transInX=b+-1,0,0.01,3,~###        7~### j#:vj
+Walter Wilson
+addOffsetY=13
+timePause=150
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Matt Holmberg
+addOffsetY=13
+timePause=110
+transInX=b+0,1,0.01,3,####        ?#### b~f2B
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+transInX=b+-1,0,0.01,3,~###        7~### j#:vj
+James Abraham
+addOffsetY=10
+timePause=70
+keyframeAdd=300
+newPage
+timeStartKeyframe=30
+offsetX=0
+offsetY=0
+timePause=8
+transInX=b+-1,1,0.01,2.5,#5yy dJ05t ;P###   iP$B- KX^WW m~cFL
+transInY=none
+transInAlpha=full
+transInXMult=1.0
+imageOnly=images/credits/jimmy
+newPage
+transInX=b+0.25,0.75,0.01,1,d###  x=###   (d###  &E### |q###
+transInY=b#-.5,1.5,0.01,1,~         ~#
+offsetX=-10
+offsetY=10
+imageOnly=images/credits/creditbubble
+newPage
+timeStartKeyframe=40
+imageOnly=images/credits/creditbubble
+offsetX=-40
+offsetY=10
+newPage
+timeStartKeyframe=60
+imageOnly=images/credits/creditbubble
+offsetX=20
+offsetY=10
+newPage
+timeStartKeyframe=80
+imageOnly=images/credits/creditbubble
+offsetX=-70
+offsetY=10
+newPage
+timeStartKeyframe=90
+imageOnly=images/credits/creditbubble
+offsetX=-30
+offsetY=10
+keyframeAdd=150
+newPage
+timeStartKeyframe=0
+blank=0
+imageOnly=images/credits/science1
+offsetX=0
+offsetY=0
+timePause=10
+transInX=emptyNone
+transInY=emptyNone
+transInAlpha=full
+newPage
+timeStartKeyframe=0
+timePause=8
+transInAlpha=full
+imageOnly=images/credits/science2
+newPage
+timeStartKeyframe=8
+imageOnly=images/credits/science1
+newPage
+timeStartKeyframe=16
+imageOnly=images/credits/science2
+newPage
+timeStartKeyframe=24
+imageOnly=images/credits/science1
+newPage
+timeStartKeyframe=32
+timePause=40
+imageOnly=images/credits/science2
+keyframeAdd=120
+newPage
+timeStartKeyframe=0
+offsetX=0
+offsetY=0
+imageOnly=images/credits/creditstar
+transInX=b#-0.3,1.1,0.01,1.5,#         ~~
+transInY=none
+transInAlpha=full
+newPage
+timeStartKeyframe=50
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=100
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=150
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=200
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=0
+offsetY=80
+imageOnly=images/credits/creditstar
+transInX=b#-0.3,1.1,0.01,1.5,~         ~#
+newPage
+timeStartKeyframe=50
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=100
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=150
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=200
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=0
+offsetY=50
+font=argontight9
+color=0xff6221
+Background Art
+color=0xcd5c1e
+transInX=b+-1,1,0.01,3,#7gH 4P###       ;P### T~f2B
+transInY=none
+timePause=200
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+Matt Holmberg
+transInXMult=-1.0
+addOffsetY=8
+timePause=150
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Present Creative
+transInXMult=1.0
+addOffsetY=13
+timePause=110
+keyframeAdd=300
+newPage
+timeStartKeyframe=0
+offsetX=0
+offsetY=0
+timePause=8
+transInX=b+-1,1,0.01,3.5,#0Y*   $KWXa    ^SV-g  B~cFL
+transInY=none
+transInAlpha=full
+transInXMult=1.0
+imageOnly=images/credits/splork
+timePause=20
+keyframeAdd=180
+newPage
+timeStartKeyframe=0
+blank=0
+imageOnly=images/credits/bowling
+offsetX=0
+offsetY=0
+timePause=10
+transInX=b+-1,1,0.01,1.2,#/iB  xP_lT#P###    YPP'T#P2)z  M~a9=
+transInY=b+-1,1,0.01,1.2,#/iB  xP_lT#P###    YPP'T#P2)z  M~a9=
+transInAlpha=b+0,1,0.01,1.2,####b#P##   F~### m~###   Y####Q#P##
+keyframeAdd=100
+newPage
+timeStartKeyframe=100
+offsetX=-10
+offsetY=0
+imageOnly=images/credits/creditstar
+transInX=none
+transInY=b#-0.3,1.1,0.01,1.5,#         ~~
+transInAlpha=full
+newPage
+timeStartKeyframe=150
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=200
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=250
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=300
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=100
+offsetX=100
+imageOnly=images/credits/creditstar
+transInY=b#-0.3,1.1,0.01,1.5,~         ~#
+newPage
+timeStartKeyframe=150
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=200
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=250
+imageOnly=images/credits/creditstar
+newPage
+timeStartKeyframe=300
+imageOnly=images/credits/creditstar
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+offsetX=3
+offsetY=30
+font=argontight9
+color=0xff6221
+Level Design
+color=0xcd5c1e
+transInX=b+0,1,0.01,5,####       Q####  O~f2B
+transInY=b+-0.2,1,0.01,5,~### R,P##E2###     g2###>.###C2###H,###J2###M*###F2Ok'
+timePause=300
+keyframeAdd=50
+newPage
+offsetX=0
+timeStartKeyframe=0
+font=mini7
+Stephen Notley
+addOffsetY=13
+timePause=250
+transInX=b+-1,0,0.01,5,~###       B~###  _#<_Z
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+addOffsetY=13
+Scott Lantz
+timePause=200
+transInX=b+0,1,0.01,5,####       Q####  O~f2B
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Ed Miller
+addOffsetY=10
+timePause=150
+transInX=b+-1,0,0.01,5,~###       B~###  _#<_Z
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Isaac Aubrey
+addOffsetY=10
+timePause=100
+transInX=b+0,1,0.01,5,####       Q####  O~f2B
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Eric Tams
+transInXMult=-1.0
+addOffsetY=10
+timePause=50
+keyframeAdd=500
+newPage
+trophyCount=5
+timeStartKeyframe=0
+offsetY=0
+timePause=200
+transInXMult=1.0
+transInYMult=1.0
+transInX=b+-1,0,0.01,3.5,#$if  @~###     c~### |#R%}
+transInY=b+-1,0,0.01,3.5,#$if  @~###     c~### |#R%}
+transInAlpha=b#0,0.25,0.01,2,~         ~~
+imageOnly=images/credits/pteridaktol
+newPage
+timeStartKeyframe=0
+imageOnly=images/credits/pteridaktol
+offsetY=0
+timePause=200
+transInXMult=-1.0
+transInYMult=-1.0
+newPage
+timeStartKeyframe=0
+imageOnly=images/credits/pteridaktol
+offsetY=0
+timePause=200
+transInXMult=-1.0
+transInYMult=1.0
+newPage
+timeStartKeyframe=0
+imageOnly=images/credits/pteridaktol
+offsetY=0
+timePause=200
+transInXMult=1.0
+transInYMult=-1.0
+newPage
+timeStartKeyframe=100
+transInXMult=1.0
+timePause=8
+transInYMult=1.0
+transInX=none
+transInY=none
+transInAlpha=b+0,1,0.01,2,#7|n O~### b#### o~### d#### ^~### ]#;6j
+imageOnly=images/credits/prehistoric
+keyframeAdd=350
+newPage
+trophyCount=-1
+timeStartKeyframe=0
+offsetY=40
+font=argontight9
+color=0xff6221
+Writing
+transInXMult=1.0
+color=0xcd5c1e
+transInX=b+0,1,0.01,3,####        ?#### b~f2B
+transInY=b+-0.1,1,0.01,3,~### T#P##A+###        .+Ok'
+transInAlpha=full
+timePause=250
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+addOffsetY=13
+Stephen Notley
+timePause=200
+transInXMult=-1.0
+keyframeAdd=300
+newPage
+timeStartKeyframe=0
+timePause=8
+offsetY=0
+transInY=none
+transInAlpha=b+0,1,0.01,3,#5d3   B~###   Y~###   (#<_Z
+imageOnly=images/credits/hu
+keyframeAdd=100
+newPage
+timeStartKeyframe=0
+blank=0
+imageOnly=images/credits/anarchy1
+offsetX=0
+offsetY=0
+timePause=10
+transInX=emptyNone
+transInY=emptyNone
+transInAlpha=full
+newPage
+timeStartKeyframe=0
+timePause=8
+transInAlpha=full
+imageOnly=images/credits/anarchy2
+newPage
+timeStartKeyframe=8
+imageOnly=images/credits/anarchy1
+newPage
+timeStartKeyframe=16
+imageOnly=images/credits/anarchy2
+newPage
+timeStartKeyframe=24
+imageOnly=images/credits/anarchy1
+newPage
+timeStartKeyframe=32
+timePause=40
+imageOnly=images/credits/anarchy2
+keyframeAdd=150
+newPage
+timeStartKeyframe=0
+offsetY=40
+font=argontight9
+color=0xff6221
+PopCap Framework
+color=0xcd5c1e
+transInX=b+0,1,0.01,4,####        ?#### b~f2B
+transInY=b+-0.1,1,0.01,4,~### T#P##A+###        .+Ok'
+timePause=250
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+Brian Fiete
+transInX=b+0,1,0.01,4,~jZq s#<4B      '####  *Jci`
+transInY=b+-0.1,1,0.01,4,~### T#P##A+###      D+###H#### B~Ok'
+transInXMult=1.0
+addOffsetY=13
+timePause=200
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+transInXMult=-1.0
+Brian Rothstein
+addOffsetY=13
+timePause=150
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+transInXMult=1.0
+David Parton
+addOffsetY=10
+timePause=100
+keyframeAdd=380
+newPage
+timeStartKeyframe=0
+timePause=8
+offsetY=0
+transInX=none
+transInY=none
+transInXMult=1.0
+transInAlpha=b+0,1,0.01,2,#5d3   B~###   Y~###   (#<_Z
+imageOnly=images/credits/creditsbeethoven
+keyframeAdd=170
+newPage
+name=musicSounds
+timeStartKeyframe=0
+offsetY=40
+font=argontight9
+color=0xff6221
+Music and Sounds
+color=0xcd5c1e
+transInXMult=1.0
+transInAlpha=full
+transInX=b+0,1,0.01,4,####        ?#### b~f2B
+transInY=b+-0.1,1,0.01,4,~### T#P##A+###        .+Ok'
+timePause=250
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+Somatone Interactive Audio
+transInXMult=-1.0
+addOffsetY=13
+timePause=200
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Matthew Lee Johnston
+transInXMult=1.0
+addOffsetY=13
+timePause=150
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Ludwig Van Beethoven
+transInXMult=-1.0
+addOffsetY=10
+timePause=100
+keyframeAdd=390
+newPage
+name=willy
+trophyCount=5
+timeStartKeyframe=0
+timePause=0
+offsetY=0
+transInX=none
+transInY=b+-1,1,0.01,5.5,#5d3  IO'<0 0P### }P### DQR@r   *~c0r
+transInAlpha=b+0,1,0.01,5.5,#5d3  Z~###     )~###  @#<_Z
+imageOnly=images/credits/willy
+newPage
+timeStartKeyframe=185
+blank=0
+imageOnly=images/credits/chachacha1
+offsetX=0
+offsetY=0
+timePause=15
+transInX=emptyNone
+transInY=emptyNone
+transInAlpha=full
+newPage
+timeStartKeyframe=200
+timePause=15
+transInAlpha=full
+imageOnly=images/credits/chachacha2
+newPage
+timeStartKeyframe=215
+imageOnly=images/credits/chachacha1
+newPage
+timeStartKeyframe=230
+imageOnly=images/credits/chachacha2
+newPage
+timeStartKeyframe=245
+imageOnly=images/credits/chachacha1
+newPage
+timeStartKeyframe=260
+timePause=40
+imageOnly=images/credits/chachacha2
+keyframeAdd=500
+imageWidth=129
+imageHeight=120
+newPage
+trophyCount=-1
+timeStartKeyframe=0
+offsetY=30
+font=argontight9
+transInAlpha=b+0,1,0.01,4,#5d4    x~###     )#<_Z
+color=0xff6221
+"Claire de Lune"
+blank=4
+color=0xcd5c1e
+font=mini7
+Written by
+Claude Debussy
+blank=4
+Arranged/Orchestrated by
+Stan LePard
+blank=4
+Performed by
+Slovak Symphony Orchestra
+transInX=none
+transInY=none
+timePause=0
+keyframeAdd=400
+newPage
+name=tula
+timeStartKeyframe=0
+timePause=0
+offsetY=0
+transInX=b+-1,1,0.01,2,#5d3   7O$xi <P###DP### fQR@r   G~c0r
+transInY=b+-1,1,0.01,2,#5d3   7O$xi <P###DP### fQR@r   G~c0r
+transInAlpha=b+0,1,0.01,2,#5d4    x~###     )#<_Z
+imageOnly=images/credits/tula
+keyframeAdd=250
+imageWidth=120
+imageHeight=20
+newPage
+timeStartKeyframe=0
+offsetY=40
+font=argontight9
+color=0xff6221
+QA Lead
+color=0xcd5c1e
+transInXMult=1.0
+transInAlpha=full
+transInX=b+0,1,0.01,4,####        ?#### b~f2B
+transInY=b+-0.1,1,0.01,4,~### T#P##A+###        .+Ok'
+timePause=250
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+Isaac Aubrey
+transInXMult=-1.0
+addOffsetY=13
+timePause=200
+keyframeAdd=340
+newPage
+timeStartKeyframe=0
+timePause=8
+offsetX=0
+offsetY=0
+transInX=b,0,1,0.01,3,~hE-  O#P##     H####  ,~fg`
+transInY=b+0,1,0.01,3,~###  O#P##     H####  ,~P##
+transInXMult=-1.0
+transInYMult=-1.0
+transInAlpha=b+0,1,0.01,2,~###         ~~P##
+imageOnly=images/credits/warren
+newPage
+offsetX=61
+timeStartKeyframe=0
+timePause=8
+transInXMult=1.0
+transInYMult=1.0
+imageOnly=images/credits/warren2
+newPage
+offsetX=0
+timeStartKeyframe=100
+transInXMult=1.0
+transInX=none
+transInY=none
+timePause=15
+transInAlpha=full
+imageOnly=images/credits/danger1
+newPage
+timeStartKeyframe=115
+imageOnly=images/credits/danger2
+newPage
+timeStartKeyframe=130
+imageOnly=images/credits/danger1
+newPage
+timeStartKeyframe=145
+imageOnly=images/credits/danger2
+newPage
+timeStartKeyframe=160
+timePause=60
+imageOnly=images/credits/danger1
+keyframeAdd=260
+newPage
+timeStartKeyframe=0
+offsetY=19
+font=argontight9
+color=0xff6221
+QA Testers
+color=0xcd5c1e
+transInAlpha=b+0,1,0.01,6,#5d4    x~###     )#<_Z
+transInX=b+0,1,0.01,6,~iQ&  &####      <#### b~f2B
+transInY=b+-0.1,1,0.01,6,~### T#P##A+###        .+Ok'
+timePause=300
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+Shawn Conard
+addOffsetY=13
+timePause=350
+transInXMult=-1.0
+transInYMult=-1.0
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+addOffsetY=13
+Ed Miller
+timePause=300
+transInXMult=1.0
+transInYMult=1.0
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+addOffsetY=10
+Adam MacDonnell
+timePause=250
+transInXMult=-2.0
+transInYMult=-1.0
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+addOffsetY=10
+Michael Racioppi
+timePause=200
+transInXMult=2.0
+transInYMult=1.0
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+addOffsetY=10
+Michael Guillory
+timePause=150
+transInXMult=-4.0
+transInYMult=-1.0
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+addOffsetY=10
+Chad Zoellner
+timePause=100
+transInXMult=4.0
+transInYMult=1.0
+keyframeAdd=500
+newPage
+timeStartKeyframe=0
+timePause=8
+offsetX=126
+offsetY=0
+transInX=b+0,1,0.01,3,#0^U  G~###     b~### v#E_|
+transInXMult=-1.0
+transInYMult=1.0
+transInY=none
+transInAlpha=b+0,1,0.01,2,~###         ~~P##
+imageOnly=images/credits/kahla
+newPage
+offsetX=-61
+timeStartKeyframe=0
+timePause=8
+transInXMult=1.0
+imageOnly=images/credits/kahla2
+keyframeAdd=150
+newPage
+timeStartKeyframe=0
+blank=0
+imageOnly=images/credits/shocker1
+offsetX=0
+offsetY=0
+timePause=10
+transInX=emptyNone
+transInY=emptyNone
+transInAlpha=full
+newPage
+timeStartKeyframe=0
+timePause=8
+transInAlpha=full
+imageOnly=images/credits/shocker2
+newPage
+timeStartKeyframe=8
+imageOnly=images/credits/shocker1
+newPage
+timeStartKeyframe=16
+imageOnly=images/credits/shocker2
+newPage
+timeStartKeyframe=24
+imageOnly=images/credits/shocker1
+newPage
+timeStartKeyframe=32
+timePause=40
+imageOnly=images/credits/shocker2
+keyframeAdd=80
+keyframeAdd=150
+newPage
+timeStartKeyframe=0
+offsetX=0
+offsetY=40
+font=argontight9
+color=0xff6221
+Special Thanks
+color=0xcd5c1e
+transInX=b+0,1,0.01,4,####        ?#### b~f2B
+transInY=b+-0.1,1,0.01,4,~### T#P##A+###        .+Ok'
+timePause=250
+keyframeAdd=50
+newPage
+timeStartKeyframe=0
+font=mini7
+John Vechey
+addOffsetY=13
+timePause=200
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Eric Pitcock
+addOffsetY=13
+timePause=150
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Jason Kapalka
+addOffsetY=10
+timePause=100
+keyframeAdd=40
+newPage
+timeStartKeyframe=0
+Chris Hargrove
+addOffsetY=10
+timePause=50
+keyframeAdd=320
+newPage
+timeStartKeyframe=0
+trophyCount=5
+offsetY=0
+timePause=0
+imageOnly=images/credits/ericart
+transInXMult=-1.0
+transInX=b+-1,1,0.01,4,#$if        )~###O~### K#:G1
+transInY=b+-1,1,0.01,4,PyVa  OPR-[  PPzHa  OPRmp  RPMEs
+keyframeAdd=500
+newPage
+trophyCount=-1
+timeStartKeyframe=0
+transInXMult=1.0
+offsetX=0
+offsetY=0
+font=argontight9
+color=0xff6221
+Beta Testers
+color=0xcd5c1e
+transInX=none
+transInY=b#-1,1,0.01,10,~         ~#
+timePause=250
+keyframeAdd=50
+imageWidth=65
+imageHeight=129
+newPage
+centered=0
+offsetX=5
+offsetY=0
+timeStartKeyframe=0
+addOffsetY=6
+timePause=150
+rambobear
+DixieWriter
+Kasandra
+shersheri
+AimeeLyn
+ms conduct
+Inkmei
+SyrinxH
+krosenlo
+NPGinWPG
+hrach18
+Meatboy
+newPage
+offsetX=60
+REBA10
+Panther
+Vexrm
+snarkcake
+Funfetti
+deb1013
+Wolfpackmama
+Susie
+Kiergi
+ArdentRogue
+pajol
+darrylo
+newPage
+offsetX=5
+addOffsetY=-9
+transInY=b#-1,2,0.01,15,~         ~#
+jael
+The Shadow
+Danicaeoin
+Fiction
+jb1939
+MattyV
+dwl
+swarters
+ogrechow
+faeremoon
+wuggies
+Keythacker
+newPage
+offsetX=60
+Phanatic
+jebksb1977
+littleamyshort
+hiwayman
+MrsDbolt
+Lovedog
+Vern
+danarenay
+wendigowolf
+33njamin
+Lexi
+tresser
+newPage
+offsetX=5
+addOffsetY=-9
+transInY=b#-1,3,0.01,20,~         ~#
+ang1669
+Sean71570
+ereich
+Iceman
+gemini2264jt
+Fire
+gslagel
+WildKitten
+badger
+monkeyboy
+Z3R05UM
+L82lalaland
+newPage
+offsetX=60
+Spaggie
+cerebus
+jakeaidan
+catzen
+onidavin
+Illyria
+tigerlynn
+tonyawinter
+Allena
+neosurfer2695
+jahroni
+Lindsay
+newPage
+imageWidth=100
+imageHeight=50
+newPage
+timeStartKeyframe=0
+offsetX=5
+addOffsetY=-9
+transInY=b#-1,4,0.01,25,~         ~#
+badtzmaru
+alskms
+lunanoir
+Beautifully Chaotic
+imageWidth=60
+newPage
+offsetX=60
+Adam1304
+llamatkrause
+davedude77
+keyframeAdd=2050
+newPage
+imageOnly=images/credits/dark
+timeStartKeyframe=0
+offsetX=0
+offsetY=0
+transInX=none
+transInY=none
+transInAlpha=b+0,1,0.01,10,#8Q? (~###       p~### ,#:eh
+timePause=550
+newPage
+imageOnly=images/credits/bjorn
+timeStartKeyframe=0
+offsetX=0
+offsetY=0
+transInX=none
+transInY=b+0.4,1,0.01,1,~### d~###  <####      $#P##
+transInAlpha=b+0,1,0.01,10,~}Ha        ;~### f#:h@
+timePause=250
+imageWidth=129
+imageHeight=20
+newPage
+centered=1
+timeStartKeyframe=0
+offsetX=0
+offsetY=30
+font=argontight9
+color=0xff6221
+transInX=b+-1,0,0.01,2,#7|n  i~###       8~P##
+transInY=none
+Thanks for Playing!
+blank=10
+newPage
+imageHeight=60
+offsetX=15
+offsetY=45
+color=0xcd5c1e
+-- The Peggle
+blank=-3
+      Nights Team
+transInXMult=-1.0
+timePause=250
+keyframeAdd=40

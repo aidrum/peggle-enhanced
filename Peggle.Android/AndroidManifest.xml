@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Port: the game activity is declared here, not with [Activity], so the launcher icon aliases can follow it
+  (an activity-alias must come after its target). The app's label and package come from the project
+  (ApplicationTitle, ApplicationId).
+  Launcher icons: one activity-alias per icon (PortOptionsDialog.APP_ICONS, App Icon page), each with its
+  icon (@mipmap/<name>, Icons/<edition>, tools/convert_icons.py: adaptive where it has layers and
+  Resources/mipmap-anydpi-v26 XML, else the legacy one, as the transparent ones). The first is the default;
+  GameActivity's SetAppIcon enables the chosen one and disables the others.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application android:icon="@mipmap/icon">
+    <activity
+        android:name="peggle.android.GameActivity"
+        android:exported="false"
+        android:icon="@mipmap/icon"
+        android:alwaysRetainTaskState="true"
+        android:launchMode="singleInstance"
+        android:screenOrientation="sensorLandscape"
+        android:configChanges="orientation|screenSize|keyboard|keyboardHidden|screenLayout|uiMode"
+        android:hardwareAccelerated="true" />
+    <activity-alias
+        android:name=".IconIOS"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon"
+        android:enabled="true"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconIOSOld"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_iosold"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconAndroid"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_android"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconPC"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_pc"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconPCTransparent"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_pc_transparent"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconNights"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_nights"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconNightsTransparent"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_nights_transparent"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconPlayStore"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_play_store"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+    <activity-alias
+        android:name=".IconJava"
+        android:targetActivity="peggle.android.GameActivity"
+        android:icon="@mipmap/icon_java"
+        android:enabled="false"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity-alias>
+  </application>
+</manifest>

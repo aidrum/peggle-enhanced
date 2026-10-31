@@ -1,0 +1,5 @@
+<Project>
+  <Target Name="CheckPeggleEdition" BeforeTargets="Build;Restore" Condition="'$(PeggleEdition)' != 'HD' And '$(PeggleEdition)' != 'iPhone'">
+    <Error Text="PeggleEdition must be HD or iPhone (got '$(PeggleEdition)')." />
+  </Target>
+</Project>

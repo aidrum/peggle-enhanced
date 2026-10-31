@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Peggle.Desktop</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>PeggleHD</AssemblyName>
+    <ApplicationIcon>Icons\$(PeggleEdition)\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PeggleEdition)' == 'iPhone'">
+    <AssemblyName>Peggle</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Window/taskbar icon: MonoGame's SDL window loads the embedded "Icon.bmp" (tools/convert_icons.py). -->
+    <EmbeddedResource Include="Icons\$(PeggleEdition)\Icon.bmp" LogicalName="Icon.bmp" />
+    <None Remove="Icons\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
+  </ItemGroup>
+  <!-- NativeAOT publish (distribution/publish_windows*.bat): AOT requires trimming, so the game's own
+       assemblies and MonoGame are kept whole (as the Android Release build does), the rest trimmed. -->
+  <PropertyGroup Condition="'$(PublishAot)' == 'true'">
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(PublishAot)' == 'true'">
+    <TrimmerRootAssembly Include="$(AssemblyName)" RootMode="All" />
+    <TrimmerRootAssembly Include="PeggleGame" RootMode="All" />
+    <TrimmerRootAssembly Include="SexyFramework" RootMode="All" />
+    <TrimmerRootAssembly Include="MonoGame.Framework" RootMode="All" />
+    <TrimmerRootAssembly Include="NVorbis" RootMode="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Peggle\Peggle.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Converted game assets (see tools/convert_assets.py), loaded as raw files at run time:
+         the edition's own art and data plus the sounds and music both editions share. -->
+    <Content Include="..\Peggle\Content.Shared\**\*" LinkBase="Content" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Peggle\Content.$(PeggleEdition)\**\*" LinkBase="Content" CopyToOutputDirectory="PreserveNewest" />
+	 <Content Include="..\alsoft.ini" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

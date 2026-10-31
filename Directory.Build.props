@@ -1,0 +1,21 @@
+<Project>
+  <!--
+    Which release of Peggle Classic to build:
+      HD     - Peggle Classic HD 2.0.6 (iPad, 1024x768). The default.
+      iPhone - Peggle Classic 1.7.2 (iPhone 5, 1136x640 with the 960x640 art).
+    Pick with: dotnet build -p:PeggleEdition=iPhone
+    Each edition gets its own bin/obj folders so the two builds never mix.
+  -->
+  <PropertyGroup>
+    <PeggleEdition Condition="'$(PeggleEdition)' == ''">HD</PeggleEdition>
+    <!-- Never glob another edition's (or configuration's) generated files into the build. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);bin/**;obj/**</DefaultItemExcludes>
+    <!-- The port's own version (Peggle Enhanced), shown in the Options dialog (SexyUtil.GetPortVersionString). -->
+    <Version>1.0</Version>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PeggleEdition)' == 'iPhone'">
+    <DefineConstants>$(DefineConstants);PEGGLE_IPHONE</DefineConstants>
+    <BaseOutputPath>bin\iPhone\</BaseOutputPath>
+    <BaseIntermediateOutputPath>obj\iPhone\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

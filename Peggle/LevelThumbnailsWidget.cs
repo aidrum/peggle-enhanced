@@ -1,0 +1,589 @@
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using static Sexy.Layout;
+
+namespace Sexy
+{
+    public interface LevelThumbnailsWidgetListener
+    {
+        void SelectionChanged();
+    }
+
+    /// <summary>
+    /// The scrolling grid of level thumbnails on the level screen (Sexy::LevelThumbnailsWidget).
+    /// Peggle stages sit in a left column and Nights stages in a right one; the stage labels in the
+    /// middle are shared, and the screen scrolls sideways between the two. Row 0 is Random Level.
+    /// Port addition: further pages to the right hold the bonus stages (StageMgr.BONUS_PAGES: Nights
+    /// bonus, Extreme, WoW). Nights bonus has its own labels; Extreme and WoW share theirs, like
+    /// Peggle and Nights.
+    /// </summary>
+    public class LevelThumbnailsWidget : Widget
+    {
+        public class LevelDisplayInfo
+        {
+            public bool mCleared;                                 // 0x0
+
+            public bool mAced;                                    // 0x1
+
+            public bool mLocked;                                  // 0x2
+
+            public int mLockAlpha;                                // 0x4
+
+            public string mName = "";                             // 0x8
+
+            public LevelInfo mLevelInfo;                          // 0xc
+        }
+
+        public static int RANDOM_BUTTON_HEIGHT;
+
+        public static int THUMB_STAGE_WIDTH;
+
+        public static int ROW_HEIGHT;
+
+        private static int aStringWidth = -1;
+
+        public int mSelected;                                     // 0x78
+
+        public ThunderballApp mApp;                               // 0x7c
+
+        public LevelThumbnailsWidgetListener mListener;           // 0x80
+
+        public List<LevelDisplayInfo> mLevels = new List<LevelDisplayInfo>(); // 0x84
+
+        public bool mThumbnailDirty;                              // 0x90
+
+        public MemoryImage mSelectedThumbnail;                    // 0x94
+
+        public LevelThumbnailsWidget(ThunderballApp theApp, LevelThumbnailsWidgetListener theListener)
+        {
+            mApp = theApp;
+            LoadDisplayInfo();
+            mSelected = -1;
+            mListener = theListener;
+            mSelectedThumbnail = null;
+            mThumbnailDirty = true;
+        }
+
+        public override void Dispose()
+        {
+            mSelectedThumbnail?.Dispose();
+            mSelectedThumbnail = null;
+            base.Dispose();
+        }
+
+        public void LoadDisplayInfo()
+        {
+            int aCount = 0x73;
+            int aBonusStages = mApp.mStageMgr.GetNumBonusStages();
+            if (aBonusStages > 0)
+            {
+                aCount = (StageMgr.BONUS_FIRST_STAGE + aBonusStages) * 5;
+            }
+            mLevels.Capacity = aCount;
+            PlayerInfo aPlayer = mApp.mPlayerInfo;
+            for (int i = 0; i < aCount; i++)
+            {
+                LevelDisplayInfo anInfo = new LevelDisplayInfo();
+                StageInfo aStage = mApp.mStageMgr.GetStageInfo(i / 5);
+                LevelInfo aLevel = aStage?.GetLevelInfo(i % 5);
+                anInfo.mLevelInfo = aLevel;
+                anInfo.mName = aLevel != null ? aLevel.mDisplayName : "";
+                anInfo.mLocked = !CanSelectLevel(i / 5, i % 5);
+                if (aPlayer != null && aLevel != null)
+                {
+                    if (StageMgr.IsBonusStage(i / 5))
+                    {
+                        anInfo.mCleared = aPlayer.mBonusClearedLevelSet.Contains(aLevel.mName);
+                        anInfo.mAced = aPlayer.mBonusAcedLevelSet.Contains(aLevel.mName);
+                    }
+                    else if (i < 0x37)
+                    {
+                        anInfo.mCleared = aPlayer.mPeggleClearedLevelSet.Contains(aLevel.mName);
+                        anInfo.mAced = aPlayer.mPeggleAcedLevelSet.Contains(aLevel.mName);
+                    }
+                    else
+                    {
+                        anInfo.mCleared = aPlayer.mNightsClearedLevelSet.Contains(aLevel.mName);
+                        anInfo.mAced = aPlayer.mNightsAcedLevelSet.Contains(aLevel.mName);
+                    }
+                }
+                mLevels.Add(anInfo);
+            }
+        }
+
+        public bool CanSelectLevel(int theStage, int theLevel)
+        {
+            if (theLevel < 0 || theLevel > 4)
+            {
+                return false;
+            }
+            if (mApp.mPlayerInfo == null)
+            {
+                return true;
+            }
+            return mApp.mPlayerInfo.IsLevelUnlocked(theStage, theLevel);
+        }
+
+        public int GetRandomLevelIndex()
+        {
+            // Port: the bonus levels aren't counted, so the index stays clear of their slots.
+            return mApp.mStageMgr.GetNumLevels() - mApp.mStageMgr.GetNumBonusLevels();
+        }
+
+        /// <summary>
+        /// Port addition: the scroll x of a page: 0 Peggle, 1 Nights, then the bonus pages, each a page
+        /// width further right (labels on the left, thumbnails at the page's right). The WoW page
+        /// follows the Extreme page the way Nights follows Peggle, a stage width on (IsSharedLeftPage).
+        /// </summary>
+        public int GetPageX(int thePage)
+        {
+            return GetPageX(thePage, ((Widget)mParent).mWidth);
+        }
+
+        /// <summary>Port addition: GetPageX for a page (scroll view) width, before the widget is placed.</summary>
+        public static int GetPageX(int thePage, int theViewWidth)
+        {
+            if (thePage == 0)
+            {
+                return 0;
+            }
+            int x = THUMB_STAGE_WIDTH;
+            for (int aPage = 2; aPage <= thePage; aPage++)
+            {
+                x += IsSharedLeftPage(aPage - 1) ? THUMB_STAGE_WIDTH : theViewWidth;
+            }
+            return x;
+        }
+
+        /// <summary>Port addition: the x of a bonus page's first thumbnail.</summary>
+        public int GetPageThumbX(int thePage)
+        {
+            int x = GetPageX(thePage);
+            return IsSharedLeftPage(thePage) ? x + LEVEL_SCREEN_STAGE_THUMB_INSET : x + ((Widget)mParent).mWidth - THUMB_STAGE_WIDTH;
+        }
+
+        /// <summary>
+        /// Port addition: true for the Extreme page when the WoW page follows it. The two share their
+        /// stage labels like Peggle and Nights: Extreme's thumbnails on the left, the labels between.
+        /// </summary>
+        public static bool IsSharedLeftPage(int thePage)
+        {
+            int anIndex = thePage - 2;
+            return anIndex >= 0 && anIndex + 1 < StageMgr.GetNumBonusPages()
+                && StageMgr.GetBonusPageAt(anIndex).mLogoCel == GameArrowButton.LOGO_EXTREME
+                && StageMgr.GetBonusPageAt(anIndex + 1).mLogoCel == GameArrowButton.LOGO_WOW;
+        }
+
+        /// <summary>Port addition: true for the WoW page when it shares labels with Extreme.</summary>
+        public static bool IsSharedRightPage(int thePage)
+        {
+            return IsSharedLeftPage(thePage - 1);
+        }
+
+        public bool CanSelectItem(int theIndex)
+        {
+            if (theIndex < 0)
+            {
+                return false;
+            }
+            if (theIndex == GetRandomLevelIndex())
+            {
+                return CanSelectLevel(0, 1) || CanSelectLevel(0xb, 1);
+            }
+            return CanSelectLevel(theIndex / 5, theIndex % 5);
+        }
+
+        private void DrawStageThumbs(Graphics g, int theStage, int theX, int theY)
+        {
+            int x = theX;
+            for (int i = 0; i < 5; i++)
+            {
+                LevelDisplayInfo anInfo = mLevels[theStage * 5 + i];
+                TRect aRect = new TRect(x, theY, LEVEL_SCREEN_STAGE_THUMB_W, LEVEL_SCREEN_STAGE_THUMB_H);
+                SexyUtil.DrawLevelThumbnail(g, theStage, i, aRect);
+                if (!anInfo.mLocked)
+                {
+                    int aRibbons = 1;
+                    if (anInfo.mCleared)
+                    {
+                        g.DrawImage(Res.IMAGE_TINYBLUERIBBON, LEVEL_SCREEN_STAGE_THUMB_W + x - Res.IMAGE_TINYBLUERIBBON.mWidth,
+                            LEVEL_SCREEN_STAGE_THUMB_H + theY - Res.IMAGE_TINYBLUERIBBON.mHeight);
+                        aRibbons++;
+                    }
+                    if (anInfo.mAced)
+                    {
+                        g.DrawImage(Res.IMAGE_TINYACEDRIBBON, LEVEL_SCREEN_STAGE_THUMB_W + x - Res.IMAGE_TINYACEDRIBBON.mWidth * aRibbons,
+                            LEVEL_SCREEN_STAGE_THUMB_H + theY - Res.IMAGE_TINYACEDRIBBON.mHeight);
+                    }
+                }
+                else
+                {
+                    g.SetColor(new Color(0, 0, 0, 0x96));
+                    g.FillRect(aRect);
+                    if (anInfo.mLockAlpha > 0)
+                    {
+                        g.SetColorizeImages(true);
+                        g.SetColor(SexyUtil.MakeColor(0xffffff, anInfo.mLockAlpha));
+                        g.DrawImage(Res.IMAGE_LS_LOCK_SMALL, LEVEL_SCREEN_STAGE_THUMB_W / 2 + x - Res.IMAGE_LS_LOCK_SMALL.mWidth / 2,
+                            LEVEL_SCREEN_STAGE_THUMB_H / 2 + theY - Res.IMAGE_LS_LOCK_SMALL.mHeight / 2);
+                        g.SetColorizeImages(false);
+                    }
+                }
+                x += LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W;
+            }
+        }
+
+        private void DrawThumbOutlines(Graphics g, int theX, int theY, int theColor)
+        {
+            g.SetColor(SexyUtil.MakeColor(theColor));
+            int x = theX;
+            for (int i = 0; i < 5; i++)
+            {
+                g.DrawRect(x, theY, LEVEL_SCREEN_STAGE_THUMB_W - 1, LEVEL_SCREEN_STAGE_THUMB_H - 1);
+                x += LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W;
+            }
+        }
+
+        /// <summary>Port addition: the Nights DLC page's stages are named after their packs, in two lines.</summary>
+        private static readonly string[][] NIGHTSDLC_STAGE_NAMES =
+        {
+            new[] { "Spring Fever:", "Day 1" },
+            new[] { "Spring Fever:", "Day 2" },
+            new[] { "Holiday", "2008" },
+            new[] { "Peggle Art", "Contest" },
+        };
+
+        private void DrawStageLabel(Graphics g, Font theLabelFont, int theLabelX, int theLabelWidth, int theRowY, int theStage, BonusPage theBonusPage = null)
+        {
+            string aTop = SexyAppBase.Loc("Stage");
+            string aBottom = (theStage + 1).ToString();
+            if (theBonusPage != null && theBonusPage.mLogoCel == GameArrowButton.LOGO_NIGHTSDLC && theStage < NIGHTSDLC_STAGE_NAMES.Length)
+            {
+                aTop = SexyAppBase.Loc(NIGHTSDLC_STAGE_NAMES[theStage][0]);
+                aBottom = SexyAppBase.Loc(NIGHTSDLC_STAGE_NAMES[theStage][1]);
+                theLabelWidth = theLabelFont.StringWidth(aTop);
+            }
+            g.SetColor(Color.White);
+            g.SetFont(theLabelFont);
+#if PEGGLE_IPHONE
+            int y = theRowY + ROW_HEIGHT / 2;
+#else
+            int y = theRowY + ROW_HEIGHT / 2 + LEVEL_SCREEN_STAGE_TEXT_OFFSET_Y;
+#endif
+            g.DrawString(aTop, theLabelX - theLabelWidth / 2, y);
+            g.SetFont(Res.FONT_OVERLOAD16OUTLINE);
+            y += g.GetFont().GetMaxCharHeight();
+            g.DrawString(aBottom, theLabelX - g.GetFont().StringWidth(aBottom) / 2, y);
+        }
+
+        public override void Draw(Graphics g)
+        {
+            mApp.LoadQuickplayResources();
+            Font aLabelFont = Res.FONT_OVERLOAD12OUTLINE;
+            Widget aParent = (Widget)mParent;
+            TRect aVisible = new TRect(aParent.mX, -mY, aParent.mWidth, aParent.mHeight);
+            int aLabelWidth = aLabelFont.StringWidth(SexyAppBase.Loc("Stage"));
+            int aLabelX = (aParent.mWidth - THUMB_STAGE_WIDTH) / 2 + THUMB_STAGE_WIDTH;
+            int aRowStep = LEVEL_SCREEN_STAGE_ROW_GAP + ROW_HEIGHT;
+            int aBonusPages = mApp.mStageMgr.GetNumBonusStages() > 0 ? StageMgr.GetNumBonusPages() : 0;
+
+            TRect aRandomRect = new TRect(0, 0, mWidth, ROW_HEIGHT);
+            if (aRandomRect.Intersects(aVisible))
+            {
+                g.SetColorizeImages(true);
+                g.SetColor(SexyUtil.MakeColor(0xd033c3, 0x7f));
+                SexyUtil.MyDrawImageBox(g, aRandomRect, Res.IMAGE_DLG_GROUPRECT);
+                g.SetColor(mSelected == GetRandomLevelIndex() ? new Color(0xff, 0xff, 0) : Color.White);
+                g.SetFont(Res.FONT_OVERLOAD16OUTLINE);
+                string aText = SexyAppBase.Loc("RANDOM LEVEL");
+                if (aStringWidth < 0)
+                {
+                    aStringWidth = g.GetFont().StringWidth(aText);
+                }
+                int aTextY = aRandomRect.mY + aRandomRect.mHeight / 2 + g.GetFont().GetCenteredHeight();
+                g.DrawString(aText, aParent.mWidth / 2 - aStringWidth / 2, aTextY);
+                g.DrawString(aText, THUMB_STAGE_WIDTH + aParent.mWidth / 2 - aStringWidth / 2, aTextY);
+                for (int aPage = 2; aPage < aBonusPages + 2; aPage++)
+                {
+                    g.DrawString(aText, GetPageX(aPage) + aParent.mWidth / 2 - aStringWidth / 2, aTextY);
+                }
+                g.SetColorizeImages(false);
+                PlayerInfo aPlayer = mApp.mPlayerInfo;
+                if (aPlayer != null && !aPlayer.IsLevelUnlocked(0, 1) && !aPlayer.IsLevelUnlocked(0xb, 1))
+                {
+                    g.SetColor(new Color(0, 0, 0, 0x96));
+                    g.FillRect(aRandomRect);
+                }
+            }
+
+            for (int aStage = 0; aStage < 0xb; aStage++)
+            {
+                TRect aRowRect = new TRect(0, (aStage + 1) * aRowStep, mWidth, ROW_HEIGHT);
+                if (!aRowRect.Intersects(aVisible))
+                {
+                    continue;
+                }
+                g.SetColorizeImages(true);
+                g.SetColor(SexyUtil.MakeColor(SexyUtil.GetColorForStage(aStage, ThunderballApp.mGameLevelPack, true), 0x7f));
+                // Port: the box spans the Peggle and Nights pages only, not the bonus ones.
+                SexyUtil.MyDrawImageBox(g, new TRect(0, aRowRect.mY, THUMB_STAGE_WIDTH + aParent.mWidth, ROW_HEIGHT), Res.IMAGE_DLG_GROUPRECT);
+                g.SetColorizeImages(false);
+                int aThumbY = aRowRect.mY + 1;
+                DrawStageThumbs(g, aStage, LEVEL_SCREEN_STAGE_THUMB_INSET, aThumbY);
+                DrawThumbOutlines(g, LEVEL_SCREEN_STAGE_THUMB_INSET, aThumbY, 0xeac76a);
+                DrawStageLabel(g, aLabelFont, aLabelX, aLabelWidth, aRowRect.mY, aStage);
+            }
+
+            for (int aRow = 0; aRow < 0xc; aRow++)
+            {
+                int aStage = aRow + 0xb;
+                TRect aRowRect = new TRect(aParent.mWidth, (aRow + 1) * aRowStep, mWidth, ROW_HEIGHT);
+                if (!aRowRect.Intersects(aVisible))
+                {
+                    continue;
+                }
+                g.SetColorizeImages(true);
+                g.SetColor(SexyUtil.MakeColor(SexyUtil.GetColorForStage(aRow, ThunderballApp.mGameLevelPack, true), 0x7f));
+                if (aRow > 10)
+                {
+                    // Nights has a twelfth stage with no Peggle row to share its box.
+                    SexyUtil.MyDrawImageBox(g, new TRect(THUMB_STAGE_WIDTH, aRowRect.mY, aParent.mWidth, ROW_HEIGHT), Res.IMAGE_DLG_GROUPRECT);
+                }
+                g.SetColorizeImages(false);
+                // Port: was mWidth - THUMB_STAGE_WIDTH, which is a bonus page now that mWidth includes them.
+                int aThumbX = aParent.mWidth;
+                int aThumbY = aRowRect.mY + 1;
+                DrawStageThumbs(g, aStage, aThumbX, aThumbY);
+                DrawThumbOutlines(g, aThumbX, aThumbY, 0xff55e9);
+                if (aRow > 10)
+                {
+                    DrawStageLabel(g, aLabelFont, aLabelX, aLabelWidth, aRowRect.mY, aRow);
+                }
+            }
+
+            // Port addition: the bonus pages, each laid out like the Nights page, a page further right.
+            for (int aPage = 2; aPage < aBonusPages + 2; aPage++)
+            {
+                BonusPage aBonus = StageMgr.GetBonusPageAt(aPage - 2);
+                // Extreme and WoW share their labels: a row both have gets one box across the two
+                // pages (drawn with Extreme's row) and one label (drawn with WoW's), as Peggle/Nights do.
+                bool isLeft = IsSharedLeftPage(aPage);
+                bool isRight = IsSharedRightPage(aPage);
+                BonusPage aPartner = isLeft ? StageMgr.GetBonusPageAt(aPage - 1) : isRight ? StageMgr.GetBonusPageAt(aPage - 3) : null;
+                int aPageLabelX = GetPageX(aPage) + aLabelX - (isLeft ? 0 : THUMB_STAGE_WIDTH);
+                for (int aRow = 0; aRow < aBonus.mNumStages; aRow++)
+                {
+                    int aStage = aRow + aBonus.mFirstStage;
+                    bool isShared = aPartner != null && aRow < aPartner.mNumStages;
+                    TRect aRowRect = new TRect(GetPageX(aPage), (aRow + 1) * aRowStep, aParent.mWidth, ROW_HEIGHT);
+                    // aVisible's x isn't the scroll position, so only test the rows vertically, as the others do.
+                    if (!new TRect(0, aRowRect.mY, mWidth, ROW_HEIGHT).Intersects(aVisible))
+                    {
+                        continue;
+                    }
+                    if (!(isRight && isShared))
+                    {
+                        TRect aBoxRect = aRowRect;
+                        if (isLeft && isShared)
+                        {
+                            aBoxRect.mWidth += THUMB_STAGE_WIDTH;
+                        }
+                        g.SetColorizeImages(true);
+                        g.SetColor(SexyUtil.MakeColor(SexyUtil.GetColorForStage(aRow, ThunderballApp.mGameLevelPack, true), 0x7f));
+                        SexyUtil.MyDrawImageBox(g, aBoxRect, Res.IMAGE_DLG_GROUPRECT);
+                        g.SetColorizeImages(false);
+                    }
+                    int aThumbX = GetPageThumbX(aPage);
+                    int aThumbY = aRowRect.mY + 1;
+                    DrawStageThumbs(g, aStage, aThumbX, aThumbY);
+                    DrawThumbOutlines(g, aThumbX, aThumbY, aBonus.mOutlineColor);
+                    if (!(isLeft && isShared))
+                    {
+                        DrawStageLabel(g, aLabelFont, aPageLabelX, aLabelWidth, aRowRect.mY, aRow, aBonus);
+                    }
+                }
+            }
+        }
+
+        public string GetSelectedLevelName()
+        {
+            if (mSelected < 0)
+            {
+                return "";
+            }
+            if (mSelected == GetRandomLevelIndex())
+            {
+                return SexyAppBase.Loc("Random Level");
+            }
+            return mLevels[mSelected].mName;
+        }
+
+        /// <summary>The selected level's thumbnail with its ribbons, rendered once per selection.</summary>
+        public Image GetSelectedThumbnail()
+        {
+            if (mSelectedThumbnail != null && !mThumbnailDirty)
+            {
+                return mSelectedThumbnail;
+            }
+            TRect aCelRect = Res.IMAGE_LS_THUMBNAILS_PEGGLE.GetCelRect(0);
+            int w = aCelRect.mWidth;
+            int h = aCelRect.mHeight;
+            if (mSelectedThumbnail == null)
+            {
+                mSelectedThumbnail = new MemoryImage();
+                mSelectedThumbnail.Create(w, h);
+            }
+            else
+            {
+                mSelectedThumbnail.Clear();
+            }
+            bool inFrame = Graphics.IsSpriteBatchBegun();
+            Graphics g = Graphics.GetNew(mSelectedThumbnail);
+            SexyUtil.DrawLevelThumbnail(g, mSelected / 5, mSelected % 5, new TRect(0, 0, w, h));
+            int aRibbons = 1;
+            LevelDisplayInfo anInfo = mLevels[mSelected];
+            if (anInfo.mCleared)
+            {
+                Image anImage = Res.IMAGE_TINYBLUERIBBON;
+                g.DrawImage(anImage, w - anImage.mWidth, h - anImage.mHeight, anImage.mWidth, anImage.mHeight);
+                aRibbons++;
+            }
+            if (anInfo.mAced)
+            {
+                Image anImage = Res.IMAGE_TINYACEDRIBBON;
+                g.DrawImage(anImage, w - anImage.mWidth * aRibbons, h - anImage.mHeight, anImage.mWidth, anImage.mHeight);
+            }
+            g.SetColor(SexyUtil.MakeColor(0x808080));
+            g.DrawRect(0, 0, w - 1, h - 1);
+            g.EndOffscreen(inFrame);
+            mThumbnailDirty = false;
+            return mSelectedThumbnail;
+        }
+
+        public TRect GetSelectedRect()
+        {
+            int aRow = mSelected / 5 + 1;
+            int aCol = mSelected % 5;
+            int x = LEVEL_SCREEN_STAGE_THUMB_INSET + aCol * (LEVEL_SCREEN_STAGE_THUMB_W + LEVEL_SCREEN_STAGE_THUMB_GAP);
+            if (StageMgr.IsBonusStage(mSelected / 5))
+            {
+                // Port addition: a bonus page puts its thumbnails where the Nights page does.
+                // The Extreme page, when it shares labels with WoW, puts them where the Peggle page does.
+                aRow = mSelected / 5 - StageMgr.GetBonusPage(mSelected / 5).mFirstStage + 1;
+                if (!IsSharedLeftPage(StageMgr.GetBonusPageIndex(mSelected / 5) + 2))
+                {
+                    x = aCol * (LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W) + (((Widget)mParent).mWidth - THUMB_STAGE_WIDTH);
+                }
+            }
+            else if (aRow > 0xb)
+            {
+                aRow = mSelected / 5 - 10;
+                x = aCol * (LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W) + (((Widget)mParent).mWidth - THUMB_STAGE_WIDTH);
+            }
+            return new TRect(x, aRow * (LEVEL_SCREEN_STAGE_ROW_GAP + ROW_HEIGHT) + 1, LEVEL_SCREEN_STAGE_THUMB_W, LEVEL_SCREEN_STAGE_THUMB_H);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            foreach (LevelDisplayInfo anInfo in mLevels)
+            {
+                if (anInfo.mLocked && anInfo.mLockAlpha > 0)
+                {
+                    anInfo.mLockAlpha -= 8;
+                }
+            }
+            MarkDirty();
+        }
+
+        public override void MouseUp(int x, int y, int theClickCount)
+        {
+            if (x <= LEVEL_SCREEN_STAGE_THUMB_INSET)
+            {
+                return;
+            }
+            int aRow = y / (LEVEL_SCREEN_STAGE_ROW_GAP + ROW_HEIGHT);
+            int aCol = (x - LEVEL_SCREEN_STAGE_THUMB_INSET) / (LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W);
+            bool isRandom = aRow == 0;
+            Widget aParent = (Widget)mParent;
+            int aPage = 0;
+            BonusPage aBonus = null;
+            if (GetPageX(2) < x)
+            {
+                // Port addition: a bonus page.
+                // The pages aren't evenly spaced (GetPageX), so find the one whose thumbnails x is on.
+                aPage = -1;
+                for (int p = 2; p < StageMgr.GetNumBonusPages() + 2; p++)
+                {
+                    int aPageThumbX = GetPageThumbX(p);
+                    int aMinX = IsSharedLeftPage(p) ? aPageThumbX : aPageThumbX + LEVEL_SCREEN_STAGE_THUMB_GAP * 2;
+                    if (aMinX < x && x < aPageThumbX + THUMB_STAGE_WIDTH - LEVEL_SCREEN_STAGE_THUMB_INSET)
+                    {
+                        aPage = p;
+                        break;
+                    }
+                }
+                if (aPage < 0)
+                {
+                    return;
+                }
+                aBonus = StageMgr.GetBonusPageAt(aPage - 2);
+                int aThumbX = GetPageThumbX(aPage);
+                if (!isRandom && aRow > aBonus.mNumStages)
+                {
+                    return;
+                }
+                aRow += aBonus.mFirstStage;
+                aCol = (x - aThumbX) / (LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W);
+            }
+            else if (THUMB_STAGE_WIDTH < x)
+            {
+                // Port: mWidth now includes the bonus pages, so the Nights bounds use the page width.
+                if (x <= LEVEL_SCREEN_STAGE_THUMB_GAP * 2 + aParent.mWidth)
+                {
+                    return;
+                }
+                if (THUMB_STAGE_WIDTH + aParent.mWidth - LEVEL_SCREEN_STAGE_THUMB_INSET <= x)
+                {
+                    return;
+                }
+                aRow += 0xb;
+                aCol = (x - aParent.mWidth) / (LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W);
+            }
+            else if (aRow > 0xb)
+            {
+                return;
+            }
+            int anIndex = isRandom ? GetRandomLevelIndex() : (aRow - 1) * 5 + aCol;
+            if (!CanSelectItem(anIndex))
+            {
+                // The original writes past the end of the list when the random row is locked.
+                if (anIndex >= 0 && anIndex < mLevels.Count)
+                {
+                    mLevels[anIndex].mLockAlpha = 0xff;
+                }
+                return;
+            }
+            if (mSelected != anIndex)
+            {
+                mThumbnailDirty = true;
+                mSelected = anIndex;
+                int aScrollX = 0;
+                int aScrollRow = aRow;
+                if (aBonus != null)
+                {
+                    aScrollRow = aRow - aBonus.mFirstStage;
+                    aScrollX = GetPageX(aPage);
+                }
+                else if (aRow > 0xb)
+                {
+                    aScrollRow = aRow - 0xb;
+                    aScrollX = THUMB_STAGE_WIDTH;
+                }
+                ((ScrollWidget)mParent).ScrollRectIntoView(new TRect(aScrollX, aScrollRow * (LEVEL_SCREEN_STAGE_ROW_GAP + ROW_HEIGHT),
+                    aParent.mWidth, ROW_HEIGHT), true);
+            }
+            mListener.SelectionChanged();
+        }
+    }
+}

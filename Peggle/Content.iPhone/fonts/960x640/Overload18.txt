@@ -1,0 +1,44 @@
+﻿Define CharMapFrom ( ' ' );
+Define CharMapTo ( ' ' );
+SetCharMap CharMapFrom CharMapTo;
+
+Define CharList0
+ ( ' ', ',', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' );
+
+Define WidthList0
+ (  12,   9,  10,  25,  15,  25,  27,  22,  25,  23,  27,  26,  23 );
+
+Define RectList0
+ ( (  0, 0,  0,  0), (  1, 1, 14, 21), ( 16, 1, 14, 16), (138, 1, 29, 42)
+   ( 31, 1, 20, 42), (168, 1, 30, 42), (230, 1, 31, 42), ( 52, 1, 27, 42)
+   (199, 1, 30, 42), ( 80, 1, 28, 42), (262, 1, 31, 42), (294, 1, 31, 42)
+   (109, 1, 28, 42) );
+
+Define OffsetList0
+ ( (0, 0), (-2, 36), (-2, 36), (-2, 10), (-2, 10), (-2, 10), (-1, 10), (-2, 10)
+   (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10) );
+
+Define ExInfoKeys0
+ ( "sfb.bold", "sfb.boxsize", "sfb.face", "sfb.italics", "sfb.linespacing"
+   "sfb.quality", "sfb.script", "sfb.size", "sfb.text", "sfb.underline" );
+
+Define ExInfoValues0
+ ( "0", "0", "Overload", "0", "0"
+   "0", "0", "36", ",.0123456789", "0" );
+
+CreateLayer               Main;
+LayerSetImage             Main 'Overload18';
+LayerSetBaseOrder         Main 0;
+LayerSetAscent            Main 49;
+LayerSetHeight            Main 60;
+LayerSetCharWidths        Main CharList0 WidthList0;
+LayerSetCharWidths        Main (' ') (12);
+LayerSetCharWidths        Main (',') (20);
+LayerSetCharWidths        Main ('.') (12);
+LayerSetImageMap          Main CharList0 RectList0;
+LayerSetCharOffsets       Main CharList0 OffsetList0;
+LayerSetPointSize         Main 36;
+LayerSetExInfo            Main ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Main 1;
+
+SetDefaultPointSize       36;

@@ -1,0 +1,766 @@
+<resources-manifest>
+    <resources id="MainMenuPeggle">
+        <atlas id="IMAGE_MM_MAINMENU" path="images/960x640/MainMenu.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_MM_BJORN" x="0" y="0" width="1136" height="512"/>
+        </atlas>
+        <image id="IMAGE_MM_BACKGROUND" format="r5g6b5" path="images/960x640/mainmenu/background.tex"/>
+    </resources>
+    <resources id="LoadCommon">
+        <image id="IMAGE_LOAD_POPCAP" format="a8r8g8b8" path="images/960x640/loading/mainmenu_popcap.tex"/>
+        <image id="IMAGE_LOAD_TM" format="a8r8g8b8" path="images/960x640/loading/tm.tex"/>
+        <image id="IMAGE_LOAD_OVERLAY" format="a8r8g8b8" path="images/960x640/loading/LoaderOverlay.tex"/>
+        <image id="IMAGE_LOAD_LIGHTS" cols="5" format="a8r8g8b8" path="images/960x640/loading/loaderlights.tex"/>
+        <image id="IMAGE_LOAD_PLAYNOW" format="a8r8g8b8" path="images/960x640/loading/playnow.tex"/>
+        <font id="FONT_OVERLOAD16" path="fonts/960x640/Overload16.dat" alias="FONT_START1"/>
+        <font id="FONT_OVERLOAD16OUTLINE" path="fonts/960x640/Overload16.dat" tags="Outline"/>
+        <font id="FONT_OVERLOAD16OUTLINE2" path="fonts/960x640/Overload16.dat" tags="Outline2" alias="FONT_END1"/>
+    </resources>
+    <resources id="Load">
+        <image id="IMAGE_LOAD_BACK" format="a8r8g8b8" path="images/960x640/loading/loaderback.tex"/>
+        <image id="IMAGE_LOAD_HILL" format="a8r8g8b8" path="images/960x640/loading/loaderhill.tex"/>
+        <image id="IMAGE_LOAD_LOGO" format="a8r8g8b8" path="images/960x640/loading/peggleloader.tex"/>
+        <image id="IMAGE_LOAD_SHADOW" format="a8r8g8b8" path="images/960x640/loading/shadow.tex"/>
+        <image id="IMAGE_LOAD_SUNHEAD" format="a8r8g8b8" path="images/960x640/loading/sunhead.tex"/>
+        <image id="IMAGE_LOAD_BALL" format="a8r8g8b8" path="images/960x640/loading/logoball.tex"/>
+    </resources>
+    <resources id="Sunglow">
+        <image id="IMAGE_LOAD_SUNGLOW_LOAD" format="a8r8g8b8" path="images/960x640/loading/sunglow_load.tex"/>
+    </resources>
+    <resources id="LoadNights">
+        <image id="IMAGE_LOAD_NIGHTS_BACK" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_back.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_HILL" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_mid.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_LOGO" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_logo.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_LOGO_OVERLAY" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_logo_overlay.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_MOON" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_moon.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_BALL" format="a4r4g4b4" path="images/960x640/loadingNights/logoball.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_LOADINGBAR" format="a8r8g8b8" path="images/960x640/loadingNights/loadingbar.tex"/>
+    </resources>
+    <resources id="NightsForeground">
+        <image id="IMAGE_LOAD_NIGHTS_FRONT" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_front.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_FRONT_TOP" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_front_top.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_FRONT_WIDE" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_front_wide.tex"/>
+        <image id="IMAGE_LOAD_NIGHTS_FRONT_TOP_WIDE" format="a8r8g8b8" path="images/960x640/loadingNights/bgd_front_top_wide.tex"/>
+    </resources>
+    <resources id="LoadingThread">
+        <font id="FONT_PLAIN" path="fonts/960x640/NeoSansMedium12.dat" alias="FONT_START2"/>
+        <font id="FONT_SMALL" path="fonts/960x640/Tahoma8.dat"/>
+        <font id="FONT_SCORE_DISP" path="fonts/960x640/Overload18.dat"/>
+        <font id="FONT_SMALL_DISP" path="fonts/960x640/Overload11.dat"/>
+        <font id="FONT_CAPTION" path="fonts/960x640/Caption11.dat"/>
+        <font id="FONT_BUTTON" path="fonts/960x640/Button12.dat"/>
+        <font id="FONT_STAGE" path="fonts/960x640/NeoSansMedium14.dat"/>
+        <font id="FONT_BONK" path="fonts/960x640/Bonk60.dat"/>
+        <font id="FONT_OVERLOAD10" path="fonts/960x640/Overload10.dat"/>
+        <font id="FONT_OVERLOAD12" path="fonts/960x640/Overload12.dat"/>
+        <font id="FONT_OVERLOAD24" path="fonts/960x640/Overload24.dat"/>
+        <font id="FONT_OVERLOADMONO12" path="fonts/960x640/OverloadMono12.dat"/>
+        <font id="FONT_OVERLOAD10OUTLINE" path="fonts/960x640/Overload10.dat" tags="Outline"/>
+        <font id="FONT_OVERLOAD12OUTLINE" path="fonts/960x640/Overload12.dat" tags="Outline"/>
+        <font id="FONT_OVERLOAD24OUTLINE" path="fonts/960x640/Overload24.dat" tags="outline"/>
+        <font id="FONT_OVERLOAD24GRAD1" path="fonts/960x640/Overload24.dat" tags="font1"/>
+        <font id="FONT_OVERLOAD24GRAD2" path="fonts/960x640/Overload24.dat" tags="font2"/>
+        <font id="FONT_OVERLOAD24GRAD_PURPLE" path="fonts/960x640/Overload24.dat" tags="font3"/>
+        <font id="FONT_OVERLOAD24GRAD_ORANGE" path="fonts/960x640/Overload24.dat" tags="font4"/>
+        <font id="FONT_OVERLOAD24GRAD_BLUE" path="fonts/960x640/Overload24.dat" tags="font5"/>
+        <font id="FONT_PLAINOUTLINE" path="fonts/960x640/NeoSansMedium12.dat" tags="Outline"/>
+        <font id="FONT_PLAIN2" path="fonts/960x640/ItalianOldStyleMT13.dat"/>
+        <font id="FONT_PLAIN2OUTLINE" path="fonts/960x640/ItalianOldStyleMT13.dat" tags="Shadow" alias="FONT_END2"/>
+        <sound id="SOUND_PEGHIT_LOW" path="sounds/peghit_low.caf" alias="SOUND_START"/>
+        <sound id="SOUND_PEGHIT" path="sounds/peghit.caf"/>
+        <sound id="SOUND_PEGSPARK" path="sounds/pegspark.caf"/>
+        <sound id="SOUND_PEGHIT2" path="sounds/peghit_plus4b.caf"/>
+        <sound id="SOUND_PEGHIT3" path="sounds/peghit_plus_mega9.caf"/>
+        <sound id="SOUND_PEGHIT_HIGH" path="sounds/peghit_high.caf"/>
+        <sound id="SOUND_EXTRABALL" path="sounds/extraball.caf"/>
+        <sound id="SOUND_EXTRABALL2" path="sounds/extraball2.caf"/>
+        <sound id="SOUND_EXTRABALL3" path="sounds/extraball3.caf"/>
+        <sound id="SOUND_MISS" path="sounds/miss.caf"/>
+        <sound id="SOUND_COINSPIN" path="sounds/coin_spin.caf"/>
+        <sound id="SOUND_COINSPIN_NO" path="sounds/coin_freeball_denied.caf"/>
+        <sound id="SOUND_FREEBALL" path="sounds/freeball2.caf" volume="0.6"/>
+        <sound id="SOUND_PENALTY" path="sounds/penalty.caf"/>
+        <sound id="SOUND_LEVELWON" path="sounds/MnE_Dia_pos.caf"/>
+        <sound id="SOUND_LEVELDONE" path="sounds/MnE_Dia_n.caf"/>
+        <sound id="SOUND_LEVELLOST" path="sounds/MnE_Dia_neg.caf"/>
+        <sound id="SOUND_POWERUP" path="sounds/powerup.caf"/>
+        <sound id="SOUND_AAH" path="sounds/aah.caf"/>
+        <sound id="SOUND_MULTIBALL" path="sounds/multiball.caf"/>
+        <sound id="SOUND_PEGPOP" path="sounds/pegpop.caf"/>
+        <sound id="SOUND_EXPLODE" path="sounds/explode.caf"/>
+        <sound id="SOUND_BUTTON1" path="sounds/button.caf"/>
+        <sound id="SOUND_BUTTON2" path="sounds/button2.caf"/>
+        <sound id="SOUND_DING" path="sounds/dinghi.caf"/>
+        <sound id="SOUND_POINTBOOST" path="sounds/aah.caf"/>
+        <sound id="SOUND_TING" path="sounds/ting.caf"/>
+        <sound id="SOUND_AWARD" path="sounds/AwardFanfareV2.caf"/>
+        <sound id="SOUND_APPLAUSE" path="sounds/applause.caf"/>
+        <sound id="SOUND_SKILLSHOT" path="sounds/gapbonus1.caf"/>
+        <sound id="SOUND_SPOOKYBALL2" path="sounds/powerup_spooky2.caf"/>
+        <sound id="SOUND_SPOOKYBALL3" path="sounds/powerup_spooky3.caf"/>
+        <sound id="SOUND_SPOOKYBALL4" path="sounds/powerup_spooky4.caf"/>
+        <sound id="SOUND_BUBBLES" path="sounds/bubbles.caf"/>
+        <sound id="SOUND_FLIP" path="sounds/flip.caf"/>
+        <sound id="SOUND_BUCKETHIT" path="sounds/buckethit.caf"/>
+        <sound id="SOUND_CANNONCOCK" path="sounds/guncock.caf" volume="0.6"/>
+        <sound id="SOUND_CANNONSHOT" path="sounds/cannonshot.caf" volume="0.6"/>
+        <sound id="SOUND_SCORECOUNTER" path="sounds/scorecounter.caf"/>
+        <sound id="SOUND_FLIPPERUP" path="sounds/flipperup.caf" volume="0.25"/>
+        <sound id="SOUND_FLIPPERDOWN" path="sounds/flipperdown.caf" volume="0.25"/>
+        <sound id="SOUND_FLIPPERBOUNCE" path="sounds/flipperbounce.caf" volume="0.5"/>
+        <sound id="SOUND_RAINBOW" path="sounds/rainbow.caf"/>
+        <sound id="SOUND_FIREWORKS1" path="sounds/fireworks1.caf"/>
+        <sound id="SOUND_FIREWORKS2" path="sounds/fireworks2.caf"/>
+        <sound id="SOUND_RICHOCHET" path="sounds/xbump_mod2.caf"/>
+        <sound id="SOUND_CYMBAL" path="sounds/cymbal.caf"/>
+        <sound id="SOUND_SIGH" path="sounds/sigh.caf"/>
+        <sound id="SOUND_WOOSH" path="sounds/extremefever2.caf" volume="0.3"/>
+        <sound id="SOUND_TEXT_WOOSH" path="sounds/missile.caf" volume="1.0"/>
+        <sound id="SOUND_WHISTLE" path="sounds/ultra2.caf" volume="0.3"/>
+        <sound id="SOUND_FEVERHIT" path="sounds/feverhit.caf" volume="1.0"/>
+        <sound id="SOUND_FIREBALLLOOP" path="sounds/FireBallLoopV4.caf" volume="0.1"/>
+        <sound id="SOUND_FIREBALLSHOT" path="sounds/fireballshoot.caf"/>
+        <sound id="SOUND_FIREBALLBOUNCE" path="sounds/fireballbounce.caf"/>
+        <sound id="SOUND_LIGHTNING_LOOP" path="sounds/lightning_shockwave.caf"/>
+        <sound id="SOUND_LIGHTNING_START" path="sounds/lightning_shockstart.caf"/>
+        <sound id="SOUND_POWERUP_00_GUIDE" path="sounds/powerup_guide.caf"/>
+        <sound id="SOUND_POWERUP_01_MULTIBALL" path="sounds/powerup_multiball.caf" volume="0.5"/>
+        <sound id="SOUND_POWERUP_02_PYRAMID" path="sounds/powerup_pyramid.caf"/>
+        <sound id="SOUND_POWERUP_03_SPACEBLAST" path="sounds/powerup_spaceblast.caf"/>
+        <sound id="SOUND_POWERUP_04_FLIPPERS" path="sounds/powerup_flippers_4.caf"/>
+        <sound id="SOUND_POWERUP_05_SPOOKYBALL" path="sounds/powerup_spooky1.caf"/>
+        <sound id="SOUND_POWERUP_06_FLOWERPOWER" path="sounds/powerup_flowerpower2.caf"/>
+        <sound id="SOUND_POWERUP_07_LUCKYSPIN" path="sounds/powerup_luckyspin.caf"/>
+        <sound id="SOUND_POWERUP_08_FIREBALL" path="sounds/powerup_fireball3.caf"/>
+        <sound id="SOUND_POWERUP_09_ZEN" path="sounds/powerup_zen3.caf"/>
+        <sound id="SOUND_POWERUP_10_LIGHTNING" path="sounds/powerup_lightning.caf"/>
+        <sound id="SOUND_GONG" path="sounds/gong.caf"/>
+        <sound id="SOUND_SLOWMO" path="sounds/timpaniroll.caf" alias="SOUND_END"/>
+        <sound id="SOUND_TYPING" path="sounds/typing2.caf"/>
+        <sound id="SOUND_STAMP" path="sounds/approval.caf"/>
+        <sound id="SOUND_ADD_BALL" path="sounds/ball_add.caf"/>
+        <sound id="SOUND_DIALOG_MOVE" path="sounds/flip2.caf"/>
+        <sound id="SOUND_FIREWORKPOP" path="sounds/FireworkPop.caf"/>
+        <sound id="SOUND_POWERUP_LIGHTNING_HIT" path="sounds/PowerupLightningHit.caf"/>
+        <sound id="SOUND_STAGE_DREAMY_IN" path="sounds/StageDreamyIn.caf"/>
+        <sound id="SOUND_STAGE_DREAMY_OUT" path="sounds/StageDreamyOut.caf"/>
+        <sound id="SOUND_TROPHY_WIN_INTRO" path="sounds/CreditsSpotlightOn.caf"/>
+        <sound id="SOUND_SPEECH_BUBBLE_POPUP" path="sounds/SpeechBubblePopup.caf"/>
+        <sound id="SOUND_DRUMROLL" path="sounds/timpani_long.caf"/>
+        <sound id="SOUND_TROPHY_PHOTO_IN" path="sounds/TrophyPhotoIn.caf"/>
+    </resources>
+    <resources id="Interface">
+        <atlas id="IMAGE_INTERFACE" path="images/960x640/Interface.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_PYRAMIDRAY" x="1" y="1" width="109" height="536"/>
+            <atlas-entry id="IMAGE_FLAMETRAIL" x="112" y="1" width="682" height="84" cols="1"/>
+            <atlas-entry id="IMAGE_FEVERRAY" x="796" y="1" width="96" height="424"/>
+            <atlas-entry id="IMAGE_INT_WHEEL_OVERLAY" x="894" y="1" width="74" height="480"/>
+            <atlas-entry id="IMAGE_SCREENFRAMELEFT" x="112" y="87" width="54" height="640"/>
+            <atlas-entry id="IMAGE_SCREENFRAMERIGHT" x="168" y="87" width="54" height="640"/>
+            <atlas-entry id="IMAGE_INT_BALLGLASS" x="224" y="87" width="74" height="442"/>
+            <atlas-entry id="IMAGE_INT_FBGLOW" x="300" y="87" width="150" height="216"/>
+            <atlas-entry id="IMAGE_STORY_TROPHYREVEAL" x="452" y="87" width="182" height="178"/>
+            <atlas-entry id="IMAGE_SCREENFRAMEBOTTOM" x="224" y="531" width="748" height="36"/>
+            <atlas-entry id="IMAGE_SCREENFRAMETOP" x="224" y="569" width="748" height="36"/>
+            <atlas-entry id="IMAGE_IP_SHOOTERORB" x="452" y="267" width="188" height="136"/>
+            <atlas-entry id="IMAGE_STORY_BIGSPARKLE" x="300" y="427" width="588" height="42" cols="14"/>
+            <atlas-entry id="IMAGE_IP_REPLAYFRAME" x="642" y="87" width="88" height="260"/>
+            <atlas-entry id="IMAGE_INT_FEVERGLOW" x="224" y="607" width="124" height="164"/>
+            <atlas-entry id="IMAGE_FEVERRAINBOW" x="1" y="539" width="100" height="200" properties="minsubdivide"/>
+            <atlas-entry id="IMAGE_IP_INSTANTREPLAY" x="350" y="607" width="100" height="196" rows="2" alphagrid="roundbutton_"/>
+            <atlas-entry id="IMAGE_IP_MENU" x="452" y="607" width="96" height="188" rows="2" alphagrid="roundbutton_"/>
+            <atlas-entry id="IMAGE_CATCHERGLOW" x="550" y="607" width="172" height="96"/>
+            <atlas-entry id="IMAGE_SPIN_RANDOMON" x="724" y="607" width="158" height="96"/>
+            <atlas-entry id="IMAGE_INT_FBLIGHTUP" x="884" y="607" width="70" height="210" rows="3"/>
+            <atlas-entry id="IMAGE_IP_SHOOTER" x="550" y="705" width="68" height="204" rows="3"/>
+            <atlas-entry id="IMAGE_IP_PLAYBUTTON" x="620" y="705" width="80" height="164" rows="2"/>
+            <atlas-entry id="IMAGE_IP_STOPBUTTON" x="702" y="705" width="80" height="160" rows="2"/>
+            <atlas-entry id="IMAGE_IP_SAVEBUTTON" x="784" y="705" width="80" height="152" rows="2"/>
+            <atlas-entry id="IMAGE_INT_FIRE_BUTTON_FIRE_TEXT" x="103" y="729" width="98" height="124"/>
+            <atlas-entry id="IMAGE_INT_FIRE_BUTTON" x="1" y="741" width="98" height="124"/>
+            <atlas-entry id="IMAGE_INT_FIRE_BUTTON_GLOW" x="203" y="773" width="98" height="124"/>
+            <atlas-entry id="IMAGE_INT_FIRE_BUTTON_FLIP_TEXT" x="303" y="805" width="98" height="124"/>
+            <atlas-entry id="IMAGE_INT_SCOREHILIGHT" x="300" y="471" width="219" height="52"/>
+            <atlas-entry id="IMAGE_INT_FREEBALLMETER" x="970" y="1" width="30" height="372" cols="3" alphagrid="rightprogressbaralpha"/>
+            <atlas-entry id="IMAGE_STORY_ROCKETFIRE" x="300" y="305" width="90" height="108" rows="6" cols="5"/>
+            <atlas-entry id="IMAGE_FFWD_BACKING" x="642" y="349" width="126" height="64"/>
+            <atlas-entry id="IMAGE_INT_FEVERBARS" x="732" y="87" width="56" height="144" rows="4"/>
+            <atlas-entry id="IMAGE_BONUSHALO" x="521" y="471" width="136" height="58"/>
+            <atlas-entry id="IMAGE_INT_BUTTONCOVER" x="452" y="797" width="80" height="80" alphaimage="button_"/>
+            <atlas-entry id="IMAGE_INT_FBCENTERDISC" x="866" y="819" width="80" height="80"/>
+            <atlas-entry id="IMAGE_SPIN_ARROW" x="948" y="819" width="72" height="88"/>
+            <atlas-entry id="IMAGE_INT_FEVERGLOW1" x="101" y="855" width="76" height="76"/>
+            <atlas-entry id="IMAGE_INT_FEVERBARLITES" x="970" y="375" width="40" height="128" rows="4"/>
+            <atlas-entry id="IMAGE_INT_FEVERGLOW3" x="784" y="859" width="70" height="70"/>
+            <atlas-entry id="IMAGE_FEVERSTAR_RED" x="1" y="867" width="68" height="68" alphaimage="feverstar_"/>
+            <atlas-entry id="IMAGE_FEVERSTAR_BLUE" x="702" y="867" width="68" height="68" alphaimage="feverstar_"/>
+            <atlas-entry id="IMAGE_FEVERSTAR_GREEN" x="620" y="871" width="68" height="68" alphaimage="feverstar_"/>
+            <atlas-entry id="IMAGE_BONUSGLOW" x="659" y="471" width="94" height="48"/>
+            <atlas-entry id="IMAGE_BONUSGLOW_BLUE" x="755" y="471" width="94" height="48"/>
+            <atlas-entry id="IMAGE_BONUSGLOW_GREEN" x="403" y="879" width="94" height="48"/>
+            <atlas-entry id="IMAGE_INT_PLUNGER" x="974" y="505" width="26" height="166"/>
+            <atlas-entry id="IMAGE_INT_FEVERGLOW2" x="956" y="673" width="64" height="64"/>
+            <atlas-entry id="IMAGE_IP_BALL_METER_BOTTOM" x="851" y="483" width="94" height="31"/>
+            <atlas-entry id="IMAGE_FEVERGLOWSTAR" x="732" y="233" width="50" height="50"/>
+            <atlas-entry id="IMAGE_IP_FFWD_GLOW_BUTTON" x="956" y="739" width="64" height="36"/>
+            <atlas-entry id="IMAGE_IP_FFWD_BUTTON" x="956" y="777" width="64" height="36"/>
+            <atlas-entry id="IMAGE_SPACESTAR" x="732" y="285" width="48" height="48"/>
+            <atlas-entry id="IMAGE_STORY_ROCKET" x="392" y="305" width="28" height="64"/>
+            <atlas-entry id="IMAGE_FEVERSTAR02" x="392" y="371" width="42" height="42"/>
+            <atlas-entry id="IMAGE_FEVERSTAR05" x="403" y="805" width="42" height="42"/>
+            <atlas-entry id="IMAGE_FEVERSTAR08" x="499" y="879" width="42" height="42"/>
+            <atlas-entry id="IMAGE_IP_BALL_METER_TOP" x="436" y="405" width="94" height="17"/>
+            <atlas-entry id="IMAGE_FEVERTRAIL" x="179" y="899" width="34" height="34"/>
+            <atlas-entry id="IMAGE_TIPARROW" x="215" y="899" width="48" height="24" cols="2"/>
+            <atlas-entry id="IMAGE_FEVERSTAR01" x="265" y="899" width="32" height="32"/>
+            <atlas-entry id="IMAGE_FEVERSTAR11" x="856" y="901" width="32" height="32"/>
+            <atlas-entry id="IMAGE_FEVERSTAR04" x="890" y="901" width="32" height="32"/>
+            <atlas-entry id="IMAGE_FEVERSTAR07" x="924" y="909" width="32" height="32"/>
+            <atlas-entry id="IMAGE_SPIN_RIMLIGHT2" x="422" y="305" width="22" height="44" rows="2"/>
+            <atlas-entry id="IMAGE_INT_FEVERMETER" x="532" y="405" width="50" height="18"/>
+            <atlas-entry id="IMAGE_INT_FEVERMETERTOP" x="584" y="405" width="50" height="18"/>
+            <atlas-entry id="IMAGE_INT_FEVERRAILING" x="958" y="909" width="54" height="16"/>
+            <atlas-entry id="IMAGE_INT_FEVERMETERBOTTOM" x="732" y="335" width="48" height="10"/>
+            <atlas-entry id="IMAGE_INT_FREEBALLMETERTOP" x="303" y="773" width="30" height="16" cols="3" alphagrid="rpbtopalpha"/>
+            <atlas-entry id="IMAGE_FEVERSTAR00" x="1002" y="1" width="20" height="20"/>
+            <atlas-entry id="IMAGE_FEVERSTAR10" x="1002" y="23" width="20" height="20"/>
+            <atlas-entry id="IMAGE_FEVERSTAR03" x="1002" y="45" width="20" height="20"/>
+            <atlas-entry id="IMAGE_FEVERSTAR06" x="1002" y="67" width="20" height="20"/>
+            <atlas-entry id="IMAGE_FEVERSTAR09" x="1002" y="89" width="20" height="20"/>
+            <atlas-entry id="IMAGE_INT_BALL" x="1002" y="111" width="20" height="20"/>
+            <atlas-entry id="IMAGE_SPIN_RIMLIGHT" x="1002" y="133" width="20" height="20"/>
+        </atlas>
+        <image id="IMAGE_INT_BACKSHADOW" alphacolor="0" format="a4r4g4b4" path="images/960x640/interface/backshadow_.txz"/>
+        <image id="IMAGE_INT_WHEEL" cols="14" format="r5g6b5" path="images/960x640/interface/Wheel.txz"/>
+    </resources>
+    <resources id="LuckySpin">
+        <atlas id="IMAGE_LUCKYSPIN_LOC" path="images/960x640/LuckySpin_loc.txz" format="a4r4g4b4">
+            <atlas-entry id="IMAGE_SPIN_SPINNER" x="1" y="1" width="280" height="280"/>
+            <atlas-entry id="IMAGE_SPIN_RANDOMTEXT" x="283" y="1" width="124" height="620" rows="10"/>
+            <atlas-entry id="IMAGE_SPIN_RANDOMTEXTON" x="1" y="283" width="124" height="620" rows="10"/>
+            <atlas-entry id="IMAGE_SPIN_TRIPLEON" x="127" y="623" width="160" height="98"/>
+            <atlas-entry id="IMAGE_SPIN_EXTRAON" x="409" y="1" width="98" height="158"/>
+            <atlas-entry id="IMAGE_SPIN_HATON" x="409" y="161" width="98" height="158"/>
+        </atlas>
+    </resources>
+    <resources id="CharSelect">
+        <atlas id="IMAGE_CHARDIALOG" path="images/960x640/CharDialog.tex" format="a1r5g5b5">
+            <atlas-entry id="IMAGE_CHARSEL_09_CINDERBOTTOM_LARGE" x="1" y="1" width="522" height="622"/>
+            <atlas-entry id="IMAGE_CHARSEL_03_KATTUT_LARGE" x="525" y="1" width="504" height="611"/>
+            <atlas-entry id="IMAGE_CHARSEL_11_MARU_LARGE" x="1031" y="1" width="436" height="600"/>
+            <atlas-entry id="IMAGE_CHARSEL_08_WAREN_LARGE" x="1469" y="1" width="354" height="640"/>
+            <atlas-entry id="IMAGE_CHARSEL_04_SPLORK_LARGE" x="1031" y="603" width="364" height="600"/>
+            <atlas-entry id="IMAGE_CHARSEL_05_CLAUD_LARGE" x="525" y="614" width="394" height="550"/>
+            <atlas-entry id="IMAGE_CHARSEL_07_TULA_LARGE" x="1" y="625" width="352" height="606"/>
+            <atlas-entry id="IMAGE_CHARSEL_01_BJORN_LARGE" x="1397" y="643" width="326" height="640"/>
+            <atlas-entry id="IMAGE_CHARSEL_02_JIMMY_LARGE" x="1725" y="643" width="314" height="566"/>
+            <atlas-entry id="IMAGE_CHARSEL_12_QUESTIONMARK" x="355" y="1166" width="406" height="432"/>
+            <atlas-entry id="IMAGE_CHARSEL_10_HU_LARGE" x="763" y="1205" width="360" height="482"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTERS" x="1" y="1689" width="1344" height="112" cols="12"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTERSHADOWS" x="1" y="1803" width="1344" height="112" cols="12"/>
+            <atlas-entry id="IMAGE_CHARSEL_06_RENFIELD_LARGE" x="1725" y="1211" width="312" height="386"/>
+            <atlas-entry id="IMAGE_CHARSEL_13_YELLOWFRAME" x="1825" y="1" width="112" height="112"/>
+            <atlas-entry id="IMAGE_CHARSEL_15_TWO" x="1939" y="1" width="62" height="84"/>
+            <atlas-entry id="IMAGE_CHARSEL_14_ONE" x="1939" y="87" width="54" height="84"/>
+        </atlas>
+    </resources>
+    <resources id="CharInGame">
+        <atlas id="IMAGE_CHARDIALOGNIGHTS" path="images/960x640/CharDialogNights.txz" format="a1r5g5b5">
+            <atlas-entry id="IMAGE_CHR_NIGHTS_PARTICLE6" x="1" y="1" width="212" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER01" x="215" y="1" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER09" x="413" y="1" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER05" x="611" y="1" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER11" x="809" y="1" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER02" x="1" y="199" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER03" x="199" y="199" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER10" x="397" y="199" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER06" x="595" y="199" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER04" x="793" y="199" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER07" x="1" y="397" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_CHARACTER08" x="199" y="397" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER01" x="397" y="397" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER07" x="595" y="397" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER09" x="793" y="397" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER08" x="1" y="595" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER05" x="199" y="595" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER02" x="397" y="595" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER03" x="595" y="595" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER10" x="793" y="595" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER06" x="1" y="793" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_CHARACTER04" x="199" y="793" width="196" height="196"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_PARTICLE1" x="397" y="793" width="144" height="132"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_PARTICLE2" x="543" y="793" width="144" height="132"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_PARTICLE3" x="689" y="793" width="120" height="108"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_PARTICLE4" x="811" y="793" width="80" height="76"/>
+            <atlas-entry id="IMAGE_CHR_NIGHTS_PARTICLE5" x="893" y="793" width="64" height="64"/>
+        </atlas>
+    </resources>
+    <resources id="IP">
+        <atlas id="IMAGE_IP" path="images/960x640/IP.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_1">
+        <atlas id="IMAGE_IP_1" path="images/960x640/IP_1.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_1_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_1_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_1_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_1_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_1_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_1_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_1_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_1_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_1_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_1_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_2">
+        <atlas id="IMAGE_IP_2" path="images/960x640/IP_2.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_2_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_2_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_2_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_2_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_2_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_2_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_2_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_2_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_2_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_2_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_3">
+        <atlas id="IMAGE_IP_3" path="images/960x640/IP_3.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_3_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_3_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_3_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_3_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_3_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_3_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_3_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_3_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_3_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_3_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_4">
+        <atlas id="IMAGE_IP_4" path="images/960x640/IP_4.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_4_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_4_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_4_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_4_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_4_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_4_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_4_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_4_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_4_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_4_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_5">
+        <atlas id="IMAGE_IP_5" path="images/960x640/IP_5.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_5_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_5_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_5_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_5_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_5_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_5_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_5_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_5_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_5_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_5_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_6">
+        <atlas id="IMAGE_IP_6" path="images/960x640/IP_6.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_6_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_6_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_6_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_6_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_6_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_6_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_6_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_6_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_6_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_6_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_7">
+        <atlas id="IMAGE_IP_7" path="images/960x640/IP_7.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_7_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_7_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_7_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_7_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_7_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_7_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_7_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_7_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_7_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_7_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_8">
+        <atlas id="IMAGE_IP_8" path="images/960x640/IP_8.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_8_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_8_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_8_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_8_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_8_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_8_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_8_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_8_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_8_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_8_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_9">
+        <atlas id="IMAGE_IP_9" path="images/960x640/IP_9.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_9_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_9_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_9_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_9_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_9_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_9_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_9_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_9_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_9_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_9_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="IP_10">
+        <atlas id="IMAGE_IP_10" path="images/960x640/IP_10.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_IP_10_BALLOFRAME" x="1" y="1" width="122" height="640"/>
+            <atlas-entry id="IMAGE_IP_10_FEVERMETER_FRAME" x="125" y="1" width="118" height="640"/>
+            <atlas-entry id="IMAGE_IP_10_WHEEL_FRAME" x="245" y="1" width="106" height="640"/>
+            <atlas-entry id="IMAGE_IP_10_LEFT_BAR" x="353" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_10_LEFT_HANDED_BAR" x="443" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_10_RIGHT_BAR" x="533" y="1" width="88" height="640"/>
+            <atlas-entry id="IMAGE_IP_10_SHOOTERBACK" x="623" y="1" width="148" height="147"/>
+            <atlas-entry id="IMAGE_IP_10_LEFT_WINDOW_FRAME" x="773" y="1" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_10_RIGHT_WINDOW_FRAME" x="773" y="61" width="231" height="58"/>
+            <atlas-entry id="IMAGE_IP_10_B" x="1006" y="1" width="12" height="624"/>
+        </atlas>
+    </resources>
+    <resources id="MainMenuCommon">
+        <atlas id="IMAGE_MAINMENUCOMMON" path="images/960x640/MAINMENUCOMMON.tex" format="a1r5g5b5">
+            <atlas-entry id="IMAGE_JIMMY_WANTS_YOU" x="0" y="0" width="457" height="600"/>
+            <atlas-entry id="IMAGE_BJORN_UPSELL" x="458" y="0" width="265" height="632"/>
+            <atlas-entry id="IMAGE_RATE_SPEECH_BUBBLE" x="0" y="601" width="412" height="275"/>
+        </atlas>
+        <image id="IMAGE_CERTIFICATE" format="r5g6b5" path="images/960x640/mainmenu/certificate.txz"/>
+        <image id="IMAGE_UPDATE_BUBBLE" format="a4r4g4b4" path="images/960x640/mainmenu/update_bubble.txz"/>
+    </resources>
+    <resources id="MainMenuNights">
+        <atlas id="IMAGE_MM_NIGHTS_MAINMENUNIGHTS" path="images/960x640/MainMenuNights.tex" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_MM_NIGHTS_BJORN" x="0" y="0" width="1136" height="492"/>
+        </atlas>
+        <image id="IMAGE_MM_NIGHTS_BACKGROUND" format="r5g6b5" path="images/960x640/mainmenuNights/bgd_back_nights.tex"/>
+    </resources>
+    <resources id="LevelSelect">
+        <image id="IMAGE_LS_THUMBNAILS_PEGGLE" cols="8" rows="7" format="r5g6b5" path="images/960x640/levelselect/levelthumbs_peggle.txz"/>
+        <image id="IMAGE_LS_THUMBNAILS_NIGHTS" cols="8" rows="8" format="r5g6b5" path="images/960x640/levelselect/levelthumbs_nights.txz"/>
+    </resources>
+    <resources id="Help">
+        <image id="IMAGE_HELP_ICONS" cols="12" rows="4" format="r5g6b5" path="images/960x640/help/Help-Icons.txz"/>
+    </resources>
+    <resources id="Game">
+        <atlas id="IMAGE_BOARD" path="images/960x640/Board.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_LIGHTNING_FRONT" x="1" y="1" width="754" height="304" cols="5"/>
+            <atlas-entry id="IMAGE_04_PULSE_POWERUP" x="1" y="307" width="1980" height="108" framedelay="3" anim="once" cols="19"/>
+            <atlas-entry id="IMAGE_SMOKE" x="1" y="417" width="2004" height="104" cols="20"/>
+            <atlas-entry id="IMAGE_03_PULSE_SCORE" x="1" y="523" width="2020" height="100" framedelay="3" anim="once" cols="21"/>
+            <atlas-entry id="IMAGE_05_PULSE2_POWERUP" x="1" y="625" width="1668" height="72" framedelay="2" anim="once" cols="26"/>
+            <atlas-entry id="IMAGE_LIGHTNING_FRONT_SMALL" x="757" y="1" width="754" height="154" cols="5"/>
+            <atlas-entry id="IMAGE_JIMMYSPEECH" x="1513" y="1" width="340" height="266"/>
+            <atlas-entry id="IMAGE_02_PULSE_GOAL" x="1" y="699" width="1460" height="60" framedelay="2" anim="once" cols="26"/>
+            <atlas-entry id="IMAGE_PYRAMIDBALL" x="1671" y="625" width="244" height="244"/>
+            <atlas-entry id="IMAGE_FIREBALLFIRE" x="1" y="761" width="234" height="220" rows="6" cols="5"/>
+            <atlas-entry id="IMAGE_LIGHTNING_BALLSPARK" x="757" y="157" width="564" height="84" cols="7"/>
+            <atlas-entry id="IMAGE_01_PULSE_NORMAL" x="757" y="243" width="732" height="60" framedelay="2" anim="once" cols="13"/>
+            <atlas-entry id="IMAGE_SPARKLE" x="237" y="761" width="564" height="44" cols="14"/>
+            <atlas-entry id="IMAGE_EMBER" x="803" y="761" width="404" height="54" framedelay="6" anim="once" cols="8"/>
+            <atlas-entry id="IMAGE_SPACEBUBBLE" x="1855" y="1" width="140" height="140"/>
+            <atlas-entry id="IMAGE_SPACEBURST" x="1855" y="143" width="140" height="140"/>
+            <atlas-entry id="IMAGE_LEVEL_COBRATREATS" x="1209" y="761" width="302" height="62"/>
+            <atlas-entry id="IMAGE_JIMMY" x="1917" y="625" width="128" height="140"/>
+            <atlas-entry id="IMAGE_LIGHTNING_BACK" x="1513" y="699" width="132" height="132"/>
+            <atlas-entry id="IMAGE_SPOOKYPOOF2" x="1917" y="767" width="72" height="176" rows="2"/>
+            <atlas-entry id="IMAGE_SPOOKYPOOF1" x="237" y="807" width="90" height="140" rows="2"/>
+            <atlas-entry id="IMAGE_CIRCLE" x="329" y="807" width="110" height="110"/>
+            <atlas-entry id="IMAGE_LEVEL_BUMPERA" x="441" y="817" width="402" height="28"/>
+            <atlas-entry id="IMAGE_LIGHTNING_SPARK" x="1323" y="157" width="164" height="64" cols="4"/>
+            <atlas-entry id="IMAGE_MAGICHAT" x="845" y="817" width="92" height="88"/>
+            <atlas-entry id="IMAGE_BUBBLES" x="939" y="817" width="184" height="40" cols="5"/>
+            <atlas-entry id="IMAGE_LIGHTNING_ROD" x="1125" y="825" width="86" height="84"/>
+            <atlas-entry id="IMAGE_LIGHTNING_ROD_ON" x="1213" y="825" width="86" height="84"/>
+            <atlas-entry id="IMAGE_LIGHTNING_ROD_ZAP" x="1301" y="825" width="86" height="84"/>
+            <atlas-entry id="IMAGE_LEVEL_LOBSTERCLAWL" x="1389" y="825" width="118" height="60"/>
+            <atlas-entry id="IMAGE_LEVEL_LOBSTERCLAWR" x="1509" y="833" width="118" height="60"/>
+            <atlas-entry id="IMAGE_SPACEHALO" x="1491" y="269" width="166" height="34"/>
+            <atlas-entry id="IMAGE_LEVEL_CATCHERA" x="1659" y="269" width="182" height="28"/>
+            <atlas-entry id="IMAGE_FLECK" x="1997" y="1" width="36" height="132" rows="4"/>
+            <atlas-entry id="IMAGE_FLOWER" x="1983" y="285" width="64" height="64"/>
+            <atlas-entry id="IMAGE_LEVEL_BUMPERB" x="441" y="847" width="182" height="22"/>
+            <atlas-entry id="IMAGE_LEVEL_CATCHERB" x="625" y="847" width="182" height="22"/>
+            <atlas-entry id="IMAGE_LEVEL_LEFTBUMPER" x="939" y="859" width="148" height="24"/>
+            <atlas-entry id="IMAGE_LIGHTNING_ROD_RING_FRONT" x="441" y="871" width="104" height="32"/>
+            <atlas-entry id="IMAGE_LIGHTNING_ROD_RING_BACK" x="547" y="871" width="104" height="32"/>
+            <atlas-entry id="IMAGE_LEVEL_RIGHTBUMPER" x="653" y="871" width="148" height="22"/>
+            <atlas-entry id="IMAGE_LEVEL_BONUSBUMPER" x="1629" y="871" width="84" height="36"/>
+            <atlas-entry id="IMAGE_BRICK0" x="1715" y="871" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICK1" x="1785" y="871" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICK2" x="939" y="885" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICK3" x="1009" y="885" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICK4" x="1389" y="887" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICK5" x="653" y="895" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICK6" x="723" y="895" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICK7" x="1459" y="895" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB0" x="1529" y="895" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB1" x="441" y="905" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB2" x="511" y="905" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB3" x="581" y="905" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB4" x="793" y="907" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB5" x="863" y="907" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB6" x="1599" y="909" width="68" height="44"/>
+            <atlas-entry id="IMAGE_BRICKCB7" x="1079" y="911" width="68" height="44"/>
+            <atlas-entry id="IMAGE_LEVEL_CATCHERCOVER" x="1149" y="911" width="130" height="22"/>
+            <atlas-entry id="IMAGE_SPOOKYEYES" x="1983" y="351" width="54" height="52"/>
+            <atlas-entry id="IMAGE_YINYANG" x="1991" y="767" width="54" height="52"/>
+            <atlas-entry id="IMAGE_LEVEL_CATCHERC" x="1323" y="223" width="108" height="16"/>
+            <atlas-entry id="IMAGE_LEVEL_BUMPERC" x="1843" y="285" width="116" height="14"/>
+            <atlas-entry id="IMAGE_BALLPEG0_LARGE" x="1997" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEG1_LARGE" x="1997" y="177" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEG2_LARGE" x="1997" y="219" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEG3_LARGE" x="2007" y="405" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEG4_LARGE" x="2007" y="447" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEG5_LARGE" x="1463" y="699" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEG6_LARGE" x="1991" y="821" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEG7_LARGE" x="1991" y="863" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB0_LARGE" x="1855" y="871" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB1_LARGE" x="1991" y="905" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB2_LARGE" x="1669" y="909" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB3_LARGE" x="1281" y="911" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB4_LARGE" x="1323" y="911" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB5_LARGE" x="1855" y="913" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB6_LARGE" x="1711" y="917" width="40" height="40"/>
+            <atlas-entry id="IMAGE_BALLPEGCB7_LARGE" x="1753" y="917" width="40" height="40"/>
+            <atlas-entry id="IMAGE_LEVEL_BONUSHOLE" x="1433" y="223" width="78" height="16"/>
+            <atlas-entry id="IMAGE_SPOOKYGHOST" x="1629" y="833" width="34" height="36"/>
+            <atlas-entry id="IMAGE_FIREBALL" x="809" y="847" width="34" height="34"/>
+            <atlas-entry id="IMAGE_HAT" x="2007" y="489" width="32" height="26"/>
+            <atlas-entry id="IMAGE_STREAK" x="1489" y="157" width="14" height="56"/>
+            <atlas-entry id="IMAGE_BALL" x="1089" y="859" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG0" x="1795" y="917" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG1" x="1823" y="917" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG2" x="329" y="919" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG3" x="357" y="919" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG4" x="385" y="919" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG5" x="413" y="919" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG6" x="933" y="931" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEG7" x="961" y="931" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB0" x="989" y="931" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB1" x="1017" y="931" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB2" x="1045" y="931" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB3" x="1365" y="933" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB4" x="1393" y="933" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB5" x="1421" y="933" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB6" x="1149" y="935" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLPEGCB7" x="1177" y="935" width="26" height="26"/>
+            <atlas-entry id="IMAGE_BALLSHADOW" x="1205" y="935" width="26" height="26"/>
+            <atlas-entry id="IMAGE_GUIDEHIT" x="1233" y="935" width="26" height="26"/>
+            <atlas-entry id="IMAGE_SPOOKYTRAIL" x="651" y="941" width="26" height="26" alphaimage="spookytrail_"/>
+            <atlas-entry id="IMAGE_ALPHABALL" x="679" y="941" width="26" height="26"/>
+            <atlas-entry id="IMAGE_GUIDEARROW" x="2023" y="517" width="18" height="28"/>
+            <atlas-entry id="IMAGE_GUIDEHINT" x="1997" y="261" width="28" height="18"/>
+            <atlas-entry id="IMAGE_GUIDERECT2" x="2035" y="1" width="8" height="54"/>
+            <atlas-entry id="IMAGE_GUIDERECT" x="1491" y="241" width="20" height="20"/>
+            <atlas-entry id="IMAGE_GUIDEPOINT" x="2035" y="57" width="12" height="12"/>
+        </atlas>
+    </resources>
+    <resources id="Fever">
+        <atlas id="IMAGE_FEVER_LOC" path="images/960x640/Fever_loc.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_XFEVERGLOW" x="1" y="1" width="1001" height="116" cols="7"/>
+            <atlas-entry id="IMAGE_XFEVER" x="1" y="119" width="1000" height="75" cols="10"/>
+            <atlas-entry id="IMAGE_FEVERSCORE" x="1" y="196" width="466" height="146"/>
+            <atlas-entry id="IMAGE_FEVERSCORETOP" x="469" y="196" width="466" height="146"/>
+            <atlas-entry id="IMAGE_ZOOMCAM" x="1" y="344" width="126" height="64"/>
+            <atlas-entry id="IMAGE_ZOOMCAM_RIGHT" x="129" y="344" width="126" height="64"/>
+            <atlas-entry id="IMAGE_FEVERCAM" x="257" y="344" width="126" height="64"/>
+            <atlas-entry id="IMAGE_BONUS_00_100000LIGHT" x="385" y="344" width="106" height="52"/>
+            <atlas-entry id="IMAGE_BONUS_01_50000LIGHT" x="493" y="344" width="100" height="52"/>
+            <atlas-entry id="IMAGE_BONUS_02_25000LIGHT" x="595" y="344" width="98" height="52"/>
+            <atlas-entry id="IMAGE_BONUS_03_10000LIGHT" x="695" y="344" width="96" height="50"/>
+            <atlas-entry id="IMAGE_BONUS_04_5000LIGHT" x="937" y="196" width="84" height="50"/>
+            <atlas-entry id="IMAGE_BONUS_05_100000" x="937" y="248" width="84" height="28"/>
+            <atlas-entry id="IMAGE_BONUS_06_50000" x="937" y="278" width="74" height="26"/>
+            <atlas-entry id="IMAGE_BONUS_07_25000" x="937" y="306" width="72" height="26"/>
+            <atlas-entry id="IMAGE_BONUS_08_10000" x="937" y="334" width="70" height="24"/>
+            <atlas-entry id="IMAGE_BONUS_09_5000" x="793" y="344" width="58" height="24"/>
+        </atlas>
+    </resources>
+    <resources id="TrophyRoom">
+        <image id="IMAGE_TROPHYROOM" format="r5g6b5" path="images/960x640/trophyroom/trophyroom.txz"/>
+        <atlas id="IMAGE_BADGES" path="images/960x640/Badges.txz" format="a4r4g4b4">
+            <atlas-entry id="IMAGE_TR_BADGE00" x="1" y="1" width="206" height="238"/>
+            <atlas-entry id="IMAGE_TR_BADGE12_TROPHY_GRANDMASTER" x="209" y="1" width="196" height="242"/>
+            <atlas-entry id="IMAGE_TR_BADGE06" x="407" y="1" width="222" height="196"/>
+            <atlas-entry id="IMAGE_TR_BADGE11_TROPHY_CHALLENGES" x="631" y="1" width="198" height="206"/>
+            <atlas-entry id="IMAGE_TR_BADGE08" x="407" y="199" width="216" height="188"/>
+            <atlas-entry id="IMAGE_TR_BADGE10_TROPHY_STAGES" x="831" y="1" width="162" height="204"/>
+            <atlas-entry id="IMAGE_TR_BADGE04" x="625" y="209" width="244" height="132"/>
+            <atlas-entry id="IMAGE_TR_BADGE02" x="1" y="241" width="194" height="120"/>
+            <atlas-entry id="IMAGE_TR_BADGE09" x="197" y="245" width="154" height="150"/>
+            <atlas-entry id="IMAGE_TR_BADGE07" x="625" y="343" width="196" height="106"/>
+            <atlas-entry id="IMAGE_TR_BADGE05" x="871" y="207" width="114" height="166"/>
+            <atlas-entry id="IMAGE_TR_BADGE01" x="1" y="363" width="138" height="130"/>
+            <atlas-entry id="IMAGE_TR_BADGE03" x="823" y="375" width="124" height="114"/>
+        </atlas>
+    </resources>
+    <resources id="TrophyRoomNights">
+        <atlas id="IMAGE_TROPHYNIGHTS" path="images/960x640/TrophyNights.txz" format="a4r4g4b4">
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPOTLIGHT" x="1" y="1" width="240" height="240"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PARTICLE6" x="243" y="1" width="212" height="196"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_ADV" x="457" y="1" width="174" height="194"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_MASTER2" x="633" y="1" width="142" height="152"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PARTICLE1" x="777" y="1" width="144" height="132"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PARTICLE2" x="923" y="1" width="144" height="132"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PARTICLE3" x="1069" y="1" width="120" height="108"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_MASTER3" x="1191" y="1" width="78" height="156"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_05" x="1271" y="1" width="70" height="124"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_MASTER1" x="1343" y="1" width="66" height="128"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PARTICLE_WHITE_MED_ROUND" x="1411" y="1" width="88" height="88"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_02" x="1501" y="1" width="76" height="100"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_10" x="1579" y="1" width="68" height="108"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_01" x="1649" y="1" width="66" height="106"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_04" x="1717" y="1" width="60" height="108"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PARTICLE4" x="1779" y="1" width="80" height="76"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_03" x="1861" y="1" width="54" height="102"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_08" x="1917" y="1" width="54" height="102"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_11" x="1973" y="1" width="54" height="100"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_09" x="1779" y="79" width="64" height="82"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_07" x="1411" y="91" width="62" height="82"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_HOLE" x="1845" y="105" width="158" height="32"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_TABLE_BOTTOM" x="1475" y="111" width="200" height="22"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PARTICLE5" x="1069" y="111" width="64" height="64"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_PORTRAIT_06" x="1135" y="111" width="44" height="86"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_LP" x="1677" y="111" width="44" height="58"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_TP" x="1271" y="127" width="56" height="42"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_BP" x="1723" y="111" width="52" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_RP" x="2005" y="103" width="40" height="52"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPARKLE" x="1329" y="131" width="40" height="44"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_B" x="777" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_BL" x="819" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_BR" x="861" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_C" x="903" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_L" x="945" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_R" x="987" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_T" x="1475" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_TL" x="1517" y="135" width="40" height="40"/>
+            <atlas-entry id="IMAGE_TR_NIGHTS_SPEECH_TR" x="1559" y="135" width="40" height="40"/>
+        </atlas>
+        <atlas id="IMAGE_TROPHYNIGHTS_LOC" path="images/960x640/TrophyNights_loc.txz" format="a4r4g4b4">
+            <atlas-entry id="IMAGE_TR_NIGHTS_TROPHYROOM_SCREEN" x="1" y="1" width="1136" height="640"/>
+        </atlas>
+    </resources>
+    <resources id="Dialog">
+        <atlas id="IMAGE_DIALOG" path="images/960x640/Dialog.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_DLG_BUTTON_NIGHTS_BIG" x="1" y="1" width="386" height="528"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON_PEGGLE_BIG" x="389" y="1" width="386" height="356"/>
+            <atlas-entry id="IMAGE_DLG_LOGO_UPSELL" x="389" y="359" width="434" height="306"/>
+            <atlas-entry id="IMAGE_DLG_DIALOGBOX" x="1" y="667" width="390" height="300"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON1" x="393" y="667" width="342" height="272"/>
+            <atlas-entry id="IMAGE_DLG_LEFT_ARROW_BUTTON" x="393" y="941" width="342" height="204"/>
+            <atlas-entry id="IMAGE_DLG_RIGHT_ARROW_BUTTON" x="1" y="969" width="342" height="204"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON3" x="345" y="1147" width="342" height="204"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON_NIGHTS" x="737" y="667" width="260" height="268"/>
+            <atlas-entry id="IMAGE_DLG_SCROLLSHADOW_BOTTOM" x="1" y="1353" width="836" height="78"/>
+            <atlas-entry id="IMAGE_DLG_SCROLLSHADOW_TOP" x="1" y="1433" width="836" height="78"/>
+            <atlas-entry id="IMAGE_DLG_SLIDER" x="1" y="1513" width="662" height="84"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON_BLUE" x="777" y="1" width="232" height="238"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON_ORANGE" x="737" y="937" width="232" height="238"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON_PURPLE" x="665" y="1513" width="232" height="238"/>
+            <atlas-entry id="IMAGE_DLG_THUMBFRAME" x="1" y="1599" width="248" height="220"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON_PEGGLE" x="251" y="1599" width="260" height="208"/>
+            <atlas-entry id="IMAGE_DLG_BUTTON2" x="1" y="1175" width="240" height="162"/>
+            <atlas-entry id="IMAGE_DLG_INSTRUCTIONS" x="825" y="241" width="196" height="188"/>
+            <atlas-entry id="IMAGE_DLG_INSTRUCTIONS2" x="825" y="431" width="196" height="188"/>
+            <atlas-entry id="IMAGE_DLG_PLAYBUTTON3" x="689" y="1177" width="234" height="136" rows="2"/>
+            <atlas-entry id="IMAGE_DLG_REPLAY_LOGO_NIGHTS" x="1" y="531" width="188" height="132"/>
+            <atlas-entry id="IMAGE_DLG_SELECTORFRAME" x="839" y="1315" width="152" height="152"/>
+            <atlas-entry id="IMAGE_DLG_INSTRUCTIONS_WHEEL" x="513" y="1599" width="136" height="138"/>
+            <atlas-entry id="IMAGE_DLG_INSTRUCTIONS_ZOOM" x="513" y="1739" width="136" height="138"/>
+            <atlas-entry id="IMAGE_UPDATE_JIMMY" x="899" y="1469" width="94" height="195"/>
+            <atlas-entry id="IMAGE_DLG_REPLAY_LOGO_PEGGLE" x="191" y="531" width="182" height="90"/>
+            <atlas-entry id="IMAGE_DLG_QUESTIONMARK" x="899" y="1666" width="122" height="122"/>
+            <atlas-entry id="IMAGE_DLG_BLUEFRAME" x="651" y="1753" width="120" height="120"/>
+            <atlas-entry id="IMAGE_DLG_SLIDERHILIGHT" x="1" y="1821" width="304" height="44"/>
+            <atlas-entry id="IMAGE_DLG_TEXTBOX" x="243" y="1175" width="90" height="90"/>
+            <atlas-entry id="IMAGE_STORY_NUKESTREAK" x="925" y="1177" width="84" height="84"/>
+            <atlas-entry id="IMAGE_DLG_SLIDERORB" x="243" y="1267" width="74" height="84"/>
+            <atlas-entry id="IMAGE_DLG_GROUPRECT" x="773" y="1753" width="66" height="66"/>
+            <atlas-entry id="IMAGE_DLG_TEXTRECT" x="841" y="1790" width="66" height="66"/>
+            <atlas-entry id="IMAGE_DLG_STAGEBULLET" x="777" y="241" width="24" height="48" rows="2" alphagrid="stagebullet_"/>
+            <atlas-entry id="IMAGE_DLG_LITTLE_GOLD_STAR" x="777" y="291" width="32" height="30"/>
+            <atlas-entry id="IMAGE_DLG_THUMBCORNER_BR" x="777" y="323" width="24" height="28"/>
+            <atlas-entry id="IMAGE_DLG_THUMBCORNER_BL" x="825" y="621" width="22" height="28"/>
+            <atlas-entry id="IMAGE_DLG_THUMBCORNER_TR" x="849" y="621" width="24" height="22"/>
+            <atlas-entry id="IMAGE_STORY_FIRESTREAK" x="1011" y="1" width="10" height="52"/>
+            <atlas-entry id="IMAGE_DLG_SCROLL_INDICATOR" x="875" y="621" width="22" height="22"/>
+            <atlas-entry id="IMAGE_DLG_THUMBCORNER_TL" x="803" y="241" width="20" height="20"/>
+            <atlas-entry id="IMAGE_DLG_BULLET" x="1011" y="55" width="12" height="12"/>
+        </atlas>
+        <atlas id="IMAGE_DIALOG_LOC" path="images/960x640/Dialog_loc.txz" format="a8r8g8b8">
+            <atlas-entry id="IMAGE_DLG_ACEDRIBBON" x="1" y="1" width="406" height="484"/>
+            <atlas-entry id="IMAGE_BLUERIBBON" x="409" y="1" width="406" height="484"/>
+            <atlas-entry id="IMAGE_DLG_MASTERSTAGE" x="1" y="487" width="470" height="406"/>
+            <atlas-entry id="IMAGE_MASTERBADGE" x="473" y="487" width="402" height="402"/>
+            <atlas-entry id="IMAGE_APPROVEDSTAMP" x="473" y="891" width="396" height="306"/>
+            <atlas-entry id="IMAGE_DLG_TROPHY_COVER" x="1" y="895" width="382" height="286"/>
+            <atlas-entry id="IMAGE_COINHEADS" x="1" y="1183" width="300" height="300"/>
+            <atlas-entry id="IMAGE_COINTAILS" x="303" y="1199" width="300" height="300"/>
+            <atlas-entry id="IMAGE_MM_NIGHTS_MOON" x="605" y="1199" width="266" height="266"/>
+            <atlas-entry id="IMAGE_16_VS" x="605" y="1467" width="276" height="228"/>
+            <atlas-entry id="IMAGE_MM_MOREGAMES_BUTTON" x="817" y="1" width="188" height="280" rows="2"/>
+            <atlas-entry id="IMAGE_MM_NIGHTS_MOREGAMES_BUTTON" x="1" y="1485" width="188" height="280" rows="2"/>
+            <atlas-entry id="IMAGE_SPEECHBUBBLE" x="191" y="1501" width="300" height="154"/>
+            <atlas-entry id="IMAGE_DLG_INSTRUCTIONS3" x="817" y="283" width="196" height="188"/>
+            <atlas-entry id="IMAGE_DLG_INSTRUCTIONS4" x="191" y="1657" width="196" height="188"/>
+            <atlas-entry id="IMAGE_COINHILIGHT" x="389" y="1657" width="198" height="186" rows="2"/>
+            <atlas-entry id="IMAGE_DLG_MASTERSTAGEPROGBAR" x="389" y="1845" width="440" height="76" rows="2"/>
+            <atlas-entry id="IMAGE_MM_BLANKSUN" x="831" y="1697" width="160" height="160"/>
+            <atlas-entry id="IMAGE_DLG_TRIAL" x="1" y="1767" width="153" height="154" rows="2"/>
+            <atlas-entry id="IMAGE_INT_FBFREEBALL" x="877" y="473" width="124" height="162" rows="3" cols="2"/>
+            <atlas-entry id="IMAGE_PAUSED" x="1" y="1923" width="264" height="74"/>
+            <atlas-entry id="IMAGE_INT_FBPOINTS" x="877" y="637" width="136" height="90" rows="3" cols="2"/>
+            <atlas-entry id="IMAGE_LOCK_SMALL" x="877" y="729" width="100" height="100"/>
+            <atlas-entry id="IMAGE_DLG_TIP" x="877" y="831" width="94" height="100"/>
+            <atlas-entry id="IMAGE_UPDATE_TEXT" x="871" y="933" width="130" height="64"/>
+            <atlas-entry id="IMAGE_DLG_TROPHY_ACED" x="871" y="999" width="144" height="52"/>
+            <atlas-entry id="IMAGE_IP_BALLOTRON_BADGE" x="871" y="1053" width="102" height="45"/>
+            <atlas-entry id="IMAGE_IP_FEVERMETER_BADGE" x="871" y="1100" width="99" height="43"/>
+            <atlas-entry id="IMAGE_TINYACEDRIBBON" x="973" y="831" width="46" height="56"/>
+            <atlas-entry id="IMAGE_TINYBLUERIBBON" x="385" y="895" width="46" height="56"/>
+        </atlas>
+    </resources>
+    <resources id="Character">
+        <image id="IMAGE_CHR_YINYANGEYE" format="a4r4g4b4" path="characters/960x640/yinyangeye.tex"/>
+    </resources>
+    <resources id="Story">
+        <image id="IMAGE_STORY_WIN" format="r5g6b5" path="images/960x640/story/TheEnd.txz"/>
+        <image id="IMAGE_STORY_WIN_WIDE" format="r5g6b5" path="images/960x640/story/TheEnd_Wide.txz"/>
+        <image id="IMAGE_STORY_TROPHIES" cols="3" rows="1" format="a8r8g8b8" path="images/960x640/story/trophies.txz"/>
+    </resources>
+    <resources id="StoryNights">
+        <image id="IMAGE_STORY_WIN_NIGHTS" format="r5g6b5" path="images/960x640/story/TheEnd_nights.txz"/>
+        <image id="IMAGE_STORY_WIN_NIGHTS_WIDE" format="r5g6b5" path="images/960x640/story/TheEnd_nights_wide.txz"/>
+        <image id="IMAGE_STORY_TROPHIES_NIGHTS" cols="4" format="a8r8g8b8" path="images/960x640/story/trophies_nights.txz"/>
+    </resources>
+    <resources id="Adventure"/>
+</resources-manifest>

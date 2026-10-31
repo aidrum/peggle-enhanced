@@ -1,0 +1,512 @@
+﻿Define CharMapFrom ( ' ' );
+Define CharMapTo ( ' ' );
+SetCharMap CharMapFrom CharMapTo;
+
+Define CharList0
+ ( ' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/'
+   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?'
+   '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'
+   'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_'
+   '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'
+   'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', '¡'
+   '¢', '£', '¤', '¥', '¦', '§', '¨', '©', 'ª', '«', '¬', '­', '®', '¯', '°', '±'
+   '²', '³', '´', 'µ', '¶', '·', '¸', '¹', 'º', '»', '¼', '½', '¾', '¿', 'À', 'Á'
+   'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ'
+   'Ò', 'Ó', 'Ô', 'Õ', 'Ö', '×', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'Þ', 'ß', 'à', 'á'
+   'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ'
+   'ò', 'ó', 'ô', 'õ', 'ö', '÷', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'þ', 'ÿ' );
+
+Define WidthList0
+ (  13,  10,  19,  21,  27,  38,  29,  10,  15,  15,  14,  15,   9,  23,  10,  14
+    27,  16,  27,  29,  23,  27,  25,  29,  27,  25,  10,  10,  14,  16,  14,  22
+    32,  26,  26,  25,  26,  26,  24,  26,  25,  10,  24,  27,  21,  31,  26,  28
+    23,  27,  26,  28,  27,  26,  26,  43,  29,  28,  28,  15,  14,  15,  13,  18
+    11,  25,  26,  25,  26,  25,  24,  26,  25,  10,  24,  27,  21,  31,  26,  28
+    23,  27,  26,  28,  27,  26,  26,  43,  29,  28,  28,  15,  10,  15,  13,  10
+    13,  13,  13,  28,  13,  13,  17,  40,  13,  29,  13,  13,  31,  13,  13,  13
+    13,  13,  11,  13,  13,  13,  17,  13,  13,  29,  13,  13,  13,  22,  26,  26
+    26,  26,  26,  26,  35,  25,  26,  26,  26,  26,  10,  10,  10,  10,  26,  26
+    28,  28,  28,  28,  28,  13,  28,  26,  26,  26,  26,  28,  24,  53,  25,  25
+    25,  25,  25,  25,  41,  25,  25,  25,  25,  25,  10,  10,  10,  10,  26,  26
+    28,  28,  28,  28,  28,  13,  28,  26,  26,  26,  26,  28,  24,  28 );
+
+Define RectList0
+ ( (  0,   0,  0,  0), ( 64, 178, 14, 45), (213,   1, 24, 21), (451,   1, 26, 38)
+   (128, 270, 31, 51), ( 42, 270, 43, 47), (110, 178, 34, 45), (198,   1, 14, 21)
+   (447, 432, 18, 57), (390, 432, 18, 57), (253,   1, 19, 26), (337,   1, 22, 30)
+   (238,   1, 14, 22), ( 56,   1, 29, 11), (158,   1, 15, 17), (107, 270, 20, 50)
+   (116,  40, 31, 44), (148,  40, 20, 44), (351,  40, 31, 44), (291,  40, 31, 44)
+   (263,  40, 27, 44), (231,  40, 31, 44), (200,  40, 30, 44), (145, 178, 32, 45)
+   ( 83,  40, 32, 44), (169,  40, 30, 44), (436,   1, 14, 33), (478,   1, 14, 38)
+   (360,   1, 20, 31), (174,   1, 23, 17), (381,   1, 20, 31), (178, 178, 27, 45)
+   (  1,  40, 36, 38), (206, 178, 31, 45), (238, 178, 30, 45), (269, 178, 28, 45)
+   (298, 178, 30, 45), (329, 178, 29, 45), (390, 178, 28, 45), (419, 178, 31, 45)
+   (451, 178, 30, 45), (  1, 224, 14, 45), ( 16, 224, 28, 45), ( 45, 224, 29, 45)
+   ( 75, 224, 26, 45), (136, 224, 35, 45), (372, 224, 30, 45), (398,  40, 32, 45)
+   (431,  40, 29, 45), (319, 432, 32, 55), (461,  40, 30, 45), (  1,  86, 31, 45)
+   ( 33,  86, 31, 45), ( 65,  86, 30, 45), ( 96,  86, 31, 45), (128,  86, 47, 45)
+   (176,  86, 31, 45), (208,  86, 30, 45), (239,  86, 31, 45), (409, 432, 18, 57)
+   ( 86, 270, 20, 50), (428, 432, 18, 57), (  0,   0,  0,  0), ( 26,   1, 29, 11)
+   (125,   1, 14, 12), (271,  86, 30, 45), (302,  86, 30, 45), (333,  86, 28, 45)
+   (362,  86, 30, 45), (393,  86, 29, 45), (423,  86, 28, 45), (452,  86, 31, 45)
+   (359, 178, 30, 45), (  1, 132, 14, 45), ( 16, 132, 28, 45), ( 45, 132, 29, 45)
+   ( 75, 132, 26, 45), (102, 132, 35, 45), (138, 132, 30, 45), (169, 132, 32, 45)
+   (202, 132, 29, 45), (228, 432, 32, 54), (232, 132, 30, 45), (263, 132, 31, 45)
+   (295, 132, 31, 45), (327, 132, 30, 45), (358, 132, 31, 45), (390, 132, 47, 45)
+   (438, 132, 31, 45), (  1, 178, 30, 45), ( 32, 178, 31, 45), (352, 432, 18, 57)
+   (466, 432, 12, 58), (371, 432, 18, 57), (  0,   0,  0,  0), (383,  40, 14, 44)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), (  0,   0,  0,  0), ( 79, 178, 30, 45)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), ( 86,   1, 22, 12), ( 38,  40, 44, 43)
+   (  0,   0,  0,  0), (273,   1, 31, 26), (  0,   0,  0,  0), (  0,   0,  0,  0)
+   (402,   1, 33, 32), (  0,   0,  0,  0), (  0,   0,  0,  0), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), (109,   1, 15, 12), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), (140,   1, 17, 16), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (305,   1, 31, 26), (  0,   0,  0,  0), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (323,  40, 27, 44), (402, 270, 31, 53), (434, 270, 31, 53)
+   (  1, 324, 31, 53), ( 33, 324, 31, 53), (243, 270, 31, 52), (308, 270, 31, 53)
+   (  1, 270, 40, 46), (261, 432, 28, 55), ( 96, 324, 29, 53), (126, 324, 29, 53)
+   (156, 324, 29, 53), (213, 270, 29, 52), (186, 324, 15, 53), ( 63, 378, 15, 53)
+   (233, 324, 17, 53), (160, 270, 21, 52), (102, 224, 33, 45), (251, 324, 30, 53)
+   (282, 324, 32, 53), (315, 324, 32, 53), (348, 324, 32, 53), (381, 324, 32, 53)
+   (275, 270, 32, 52), (  0,   0,  0,  0), (172, 224, 32, 45), (414, 324, 30, 53)
+   (445, 324, 30, 53), (  1, 378, 30, 53), (182, 270, 30, 52), ( 32, 378, 30, 53)
+   (205, 224, 29, 45), (235, 224, 56, 45), ( 79, 378, 30, 53), (110, 378, 30, 53)
+   (141, 378, 30, 53), (172, 378, 30, 53), (203, 378, 30, 53), (234, 378, 30, 53)
+   (292, 224, 45, 45), (290, 432, 28, 55), (265, 378, 29, 53), (295, 378, 29, 53)
+   (325, 378, 29, 53), (355, 378, 29, 53), (385, 378, 15, 53), (401, 378, 15, 53)
+   (417, 378, 17, 53), (435, 378, 21, 53), (338, 224, 33, 45), (457, 378, 30, 53)
+   (  1, 432, 32, 53), ( 34, 432, 32, 53), ( 67, 432, 32, 53), (100, 432, 32, 53)
+   (133, 432, 32, 53), (  0,   0,  0,  0), (403, 224, 32, 45), (197, 432, 30, 53)
+   (340, 270, 30, 53), (371, 270, 30, 53), ( 65, 324, 30, 53), (202, 324, 30, 53)
+   (436, 224, 29, 45), (166, 432, 30, 53) );
+
+Define OffsetList0
+ ( (0, 0), (-2, 10), (-2, 10), (-2, 10), (-1, 7), (-2, 9), (-2, 10), (-2, 10)
+   (-2, 8), (-1, 8), (-2, 11), (-3, 21), (-2, 38), (-3, 30), (-2, 38), (-3, 9)
+   (-2, 11), (-2, 11), (-2, 11), (0, 11), (-2, 11), (-2, 11), (-2, 11), (-1, 11)
+   (-2, 11), (-2, 11), (-2, 22), (-2, 22), (-3, 19), (-3, 27), (-2, 19), (-2, 10)
+   (-3, 14), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10)
+   (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10)
+   (-2, 10), (-2, 10), (-2, 10), (-1, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10)
+   (-1, 10), (-1, 10), (-2, 10), (-2, 8), (-3, 9), (-1, 8), (0, 0), (-5, 49)
+   (-2, 3), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10)
+   (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10)
+   (-2, 10), (-2, 10), (-2, 10), (-1, 10), (-2, 10), (-2, 10), (-2, 10), (-2, 10)
+   (-1, 10), (-1, 10), (-2, 10), (-2, 8), (-1, 4), (-1, 8), (0, 0), (-2, 16)
+   (0, 0), (0, 0), (0, 0), (-1, 10), (0, 0), (0, 0), (-2, 4), (-2, 12)
+   (0, 0), (0, 23), (0, 0), (0, 0), (0, 12), (0, 0), (0, 0), (0, 0)
+   (0, 0), (0, 0), (-2, 3), (0, 0), (0, 0), (0, 0), (2, 49), (0, 0)
+   (0, 0), (0, 23), (0, 0), (0, 0), (0, 0), (-2, 16), (-2, 2), (-2, 2)
+   (-2, 2), (-2, 2), (-2, 3), (-2, 2), (-2, 10), (-2, 10), (-2, 2), (-2, 2)
+   (-2, 2), (-2, 3), (-2, 2), (-2, 2), (-3, 2), (-5, 3), (-5, 10), (-2, 2)
+   (-2, 2), (-2, 2), (-2, 2), (-2, 2), (-2, 3), (0, 0), (-2, 10), (-2, 2)
+   (-2, 2), (-2, 2), (-2, 3), (-1, 2), (-2, 10), (-1, 10), (-2, 2), (-2, 2)
+   (-2, 2), (-2, 2), (-2, 2), (-2, 2), (-2, 10), (-2, 10), (-2, 2), (-2, 2)
+   (-2, 2), (-2, 2), (-2, 2), (-2, 2), (-3, 2), (-5, 2), (-5, 10), (-2, 2)
+   (-2, 2), (-2, 2), (-2, 2), (-2, 2), (-2, 2), (0, 0), (-2, 10), (-2, 2)
+   (-2, 2), (-2, 2), (-2, 2), (-1, 2), (-2, 10), (-1, 2) );
+
+Define KerningPairs0
+ ( "\"A", "\'s", "A\"", "A\'", "AC", "AG", "AO", "AT", "AU", "AV", "AW", "AY", "Ac", "Ao", "As", "At"
+   "Au", "Av", "Aw", "BA", "C.", "CA", "DA", "DV", "DW", "F,", "F.", "FA", "Fo", "KC", "KO", "Ko"
+   "Ku", "L\"", "L\'", "LT", "LV", "LW", "LY", "OA", "OT", "OV", "OW", "OX", "P,", "P.", "PA", "RT"
+   "RV", "RW", "S.", "T,", "T-", "T.", "T:", "T;", "TA", "TO", "To", "U.", "UA", "V,", "V-", "V."
+   "V:", "V;", "VA", "VG", "VO", "Vo", "W,", "W-", "W.", "W:", "W;", "WA", "WO", "Wo", "bv", "c."
+   "ch", "ck", "cl", "dv", "dw", "f,", "f.", "fo", "ko", "lt", "lw", "ly", "ov", "ow", "ox", "p,"
+   "p.", "rs", "rt", "rv", "s.", "sw", "v,", "v.", "vA", "vo", "w,", "w.", "wA", "wo", "zo" );
+
+Define KerningValues0
+ (  -6,  -1,  -6,  -6,  -1,  -1,  -1,  -7,  -1,  -7,  -7,  -6,  -1,  -1,  -1,  -7
+    -1,  -7,  -7,  -1,  -1,  -1,  -1,  -1,  -1, -12, -13,  -5,  -1,  -3,  -3,  -3
+    -2,  -8,  -7,  -7,  -5,  -5,  -8,  -1,  -1,  -1,  -1,  -3, -11, -12,  -3,  -1
+    -1,  -1,  -1,  -8,  -7,  -9,  -5,  -4,  -7,  -1,  -1,  -1,  -1,  -6,  -4,  -7
+    -2,  -1,  -7,  -1,  -1,  -1,  -6,  -4,  -7,  -2,  -1,  -7,  -1,  -1,  -1,  -1
+    -1,  -1,  -1,  -1,  -1, -12, -13,  -1,  -3,  -7,  -5,  -6,  -1,  -1,  -3, -11
+   -12,  -1,  -1,  -1,  -1,  -1,  -6,  -7,  -5,  -1,  -6,  -7,  -4,  -1,  -2 );
+
+Define ExInfoKeys0
+ ( "sfb.bold", "sfb.boxsize", "sfb.face", "sfb.italics", "sfb.linespacing"
+   "sfb.quality", "sfb.script", "sfb.size", "sfb.text", "sfb.underline" );
+
+Define ExInfoValues0
+ ( "0", "0", "Overload", "0", "0"
+   "79298560", "0", "38", "!\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ", "0" );
+
+Define RectList1
+ ( (  0,   0,  0,  0), (405, 191,  8, 39), (212, 311, 18, 15), ( 32, 311, 20, 32)
+   (401, 102, 25, 45), (457, 102, 37, 41), (414, 191, 28, 39), (231, 311,  8, 15)
+   ( 47,   1, 12, 51), (  8,   1, 12, 51), (189, 311, 13, 20), (120, 311, 16, 24)
+   (203, 311,  8, 16), (316, 311, 23,  5), (258, 311,  9, 11), (427, 102, 14, 44)
+   (246, 271, 25, 38), (399, 271, 14, 38), (373, 271, 25, 38), (320, 271, 25, 38)
+   (298, 271, 21, 38), (272, 271, 25, 38), (196, 271, 24, 38), (443, 191, 26, 39)
+   (346, 271, 26, 38), (221, 271, 24, 38), ( 53, 311,  8, 27), (484, 271,  8, 32)
+   (105, 311, 14, 25), (240, 311, 17, 11), ( 90, 311, 14, 25), (470, 191, 21, 39)
+   (  1, 311, 30, 32), (  1, 231, 25, 39), ( 27, 231, 24, 39), ( 92, 231, 22, 39)
+   (115, 231, 24, 39), (140, 231, 23, 39), (164, 231, 22, 39), (187, 231, 25, 39)
+   (213, 231, 24, 39), (238, 231,  8, 39), (247, 231, 22, 39), (298, 231, 23, 39)
+   (322, 231, 20, 39), (343, 231, 29, 39), (373, 231, 24, 39), (223, 191, 26, 39)
+   (398, 231, 23, 39), ( 86,   1, 26, 49), (422, 231, 24, 39), (  1, 271, 25, 39)
+   ( 27, 271, 25, 39), ( 53, 271, 24, 39), ( 78, 271, 25, 39), (104, 271, 41, 39)
+   (170, 271, 25, 39), ( 36, 150, 24, 39), ( 61, 150, 25, 39), ( 21,   1, 12, 51)
+   (442, 102, 14, 44), ( 60,   1, 12, 51), (  0,   0,  0,  0), (340, 311, 23,  5)
+   (307, 311,  8,  6), ( 87, 150, 24, 39), (112, 150, 24, 39), (137, 150, 22, 39)
+   (160, 150, 24, 39), (185, 150, 23, 39), (209, 150, 22, 39), (232, 150, 25, 39)
+   (258, 150, 24, 39), (283, 150,  8, 39), (292, 150, 22, 39), (315, 150, 23, 39)
+   (339, 150, 20, 39), (360, 150, 29, 39), (390, 150, 24, 39), (415, 150, 26, 39)
+   (442, 150, 23, 39), (159,   1, 26, 48), (466, 150, 24, 39), (  1, 191, 25, 39)
+   ( 27, 191, 25, 39), ( 53, 191, 24, 39), ( 78, 191, 25, 39), (104, 191, 41, 39)
+   (146, 191, 25, 39), (172, 191, 24, 39), (197, 191, 25, 39), ( 34,   1, 12, 51)
+   (  1,   1,  6, 52), ( 73,   1, 12, 51), (  0,   0,  0,  0), (414, 271,  8, 38)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), (  0,   0,  0,  0), (250, 191, 24, 39)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), (280, 311, 16,  6), (445, 271, 38, 37)
+   (  0,   0,  0,  0), (137, 311, 25, 20), (  0,   0,  0,  0), (  0,   0,  0,  0)
+   ( 62, 311, 27, 26), (  0,   0,  0,  0), (  0,   0,  0,  0), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), (297, 311,  9,  6), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (  0,   0,  0,  0), (268, 311, 11, 10), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (163, 311, 25, 20), (  0,   0,  0,  0), (  0,   0,  0,  0)
+   (  0,   0,  0,  0), (423, 271, 21, 38), (286,   1, 25, 47), (284,  54, 25, 47)
+   (258,  54, 25, 47), (232,  54, 25, 47), (375, 102, 25, 46), (181,  54, 25, 47)
+   (  1, 150, 34, 40), (136,   1, 22, 49), (157,  54, 23, 47), (133,  54, 23, 47)
+   (109,  54, 23, 47), (335, 102, 23, 46), ( 75,  54,  9, 47), ( 65,  54,  9, 47)
+   ( 53,  54, 11, 47), (359, 102, 15, 46), (275, 191, 27, 39), ( 28,  54, 24, 47)
+   (  1,  54, 26, 47), (466,   1, 26, 47), (439,   1, 26, 47), (412,   1, 26, 47)
+   (308, 102, 26, 46), (  0,   0,  0,  0), (303, 191, 26, 39), (362,   1, 24, 47)
+   (337,   1, 24, 47), (312,   1, 24, 47), (283, 102, 24, 46), (186,   1, 24, 47)
+   (330, 191, 23, 39), (354, 191, 50, 39), (207,  54, 24, 47), (310,  54, 24, 47)
+   (335,  54, 24, 47), (360,  54, 24, 47), (385,  54, 24, 47), (410,  54, 24, 47)
+   ( 52, 231, 39, 39), (113,   1, 22, 49), ( 85,  54, 23, 47), (435,  54, 23, 47)
+   (459,  54, 23, 47), (  1, 102, 23, 47), ( 25, 102,  9, 47), ( 35, 102,  9, 47)
+   ( 45, 102, 11, 47), ( 57, 102, 15, 47), (270, 231, 27, 39), ( 73, 102, 24, 47)
+   ( 98, 102, 26, 47), (125, 102, 26, 47), (152, 102, 26, 47), (179, 102, 26, 47)
+   (206, 102, 26, 47), (  0,   0,  0,  0), (447, 231, 26, 39), (233, 102, 24, 47)
+   (258, 102, 24, 47), (211,   1, 24, 47), (236,   1, 24, 47), (261,   1, 24, 47)
+   (146, 271, 23, 39), (387,   1, 24, 47) );
+
+Define OffsetList1
+ ( (0, 0), (1, 13), (1, 13), (1, 13), (2, 10), (1, 12), (1, 13), (1, 13)
+   (1, 11), (2, 11), (1, 14), (0, 24), (1, 41), (0, 33), (1, 41), (0, 12)
+   (1, 14), (1, 14), (1, 14), (3, 14), (1, 14), (1, 14), (1, 14), (2, 14)
+   (1, 14), (1, 14), (1, 25), (1, 25), (0, 22), (0, 30), (1, 22), (1, 13)
+   (0, 17), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13)
+   (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13)
+   (1, 13), (1, 13), (1, 13), (2, 13), (1, 13), (1, 13), (1, 13), (1, 13)
+   (2, 13), (2, 13), (1, 13), (1, 11), (0, 12), (2, 11), (0, 0), (-2, 52)
+   (1, 6), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13)
+   (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13), (1, 13)
+   (1, 13), (1, 13), (1, 13), (2, 13), (1, 13), (1, 13), (1, 13), (1, 13)
+   (2, 13), (2, 13), (1, 13), (1, 11), (2, 7), (2, 11), (0, 0), (1, 19)
+   (0, 0), (0, 0), (0, 0), (2, 13), (0, 0), (0, 0), (1, 7), (1, 15)
+   (0, 0), (3, 26), (0, 0), (0, 0), (3, 15), (0, 0), (0, 0), (0, 0)
+   (0, 0), (0, 0), (1, 6), (0, 0), (0, 0), (0, 0), (5, 52), (0, 0)
+   (0, 0), (3, 26), (0, 0), (0, 0), (0, 0), (1, 19), (1, 5), (1, 5)
+   (1, 5), (1, 5), (1, 6), (1, 5), (1, 13), (1, 13), (1, 5), (1, 5)
+   (1, 5), (1, 6), (1, 5), (1, 5), (0, 5), (-2, 6), (-2, 13), (1, 5)
+   (1, 5), (1, 5), (1, 5), (1, 5), (1, 6), (0, 0), (1, 13), (1, 5)
+   (1, 5), (1, 5), (1, 6), (2, 5), (1, 13), (2, 13), (1, 5), (1, 5)
+   (1, 5), (1, 5), (1, 5), (1, 5), (1, 13), (1, 13), (1, 5), (1, 5)
+   (1, 5), (1, 5), (1, 5), (1, 5), (0, 5), (-2, 5), (-2, 13), (1, 5)
+   (1, 5), (1, 5), (1, 5), (1, 5), (1, 5), (0, 0), (1, 13), (1, 5)
+   (1, 5), (1, 5), (1, 5), (2, 5), (1, 13), (2, 5) );
+
+Define ExInfoValues1
+ ( "0", "0", "Overload", "0", "0"
+   "44892160", "0", "38", "!\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ", "0" );
+
+Define ExInfoValues2
+ ( "0", "0", "Overload", "0", "0"
+   "86179840", "0", "38", "!\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ", "0" );
+
+CreateLayer               Outline;
+LayerSetImage             Outline 'Overload24-Outline';
+LayerSetBaseOrder         Outline 0;
+LayerSetAscent            Outline 52;
+LayerSetHeight            Outline 63;
+LayerSetCharWidths        Outline CharList0 WidthList0;
+LayerSetKerningPairs      Outline KerningPairs0 KerningValues0;
+LayerSetImageMap          Outline CharList0 RectList0;
+LayerSetCharOffsets       Outline CharList0 OffsetList0;
+LayerSetPointSize         Outline 38;
+LayerRequireTags          Outline ('OUTLINE');
+LayerSetColorMult         Outline (0.000000, 0.000000, 0.000000, 1.000000);
+LayerSetExInfo            Outline ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Outline 1;
+
+CreateLayer               Outline1;
+LayerSetImage             Outline1 'Overload24-Outline';
+LayerSetBaseOrder         Outline1 0;
+LayerSetAscent            Outline1 52;
+LayerSetHeight            Outline1 63;
+LayerSetCharWidths        Outline1 CharList0 WidthList0;
+LayerSetKerningPairs      Outline1 KerningPairs0 KerningValues0;
+LayerSetImageMap          Outline1 CharList0 RectList0;
+LayerSetCharOffsets       Outline1 CharList0 OffsetList0;
+LayerSetPointSize         Outline1 38;
+LayerRequireTags          Outline1 ('FONT1');
+LayerSetOffset            Outline1 (0, 0);
+LayerSetColorMult         Outline1 (0.298039, 0.298039, 1.000000, 0.898039);
+LayerSetExInfo            Outline1 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Outline1 1;
+
+CreateLayer               Main;
+LayerSetImage             Main 'Overload24';
+LayerSetBaseOrder         Main 1;
+LayerSetAscent            Main 52;
+LayerSetHeight            Main 63;
+LayerSetCharWidths        Main CharList0 WidthList0;
+LayerSetKerningPairs      Main KerningPairs0 KerningValues0;
+LayerSetImageMap          Main CharList0 RectList1;
+LayerSetCharOffsets       Main CharList0 OffsetList1;
+LayerSetPointSize         Main 38;
+LayerSetSpacing           Main 1;
+LayerSetExInfo            Main ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Main 1;
+
+CreateLayer               Outline2;
+LayerSetImage             Outline2 'Overload24-Outline';
+LayerSetBaseOrder         Outline2 0;
+LayerSetAscent            Outline2 52;
+LayerSetHeight            Outline2 63;
+LayerSetCharWidths        Outline2 CharList0 WidthList0;
+LayerSetKerningPairs      Outline2 KerningPairs0 KerningValues0;
+LayerSetImageMap          Outline2 CharList0 RectList0;
+LayerSetCharOffsets       Outline2 CharList0 OffsetList0;
+LayerSetPointSize         Outline2 38;
+LayerRequireTags          Outline2 ('FONT2');
+LayerSetOffset            Outline2 (0, 0);
+LayerSetColorMult         Outline2 (0.000000, 0.000000, 0.000000, 1.000000);
+LayerSetExInfo            Outline2 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Outline2 1;
+
+CreateLayer               Outline3;
+LayerSetImage             Outline3 'Overload24-Outline';
+LayerSetBaseOrder         Outline3 0;
+LayerSetAscent            Outline3 52;
+LayerSetHeight            Outline3 63;
+LayerSetCharWidths        Outline3 CharList0 WidthList0;
+LayerSetKerningPairs      Outline3 KerningPairs0 KerningValues0;
+LayerSetImageMap          Outline3 CharList0 RectList0;
+LayerSetCharOffsets       Outline3 CharList0 OffsetList0;
+LayerSetPointSize         Outline3 38;
+LayerRequireTags          Outline3 ('FONT3');
+LayerSetOffset            Outline3 (0, 0);
+LayerSetColorMult         Outline3 (0.607843, 0.019608, 0.494118, 1.000000);
+LayerSetExInfo            Outline3 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Outline3 1;
+
+CreateLayer               Outline4;
+LayerSetImage             Outline4 'Overload24-Outline';
+LayerSetBaseOrder         Outline4 0;
+LayerSetAscent            Outline4 52;
+LayerSetHeight            Outline4 63;
+LayerSetCharWidths        Outline4 CharList0 WidthList0;
+LayerSetKerningPairs      Outline4 KerningPairs0 KerningValues0;
+LayerSetImageMap          Outline4 CharList0 RectList0;
+LayerSetCharOffsets       Outline4 CharList0 OffsetList0;
+LayerSetPointSize         Outline4 38;
+LayerRequireTags          Outline4 ('FONT4');
+LayerSetOffset            Outline4 (0, 0);
+LayerSetColorMult         Outline4 (0.584314, 0.196078, 0.054900, 1.000000);
+LayerSetExInfo            Outline4 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Outline4 1;
+
+CreateLayer               Outline5;
+LayerSetImage             Outline5 'Overload24-Outline';
+LayerSetBaseOrder         Outline5 0;
+LayerSetAscent            Outline5 52;
+LayerSetHeight            Outline5 63;
+LayerSetCharWidths        Outline5 CharList0 WidthList0;
+LayerSetKerningPairs      Outline5 KerningPairs0 KerningValues0;
+LayerSetImageMap          Outline5 CharList0 RectList0;
+LayerSetCharOffsets       Outline5 CharList0 OffsetList0;
+LayerSetPointSize         Outline5 38;
+LayerRequireTags          Outline5 ('FONT5');
+LayerSetOffset            Outline5 (0, 0);
+LayerSetColorMult         Outline5 (0.000000, 0.298039, 1.000000, 1.000000);
+LayerSetExInfo            Outline5 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Outline5 1;
+
+CreateLayer               Main1;
+LayerSetImage             Main1 'Overload24';
+LayerSetBaseOrder         Main1 1;
+LayerSetAscent            Main1 52;
+LayerSetHeight            Main1 63;
+LayerSetCharWidths        Main1 CharList0 WidthList0;
+LayerSetKerningPairs      Main1 KerningPairs0 KerningValues0;
+LayerSetImageMap          Main1 CharList0 RectList1;
+LayerSetCharOffsets       Main1 CharList0 OffsetList1;
+LayerSetPointSize         Main1 38;
+LayerRequireTags          Main1 ('FONT1');
+LayerSetOffset            Main1 (0, 0);
+LayerSetSpacing           Main1 1;
+LayerSetExInfo            Main1 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Main1 1;
+
+CreateLayer               Main2;
+LayerSetImage             Main2 'Overload24';
+LayerSetBaseOrder         Main2 1;
+LayerSetAscent            Main2 52;
+LayerSetHeight            Main2 63;
+LayerSetCharWidths        Main2 CharList0 WidthList0;
+LayerSetKerningPairs      Main2 KerningPairs0 KerningValues0;
+LayerSetImageMap          Main2 CharList0 RectList1;
+LayerSetCharOffsets       Main2 CharList0 OffsetList1;
+LayerSetPointSize         Main2 38;
+LayerRequireTags          Main2 ('FONT2');
+LayerSetOffset            Main2 (0, 0);
+LayerSetSpacing           Main2 1;
+LayerSetExInfo            Main2 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Main2 1;
+
+CreateLayer               Main3;
+LayerSetImage             Main3 'Overload24';
+LayerSetBaseOrder         Main3 1;
+LayerSetAscent            Main3 52;
+LayerSetHeight            Main3 63;
+LayerSetCharWidths        Main3 CharList0 WidthList0;
+LayerSetKerningPairs      Main3 KerningPairs0 KerningValues0;
+LayerSetImageMap          Main3 CharList0 RectList1;
+LayerSetCharOffsets       Main3 CharList0 OffsetList1;
+LayerSetPointSize         Main3 38;
+LayerRequireTags          Main3 ('FONT3');
+LayerSetOffset            Main3 (0, 0);
+LayerSetColorMult         Main3 (0.000000, 0.000000, 0.000000, 1.000000);
+LayerSetColorAdd          Main3 (1.000000, 0.866667, 0.964706, 0.000000);
+LayerSetSpacing           Main3 1;
+LayerSetExInfo            Main3 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Main3 1;
+
+CreateLayer               Main4;
+LayerSetImage             Main4 'Overload24';
+LayerSetBaseOrder         Main4 1;
+LayerSetAscent            Main4 52;
+LayerSetHeight            Main4 63;
+LayerSetCharWidths        Main4 CharList0 WidthList0;
+LayerSetKerningPairs      Main4 KerningPairs0 KerningValues0;
+LayerSetImageMap          Main4 CharList0 RectList1;
+LayerSetCharOffsets       Main4 CharList0 OffsetList1;
+LayerSetPointSize         Main4 38;
+LayerRequireTags          Main4 ('FONT4');
+LayerSetOffset            Main4 (0, 0);
+LayerSetColorMult         Main4 (0.000000, 0.000000, 0.000000, 1.000000);
+LayerSetColorAdd          Main4 (0.996078, 0.960784, 0.721569, 0.000000);
+LayerSetSpacing           Main4 1;
+LayerSetExInfo            Main4 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Main4 1;
+
+CreateLayer               Main5;
+LayerSetImage             Main5 'Overload24';
+LayerSetBaseOrder         Main5 1;
+LayerSetAscent            Main5 52;
+LayerSetHeight            Main5 63;
+LayerSetCharWidths        Main5 CharList0 WidthList0;
+LayerSetKerningPairs      Main5 KerningPairs0 KerningValues0;
+LayerSetImageMap          Main5 CharList0 RectList1;
+LayerSetCharOffsets       Main5 CharList0 OffsetList1;
+LayerSetPointSize         Main5 38;
+LayerRequireTags          Main5 ('FONT5');
+LayerSetOffset            Main5 (0, 0);
+LayerSetColorMult         Main5 (0.000000, 0.000000, 1.000000, 1.000000);
+LayerSetColorAdd          Main5 (0.003922, 0.298039, 0.909804, 0.000000);
+LayerSetSpacing           Main5 1;
+LayerSetExInfo            Main5 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Main5 1;
+
+
+CreateLayer               Grad;
+LayerSetImage             Grad 'Overload24-Gradient';
+LayerSetBaseOrder         Grad 2;
+LayerSetAscent            Grad 52;
+LayerSetHeight            Grad 63;
+LayerSetCharWidths        Grad CharList0 WidthList0;
+LayerSetKerningPairs      Grad KerningPairs0 KerningValues0;
+LayerSetImageMap          Grad CharList0 RectList1;
+LayerSetCharOffsets       Grad CharList0 OffsetList1;
+LayerSetPointSize         Grad 38;
+LayerRequireTags          Grad ('FONT1');
+LayerSetOffset            Grad (0, 0);
+LayerSetColorMult         Grad (0.298039, 0.647059, 1.000000, 1.000000);
+LayerSetColorAdd          Grad (0.000000, 0.000000, 0.000000, 0.098039);
+LayerSetExInfo            Grad ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Grad 1;
+
+CreateLayer               Grad2;
+LayerSetImage             Grad2 'Overload24-Gradient';
+LayerSetBaseOrder         Grad2 2;
+LayerSetAscent            Grad2 52;
+LayerSetHeight            Grad2 63;
+LayerSetCharWidths        Grad2 CharList0 WidthList0;
+LayerSetKerningPairs      Grad2 KerningPairs0 KerningValues0;
+LayerSetImageMap          Grad2 CharList0 RectList1;
+LayerSetCharOffsets       Grad2 CharList0 OffsetList1;
+LayerSetPointSize         Grad2 38;
+LayerRequireTags          Grad2 ('FONT2');
+LayerSetOffset            Grad2 (0, 0);
+LayerSetColorMult         Grad2 (0.000000, 0.000000, 0.000000, 1.000000);
+LayerSetColorAdd          Grad2 (1.000000, 0.298039, 0.000000, 0.000000);
+LayerSetExInfo            Grad2 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Grad2 1;
+
+CreateLayer               Grad3;
+LayerSetImage             Grad3 'Overload24-Gradient';
+LayerSetBaseOrder         Grad3 2;
+LayerSetAscent            Grad3 52;
+LayerSetHeight            Grad3 63;
+LayerSetCharWidths        Grad3 CharList0 WidthList0;
+LayerSetKerningPairs      Grad3 KerningPairs0 KerningValues0;
+LayerSetImageMap          Grad3 CharList0 RectList1;
+LayerSetCharOffsets       Grad3 CharList0 OffsetList1;
+LayerSetPointSize         Grad3 38;
+LayerRequireTags          Grad3 ('FONT3');
+LayerSetOffset            Grad3 (0, 0);
+LayerSetColorMult         Grad3 (0.000000, 0.000000, 0.000000, 1.000000);
+LayerSetColorAdd          Grad3 (0.933333, 0.545098, 0.847059, 0.000000);
+LayerSetExInfo            Grad3 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Grad3 1;
+
+CreateLayer               Grad4;
+LayerSetImage             Grad4 'Overload24-Gradient';
+LayerSetBaseOrder         Grad4 2;
+LayerSetAscent            Grad4 52;
+LayerSetHeight            Grad4 63;
+LayerSetCharWidths        Grad4 CharList0 WidthList0;
+LayerSetKerningPairs      Grad4 KerningPairs0 KerningValues0;
+LayerSetImageMap          Grad4 CharList0 RectList1;
+LayerSetCharOffsets       Grad4 CharList0 OffsetList1;
+LayerSetPointSize         Grad4 38;
+LayerRequireTags          Grad4 ('FONT4');
+LayerSetOffset            Grad4 (0, 0);
+LayerSetColorMult         Grad4 (0.000000, 0.000000, 0.000000, 1.000000);
+LayerSetColorAdd          Grad4 (0.968627, 0.854902, 0.427450, 0.000000);
+LayerSetExInfo            Grad4 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Grad4 1;
+
+CreateLayer               Grad5;
+LayerSetImage             Grad5 'Overload24-Gradient';
+LayerSetBaseOrder         Grad5 2;
+LayerSetAscent            Grad5 52;
+LayerSetHeight            Grad5 63;
+LayerSetCharWidths        Grad5 CharList0 WidthList0;
+LayerSetKerningPairs      Grad5 KerningPairs0 KerningValues0;
+LayerSetImageMap          Grad5 CharList0 RectList1;
+LayerSetCharOffsets       Grad5 CharList0 OffsetList1;
+LayerSetPointSize         Grad5 38;
+LayerRequireTags          Grad5 ('FONT5');
+LayerSetOffset            Grad5 (0, 0);
+LayerSetColorMult         Grad5 (0.000000, 0.000000, 1.000000, 1.000000);
+LayerSetColorAdd          Grad5 (0.003922, 0.654902, 1.000000, 0.000000);
+LayerSetExInfo            Grad5 ExInfoKeys0 ExInfoValues0;
+LayerSetAlphaCorrection   Grad5 1;
+
+LayerSetBaseOrder Outline 0;
+LayerSetBaseOrder Outline1 1;
+LayerSetBaseOrder Outline2 2;
+LayerSetBaseOrder Outline3 3;
+LayerSetBaseOrder Outline4 4;
+LayerSetBaseOrder Outline5 5;
+LayerSetBaseOrder Main 6;
+LayerSetBaseOrder Grad 7;
+LayerSetBaseOrder Grad2 8;
+LayerSetBaseOrder Grad3 9;
+LayerSetBaseOrder Grad4 10;
+LayerSetBaseOrder Grad5 11;
+SetDefaultPointSize       38;
