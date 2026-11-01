@@ -25,31 +25,40 @@ Additionally, TheAwesomeBlue simply had a strange thought for a while now: It ha
 
 ## FAQ
 
-- iOS version???
+- **iOS version???**
+
   Maybe in the future, but right now we don't have the hardware to test or compile iOS apps. Would love to do it though.
 
-- Will this get any updates?
+- **Will this get any updates?**
+
   If we think of cool stuff to add, likely. If we have to fix bugs, definitetly. We may add the exclusive Peggle Dual Shot levels too, but don't count on it yet. The peg placements would have to be remade.
 
-- Will any other PopCap Games get the same treatment?
+- **Will any other PopCap Games get the same treatment?**
+
   Bookworm is highly likely, the rest probably not. The reason being that there's already great ways of playing nearly all of the PopCap games that ever received an iOS port on modern Android. You can find these on the "MORE GAMES" button in-game.
 
-- What devices are supported?
+- **What devices are supported?**
+
   Any Android device with an armv7, arm64 or x64 processor running Android 6.0 or later.
 
-- What Android devices was this tested on?
+- **What Android devices was this tested on?**
+
   - Redmi Note 13 Pro 5G (Android 13): Great performance. All adventures were beaten here with no issues.
   - Huawei MediaPad T3 10 (Android 7): Great performance, briefly tested in a few levels.
   - Samsung Galaxy J2 Prime (Android 6): Great performance, relatively long initial loading time but the game itself runs well. Briefly tested in a few levels.
 
-- Why do some textures look different from the original iOS version?
+- **Why do some textures look different from the original iOS version?**
+
   On the non-HD version, a small number of textures were modified or added to make them look better on ultrawide displays. These replacement textures were taken from the Peggle console version.
 
-- Dynamic music??
+- **Dynamic music??**
+
   Maybe in the future, but unlikely. If it does get added, it will be a setting due to performance concerns on lower end devices.
 
-- Was AI used to generate graphics or music?
+- **Was AI used to generate graphics or music?**
+
   Nope. AI was purely used for the game code. Graphical edits, app icon remakes and music additions were all done manually. This readme was written by hand too.
 
-- Why was AI used for the code?
+- **Why was AI used for the code?**
+
   We do not have the time or resources needed to do a full analysis of the iOS code manually. We playtested it for a while, even comparing it with real hardware to ensure the game was working right/accurately. (HD: iPad 3 - Original: iPhone 4S)
