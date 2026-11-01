@@ -25,6 +25,8 @@ dotnet publish Peggle.Desktop -c Release -r "$RID" --self-contained \
 
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp -R "$PUBLISH"/. "$APP/Contents/MacOS/"
+# Game data goes in Resources (Program.cs looks there): codesign rejects data folders like en.lproj in MacOS.
+mv "$APP/Contents/MacOS/Content" "$APP/Contents/Resources/Content"
 cp "Peggle.Desktop/Icons/$EDITION/icon.icns" "$APP/Contents/Resources/icon.icns"
 chmod +x "$APP/Contents/MacOS/$EXE"
 
