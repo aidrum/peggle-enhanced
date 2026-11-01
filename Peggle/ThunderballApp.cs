@@ -503,14 +503,14 @@ namespace Sexy
             RegistryReadBoolean("MainMenuAmbience", ref mMainMenuAmbience);
             // Port: lazy loading is an option, read once here (a change applies on the next start).
             // Phones keep the original's lazy loading; PCs load everything while the loading screen shows.
-            mLazyResourceLoading = OperatingSystem.IsAndroid();
+            mLazyResourceLoading = Main.IsMobile;
             RegistryReadBoolean("LazyLoading", ref mLazyResourceLoading);
             mLazyLoadingOption = mLazyResourceLoading;
             // Port: High Quality Pegs is on by default on PCs, off on phones.
-            bool aHighQualityPegs = !OperatingSystem.IsAndroid();
+            bool aHighQualityPegs = !Main.IsMobile;
             RegistryReadBoolean("HighQualityPegs", ref aHighQualityPegs);
             RegistryReadBoolean("RandomMusic", ref mRandomMusic);
-            mPCControls = !OperatingSystem.IsAndroid();
+            mPCControls = !Main.IsMobile;
             if (mPCControls)
             {
                 RegistryReadBoolean("PCControls", ref mPCControls);
@@ -826,7 +826,7 @@ namespace Sexy
         /// <summary>Port addition: sets the PC Controls option and saves it; it applies at once.</summary>
         public void SetPCControls(bool theOn)
         {
-            if (OperatingSystem.IsAndroid())
+            if (Main.IsMobile)
             {
                 return;
             }

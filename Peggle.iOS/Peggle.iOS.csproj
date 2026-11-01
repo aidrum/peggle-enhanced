@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    iOS / iPadOS build (MonoGame iOS). Like Peggle.Android, it swaps the DesktopGL MonoGame the shared
+    projects compile against for MonoGame.Framework.iOS (same assembly, same API).
+    Unsigned device build (what .github/workflows/ios.yml does, then zips Payload/*.app into an .ipa
+    that Sideloadly / AltStore / TrollStore re-sign on install):
+      dotnet build Peggle.iOS -c Release -r ios-arm64 -p:EnableCodeSigning=false
+    Pick the edition with -p:PeggleEdition=iPhone, as for the other platforms.
+  -->
+  <PropertyGroup>
+    <!-- Pinned to the iOS 26.0 bindings: the default (latest) ones require the newest Xcode, which CI
+         runners lag behind; these build with any Xcode 26.x or later. -->
+    <TargetFramework>net10.0-ios26.0</TargetFramework>
+    <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Peggle.iOS</RootNamespace>
+    <AssemblyName>PeggleClassic</AssemblyName>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <ApplicationId>com.aidrum.peggle.hd</ApplicationId>
+    <ApplicationTitle>Peggle HD</ApplicationTitle>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>$(Version)</ApplicationDisplayVersion>
+    <!-- No Mac Catalyst / simulator-specific setup; the device build is ios-arm64. -->
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">ios-arm64</RuntimeIdentifier>
+  </PropertyGroup>
+  <!-- The iPhone edition is a separate app, so both can be installed side by side. -->
+  <PropertyGroup Condition="'$(PeggleEdition)' == 'iPhone'">
+    <ApplicationId>com.aidrum.peggle</ApplicationId>
+    <ApplicationTitle>Peggle</ApplicationTitle>
+  </PropertyGroup>
+  <!-- iOS forbids JIT: Release is fully AOT compiled. As on Android, trimming only touches the framework
+       libraries; the game's own assemblies (which use reflection here and there) are kept whole. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TrimMode>partial</TrimMode>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <TrimmerRootAssembly Include="PeggleClassic" RootMode="All" />
+    <TrimmerRootAssembly Include="PeggleGame" RootMode="All" />
+    <TrimmerRootAssembly Include="SexyFramework" RootMode="All" />
+    <TrimmerRootAssembly Include="MonoGame.Framework" RootMode="All" />
+    <TrimmerRootAssembly Include="NVorbis" RootMode="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.4.1" />
+    <!-- CPU image decoding with straight alpha (see Program.DecodeImage). -->
+    <PackageReference Include="StbImageSharp" Version="2.30.15" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Peggle\Peggle.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- App icon for the edition (a single 1024px image; actool makes the rest). -->
+    <!-- Not the default glob, which would pick up every edition's icon set under its own path. -->
+    <ImageAsset Remove="Icons\**" />
+    <ImageAsset Include="Icons\$(PeggleEdition)\Assets.xcassets\**\*" Link="Assets.xcassets\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Remove="Icons\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Converted game assets, read as loose files from the app bundle's Content folder
+         (ContentFS's default: AppContext.BaseDirectory/Content). -->
+    <BundleResource Include="..\Peggle\Content.Shared\**\*" Link="Content\%(RecursiveDir)%(Filename)%(Extension)" />
+    <BundleResource Include="..\Peggle\Content.$(PeggleEdition)\**\*" Link="Content\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

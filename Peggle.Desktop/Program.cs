@@ -17,6 +17,25 @@ namespace Peggle.Desktop
             // Saves live next to the executable, like the original PC release.
             // Debug aid: SEXY_STORAGE_DIR points saves/profiles at another folder (scripted test runs).
             string storage = Environment.GetEnvironmentVariable("SEXY_STORAGE_DIR");
+            // In a macOS .app the game data lives in Contents/Resources/Content (codesign rejects data
+            // folders such as en.lproj next to the executable in Contents/MacOS).
+            string bundleContent = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Resources", "Content"));
+            if (OperatingSystem.IsMacOS() && !Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Content")) && Directory.Exists(bundleContent))
+            {
+                ContentFS.Root = bundleContent;
+            }
+            if (storage == null && OperatingSystem.IsMacOS())
+            {
+                // A .app bundle is read-only (and may run from a randomized, translocated path), so macOS
+                // saves go to ~/Library/Application Support/Peggle Enhanced/<edition>.
+                storage = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "Library", "Application Support", "Peggle Enhanced",
+#if PEGGLE_IPHONE
+                    "iPhone");
+#else
+                    "HD");
+#endif
+            }
             if (storage == null)
             {
                 storage = AppContext.BaseDirectory;
