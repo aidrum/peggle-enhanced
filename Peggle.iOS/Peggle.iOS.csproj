@@ -8,7 +8,9 @@
     Pick the edition with -p:PeggleEdition=iPhone, as for the other platforms.
   -->
   <PropertyGroup>
-    <TargetFramework>net10.0-ios</TargetFramework>
+    <!-- Pinned to the iOS 26.0 bindings: the default (latest) ones require the newest Xcode, which CI
+         runners lag behind; these build with any Xcode 26.x or later. -->
+    <TargetFramework>net10.0-ios26.0</TargetFramework>
     <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <RootNamespace>Peggle.iOS</RootNamespace>
@@ -50,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- App icon for the edition (a single 1024px image; actool makes the rest). -->
+    <!-- Not the default glob, which would pick up every edition's icon set under its own path. -->
+    <ImageAsset Remove="Icons\**" />
     <ImageAsset Include="Icons\$(PeggleEdition)\Assets.xcassets\**\*" Link="Assets.xcassets\%(RecursiveDir)%(Filename)%(Extension)" />
     <None Remove="Icons\**" />
   </ItemGroup>
