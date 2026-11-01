@@ -14,40 +14,12 @@ namespace Peggle.Desktop
                 TestLevels(args[1]);
                 return;
             }
-            // Saves live next to the executable, like the original PC release.
+            if (OperatingSystem.IsMacOS())
+            {
+                UseAppBundleContent();
+            }
             // Debug aid: SEXY_STORAGE_DIR points saves/profiles at another folder (scripted test runs).
-            string storage = Environment.GetEnvironmentVariable("SEXY_STORAGE_DIR");
-            // In a macOS .app the game data lives in Contents/Resources/Content (codesign rejects data
-            // folders such as en.lproj next to the executable in Contents/MacOS).
-            string bundleContent = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Resources", "Content"));
-            if (OperatingSystem.IsMacOS() && !Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Content")) && Directory.Exists(bundleContent))
-            {
-                ContentFS.Root = bundleContent;
-            }
-#if PEGGLE_IPHONE
-            const string edition = "iPhone";
-#else
-            const string edition = "HD";
-#endif
-            if (storage == null && OperatingSystem.IsMacOS())
-            {
-                // A .app bundle is read-only (and may run from a randomized, translocated path), so macOS
-                // saves go to ~/Library/Application Support/Peggle Enhanced/<edition>.
-                storage = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                    "Library", "Application Support", "Peggle Enhanced", edition);
-            }
-            if (storage == null && OperatingSystem.IsLinux() && !HasSaves(AppContext.BaseDirectory))
-            {
-                // Linux: $XDG_DATA_HOME (~/.local/share)/Peggle Enhanced/<edition>, as the install folder may
-                // be read-only (an AppImage always is). Saves already next to the executable stay there.
-                storage = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData,
-                    Environment.SpecialFolderOption.Create), "Peggle Enhanced", edition);
-            }
-            if (storage == null)
-            {
-                storage = AppContext.BaseDirectory;
-                ImportOldSaves(storage);
-            }
+            string storage = Environment.GetEnvironmentVariable("SEXY_STORAGE_DIR") ?? GetDefaultStorageDir();
             Directory.CreateDirectory(storage);
             Sexy.Main.AppFactory = game => new ThunderballApp(game);
             using (Sexy.Main game = new Sexy.Main())
@@ -59,6 +31,52 @@ namespace Peggle.Desktop
                 game.Window.Title = "Peggle HD";
 #endif
                 game.Run();
+            }
+        }
+
+        /// <summary>The per-edition folder name used under the OS's application data folder.</summary>
+#if PEGGLE_IPHONE
+        private const string SAVE_FOLDER_EDITION = "iPhone";
+#else
+        private const string SAVE_FOLDER_EDITION = "HD";
+#endif
+
+        /// <summary>
+        /// Where saves live when SEXY_STORAGE_DIR isn't set:
+        /// <list type="bullet">
+        /// <item>Windows: next to the executable, like the original PC release.</item>
+        /// <item>macOS: ~/Library/Application Support/Peggle Enhanced/&lt;edition&gt;, as a .app bundle is read-only
+        /// (and may run from a randomized, translocated path).</item>
+        /// <item>Linux: $XDG_DATA_HOME (~/.local/share)/Peggle Enhanced/&lt;edition&gt;, as the install folder may be
+        /// read-only (an AppImage always is). Saves already next to the executable keep being used.</item>
+        /// </list>
+        /// </summary>
+        private static string GetDefaultStorageDir()
+        {
+            if (OperatingSystem.IsMacOS())
+            {
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "Library", "Application Support", "Peggle Enhanced", SAVE_FOLDER_EDITION);
+            }
+            if (OperatingSystem.IsLinux() && !HasSaves(AppContext.BaseDirectory))
+            {
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData,
+                    Environment.SpecialFolderOption.Create), "Peggle Enhanced", SAVE_FOLDER_EDITION);
+            }
+            ImportOldSaves(AppContext.BaseDirectory);
+            return AppContext.BaseDirectory;
+        }
+
+        /// <summary>
+        /// In a macOS .app the game data lives in Contents/Resources/Content (codesign rejects data folders such
+        /// as en.lproj next to the executable in Contents/MacOS); a plain build keeps it next to the executable.
+        /// </summary>
+        private static void UseAppBundleContent()
+        {
+            string aBundleContent = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Resources", "Content"));
+            if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Content")) && Directory.Exists(aBundleContent))
+            {
+                ContentFS.Root = aBundleContent;
             }
         }
 

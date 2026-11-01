@@ -10,18 +10,19 @@ using UIKit;
 namespace Peggle.iOS
 {
     /// <summary>
-    /// iOS host (MonoGame's iOS template): UIKit starts the app delegate, which runs the game. Mirrors
+    /// iOS host (MonoGame's iOS template): UIKit starts this app delegate, which runs the game. Mirrors
     /// Peggle.Android's GameActivity: the game data is read as loose files from the app bundle's Content
     /// folder (ContentFS's default), saves go to the app's Documents folder (visible in the Files app).
     /// </summary>
     [Register("AppDelegate")]
-    internal class Program : UIApplicationDelegate
+    internal class AppDelegate : UIApplicationDelegate
     {
+        // Held for the app's lifetime; UIKit keeps running the game loop after FinishedLaunching returns.
         private static Sexy.Main sGame;
 
         private static void Main(string[] args)
         {
-            UIApplication.Main(args, null, typeof(Program));
+            UIApplication.Main(args, null, typeof(AppDelegate));
         }
 
         public override void FinishedLaunching(UIApplication app)

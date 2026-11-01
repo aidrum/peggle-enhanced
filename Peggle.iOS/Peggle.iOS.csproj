@@ -21,7 +21,7 @@
     <ApplicationTitle>Peggle HD</ApplicationTitle>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>$(Version)</ApplicationDisplayVersion>
-    <!-- No Mac Catalyst / simulator-specific setup; the device build is ios-arm64. -->
+    <!-- Device builds only (no simulator setup), so ios-arm64 unless another RID is given. -->
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">ios-arm64</RuntimeIdentifier>
   </PropertyGroup>
   <!-- The iPhone edition is a separate app, so both can be installed side by side. -->
@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.4.1" />
-    <!-- CPU image decoding with straight alpha (see Program.DecodeImage). -->
+    <!-- CPU image decoding with straight alpha (see AppDelegate.DecodeImage). -->
     <PackageReference Include="StbImageSharp" Version="2.30.15" />
   </ItemGroup>
   <ItemGroup>

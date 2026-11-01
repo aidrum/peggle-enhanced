@@ -17,7 +17,7 @@ namespace Sexy
 
         public static Func<Main, SexyAppBase> AppFactory;
 
-        /// <summary>Full-screen platforms (Android): the screen's size in pixels, for the backbuffer.</summary>
+        /// <summary>Full-screen platforms (Android, iOS): the screen's size in pixels, for the backbuffer.</summary>
         public static Point? NativeScreenSize;
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Sexy
             Main.graphics = Graphics.GetNew(this);
             Main.graphics.IsFullScreen = IsMobile;
 #if PEGGLE_IPHONE
-            // A full screen (Android) lays out at its own aspect, as the original did on the device; a
+            // A full screen (Android, iOS) lays out at its own aspect, as the original did on the device; a
             // resizable window switches between the 960 and 1136 layouts (see ChooseScreenWidth).
             if (NativeScreenSize is Point aScreen)
             {
@@ -154,7 +154,7 @@ namespace Sexy
         }
 
         /// <summary>
-        /// On Android the backbuffer must be exactly the surface size. Otherwise MonoGame letterboxes it
+        /// On phones and tablets the backbuffer must be exactly the surface size. Otherwise MonoGame letterboxes it
         /// through the viewport, which is lost whenever a render target is unset, so the picture shrank
         /// and later jumped (black bands at the top when the surface was smaller than the display).
         /// </summary>
