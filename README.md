@@ -41,11 +41,13 @@ Windows, macOS, Linux, Android and iOS builds are made by GitHub Actions and pub
 
   Any Android device with an armv7, arm64 or x64 processor running Android 6.0 or later.
 
-- **What Android devices was this tested on?**
+- **What devices was this tested on?**
 
   - Redmi Note 13 Pro 5G (Android 13): Great performance. All adventures were beaten here with no issues.
   - Huawei MediaPad T3 10 (Android 7): Great performance, briefly tested in a few levels.
   - Samsung Galaxy J2 Prime (Android 6): Great performance, relatively long initial loading time but the game itself runs well. Briefly tested in a few levels.
+  - Samsung Galaxy Tab S10 FE+ (Android 16): Great performance.
+  - iPhone 17 (iOS 27.0.1): Great performance, but the game displays in 4:3.
 
 - **Why do some textures look different from the original iOS version?**
 
