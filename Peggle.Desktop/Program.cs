@@ -24,17 +24,24 @@ namespace Peggle.Desktop
             {
                 ContentFS.Root = bundleContent;
             }
+#if PEGGLE_IPHONE
+            const string edition = "iPhone";
+#else
+            const string edition = "HD";
+#endif
             if (storage == null && OperatingSystem.IsMacOS())
             {
                 // A .app bundle is read-only (and may run from a randomized, translocated path), so macOS
                 // saves go to ~/Library/Application Support/Peggle Enhanced/<edition>.
                 storage = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                    "Library", "Application Support", "Peggle Enhanced",
-#if PEGGLE_IPHONE
-                    "iPhone");
-#else
-                    "HD");
-#endif
+                    "Library", "Application Support", "Peggle Enhanced", edition);
+            }
+            if (storage == null && OperatingSystem.IsLinux() && !HasSaves(AppContext.BaseDirectory))
+            {
+                // Linux: $XDG_DATA_HOME (~/.local/share)/Peggle Enhanced/<edition>, as the install folder may
+                // be read-only (an AppImage always is). Saves already next to the executable stay there.
+                storage = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData,
+                    Environment.SpecialFolderOption.Create), "Peggle Enhanced", edition);
             }
             if (storage == null)
             {
@@ -55,6 +62,12 @@ namespace Peggle.Desktop
             }
         }
 
+        /// <summary>Whether a folder holds the game's saves (registry and/or profiles).</summary>
+        private static bool HasSaves(string theDir)
+        {
+            return File.Exists(Path.Combine(theDir, "registry.txt")) || Directory.Exists(Path.Combine(theDir, "userdata"));
+        }
+
         /// <summary>
         /// Earlier builds saved to %AppData%\PeggleClassic. If the install folder has no saves yet,
         /// those are copied over (the old folder is left as it was).
@@ -62,7 +75,7 @@ namespace Peggle.Desktop
         private static void ImportOldSaves(string theDir)
         {
             string oldDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PeggleClassic");
-            if (!Directory.Exists(oldDir) || File.Exists(Path.Combine(theDir, "registry.txt")) || Directory.Exists(Path.Combine(theDir, "userdata")))
+            if (!Directory.Exists(oldDir) || HasSaves(theDir))
             {
                 return;
             }
