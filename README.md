@@ -29,9 +29,9 @@ Additionally, TheAwesomeBlue simply had a strange thought for a while now: It ha
 
   Maybe in the future, but right now we don't have the hardware to test or compile iOS apps. Would love to do it though.
 
-- **Will this get any updates?**
+- **Will this get any more updates?**
 
-  If we think of cool stuff to add, likely. If we have to fix bugs, definitetly. We may add the exclusive Peggle Dual Shot levels too, but don't count on it yet. The peg placements would have to be remade.
+  If we think of cool stuff to add, likely. If we have to fix bugs, definitetly.
 
 - **Will any other PopCap Games get the same treatment?**
 
