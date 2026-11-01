@@ -17,9 +17,9 @@ on:
   push:
     branches: ['**']
     tags: ['v*']
-    paths-ignore: ['**.md', 'distribution/*.bat']
+    paths-ignore: ['**.md']
   pull_request:
-    paths-ignore: ['**.md', 'distribution/*.bat']
+    paths-ignore: ['**.md']
 
 concurrency:
   # Every main build becomes a release, so those never cancel each other; elsewhere only the newest
@@ -53,13 +53,13 @@ jobs:
             package: com.aidrum.peggle
             apk: Peggle-android.apk
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -113,7 +113,7 @@ jobs:
           "$BT/zipalign" -c -P 16 4 "${{ matrix.apk }}" > /dev/null && echo "zipalign (16 KB pages): OK"
           ls -lh "${{ matrix.apk }}"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.apk }}
           path: ${{ matrix.apk }}
@@ -134,7 +134,7 @@ jobs:
           - edition: iPhone
             ipa: Peggle
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # The .NET iOS workload needs a recent Xcode; the project pins the iOS 26.0 bindings so any
       # Xcode 26.x or later works.
@@ -142,7 +142,7 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -174,7 +174,7 @@ jobs:
           (cd ipa && zip -qry "../${{ matrix.ipa }}-unsigned.ipa" Payload)
           ls -lh "${{ matrix.ipa }}-unsigned.ipa"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.ipa }}-unsigned.ipa
           path: ${{ matrix.ipa }}-unsigned.ipa
@@ -192,16 +192,16 @@ jobs:
         edition: [HD, iPhone]
         rid: [osx-x64, osx-arm64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
       - name: Build .app (ad-hoc signed, zipped)
         run: distribution/build_macos.sh ${{ matrix.edition }} ${{ matrix.rid }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: macOS-${{ matrix.edition }}-${{ matrix.rid }}
           path: distribution/out/*.zip
@@ -221,9 +221,9 @@ jobs:
       # Runs appimagetool (itself an AppImage) without FUSE.
       APPIMAGE_EXTRACT_AND_RUN: '1'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -236,7 +236,7 @@ jobs:
       - name: Build .tar.gz and AppImage
         run: distribution/build_linux.sh ${{ matrix.edition }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: Linux-${{ matrix.edition }}
           path: |
@@ -261,9 +261,9 @@ jobs:
             script: publish_windows.bat
             name: Peggle
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -281,7 +281,7 @@ jobs:
           Compress-Archive -Path $dir -DestinationPath "${{ matrix.name }}-windows-x64.zip"
           Get-Item "${{ matrix.name }}-windows-x64.zip" | Select-Object Name, Length
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.name }}-windows-x64
           path: ${{ matrix.name }}-windows-x64.zip
@@ -301,7 +301,7 @@ jobs:
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/download-artifact@v4
         with:
@@ -347,7 +347,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check that Pages is set up
         id: check
