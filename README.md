@@ -6,7 +6,7 @@
 
 By aidrum and TheAwesomeBlue
 
-Peggle Enhanced is a Peggle iOS decompilation ported to MonoGame, available for Android and Windows. It features the complete Peggle, Peggle Nights, Peggle Extreme and Peggle World of Warcraft adventures! It includes both the original version adapted for ultrawide and the HD version for tablets.
+Peggle Enhanced is a Peggle iOS decompilation ported to MonoGame, available for Windows, macOS, Linux, Android and iOS. It features the complete Peggle, Peggle Nights, Peggle Extreme and Peggle World of Warcraft adventures! It includes both the original version adapted for ultrawide and the HD version for tablets.
 
 While PC builds are offered, this project is mostly intended for Android/iOS phones and tablets. You're still recommended to play the original version of each game on PC, as this version is optimized for mobile.
 
