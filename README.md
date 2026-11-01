@@ -31,7 +31,7 @@ Windows, macOS, Linux, Android and iOS builds are made by GitHub Actions and pub
 
 - **Will this get any updates?**
 
-  If we think of cool stuff to add, likely. If we have to fix bugs, definitetly. We may add the exclusive Peggle Dual Shot levels too, but don't count on it yet. The peg placements would have to be remade.
+  If we think of cool stuff to add, likely. If we have to fix bugs, definitely. We may add the exclusive Peggle Dual Shot levels too, but don't count on it yet. The peg placements would have to be remade.
 
 - **Will any other PopCap Games get the same treatment?**
 
