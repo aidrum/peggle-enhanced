@@ -2578,10 +2578,10 @@ namespace Sexy
         }
 #endif
 
-        /// <summary>Port addition: whether the PC Controls option is on (never on Android).</summary>
+        /// <summary>Port addition: whether the PC Controls option is on (never on phones/tablets).</summary>
         public bool UsePCControls()
         {
-            return mApp.mPCControls && !System.OperatingSystem.IsAndroid();
+            return mApp.mPCControls && !Main.IsMobile;
         }
 
         /// <summary>
