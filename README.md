@@ -25,7 +25,7 @@ Additionally, TheAwesomeBlue simply had a strange thought for a while now: It ha
 
 ## Building
 
-Android, iOS, macOS and Linux builds are made by GitHub Actions. See [BUILDING.md](BUILDING.md) for downloading and installing them, and for building them yourself.
+Windows, macOS, Linux, Android and iOS builds are made by GitHub Actions and published on the [Releases](../../releases) page. iOS builds can also be installed through an AltStore / SideStore source. See [BUILDING.md](BUILDING.md) for downloading and installing them, and for building them yourself.
 
 ## FAQ
 
