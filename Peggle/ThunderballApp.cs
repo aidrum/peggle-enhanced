@@ -2556,7 +2556,7 @@ namespace Sexy
 
         /// <summary>
         /// Port: theAdventure (or null) is the bonus Adventure being played (mBonusAdventure). Its stage
-        /// range is its page's, and its last stage is an ordinary one (no Master stage).
+        /// range is its page's Adventure stages, and its last stage is an ordinary one (no Master stage).
         /// </summary>
         public void SetLevelPack(int theLevelPack, BonusPage theAdventure)
         {
@@ -2570,7 +2570,7 @@ namespace Sexy
             {
                 mPlayerInfo.mFirstAdventureStage = theAdventure.mFirstStage;
                 mPlayerInfo.mLastAdventureStage = theAdventure.mLastStage;
-                mPlayerInfo.mNumAdventureStages = theAdventure.mNumStages - 1;
+                mPlayerInfo.mNumAdventureStages = theAdventure.AdventureStages - 1;
             }
             else if (theLevelPack == 1)
             {

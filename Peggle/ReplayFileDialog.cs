@@ -427,10 +427,10 @@ namespace Sexy
                     SexyUtil.MyDrawImageBox(g, anInner, Res.IMAGE_DLG_GROUPRECT);
                 }
                 g.SetColorizeImages(false);
-                // Port addition: the Extreme and WoW Adventures use their logo from the game arrows.
+                // Port addition: the Extreme, WoW and Dual Shot levels use their logo from the game arrows.
                 BonusPage aBonusPage = StageMgr.GetBonusPage(anInfo.mStage);
                 int aBonusLogo = aBonusPage != null ? aBonusPage.mLogoCel : -1;
-                if (aBonusLogo == GameArrowButton.LOGO_EXTREME || aBonusLogo == GameArrowButton.LOGO_WOW)
+                if (aBonusLogo == GameArrowButton.LOGO_EXTREME || aBonusLogo == GameArrowButton.LOGO_WOW || aBonusLogo == GameArrowButton.LOGO_DUALSHOT)
                 {
                     TRect aSrc = GameArrowButton.GetLogoRect(aBonusLogo);
                     g.DrawImage(GameArrowButton.GetSheet(), anInner.mX + anInner.mWidth - aSrc.mWidth, anInner.mY + (anInner.mHeight - aSrc.mHeight) / 2, aSrc);

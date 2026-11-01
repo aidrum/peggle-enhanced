@@ -78,9 +78,16 @@ namespace Sexy
         /// </summary>
         public int mCreditsEnding;
 
+        /// <summary>
+        /// How many of its stages, from the first, its Adventure plays (-1: all). The stages after
+        /// them are Quick Play levels only, always open (the WoW addon levels under the WoW page).
+        /// </summary>
+        public int mAdventureStageCount;
+
         public BonusPage(string theConfig, int theLevelPack, int theLogoCel, int theOutlineColor, string theAdventureKey = null,
-            int[] theStageCharacters = null, int theCreditsEnding = -1)
+            int[] theStageCharacters = null, int theCreditsEnding = -1, int theAdventureStageCount = -1)
         {
+            mAdventureStageCount = theAdventureStageCount;
             mCreditsEnding = theCreditsEnding;
             mConfig = theConfig;
             mLevelPack = theLevelPack;
@@ -92,8 +99,17 @@ namespace Sexy
 
         public bool HasAdventure => mAdventureKey != null;
 
+        /// <summary>The number of stages its Adventure plays.</summary>
+        public int AdventureStages => mAdventureStageCount < 0 ? mNumStages : Math.Min(mAdventureStageCount, mNumStages);
+
+        /// <summary>True for a stage its Adventure plays (and unlocks).</summary>
+        public bool IsAdventureStage(int theStage)
+        {
+            return HasAdventure && theStage >= mFirstStage && theStage < mFirstStage + AdventureStages;
+        }
+
         /// <summary>The Adventure's last stage (its final one is an ordinary stage, not a Master stage).</summary>
-        public int mLastStage => mFirstStage + mNumStages - 1;
+        public int mLastStage => mFirstStage + AdventureStages - 1;
     }
 
     /// <summary>A stage of five levels plus its story texts (Sexy::StageInfo).</summary>
@@ -144,7 +160,8 @@ namespace Sexy
             // challenges and Credit 2 the full game, which don't apply here). WoW: Bjorn, then Splork
             // (Space Blast); it has no credits.
             new BonusPage("levels/stages_extreme.cfg", 0, GameArrowButton.LOGO_EXTREME, 0xff8a2a, ADVENTURE_EXTREME, new[] { 0, 0 }, 2),
-            new BonusPage("levels/stages_wow.cfg", 1, GameArrowButton.LOGO_WOW, 0xf0b030, ADVENTURE_WOW, new[] { 0, 3 }),
+            // Its Adventure is the first two stages; the WoW addon levels follow, outside it.
+            new BonusPage("levels/stages_wow.cfg", 1, GameArrowButton.LOGO_WOW, 0xf0b030, ADVENTURE_WOW, new[] { 0, 3 }, -1, 2),
         };
 
         /// <summary>Port addition: the bonus Adventures' keys (BonusPage.mAdventureKey).</summary>
@@ -370,12 +387,13 @@ namespace Sexy
                 {
                     if (!curPackOnly || GetLevelPackForStage(s) == ThunderballApp.mGameLevelPack)
                     {
-                        // A page with its own Adventure only offers the levels that Adventure has unlocked.
+                        // A page with its own Adventure only offers the levels that Adventure has unlocked
+                        // (the stages outside it are always open).
                         int aMaxStage = int.MaxValue;
                         int aMaxLevel = 0;
                         BonusPage aPage = GetBonusPage(s);
                         PlayerInfo aPlayer = mApp?.mPlayerInfo;
-                        if (aPage != null && aPage.HasAdventure && aPlayer != null && !PlayerInfo.gDebugUnlockAll)
+                        if (aPage != null && aPage.IsAdventureStage(s) && aPlayer != null && !PlayerInfo.gDebugUnlockAll)
                         {
                             BonusAdventureInfo anInfo = aPlayer.GetBonusAdventure(aPage);
                             aMaxStage = aPage.mFirstStage + anInfo.mMaxStage;
