@@ -14,8 +14,8 @@ namespace Sexy
     /// Peggle stages sit in a left column and Nights stages in a right one; the stage labels in the
     /// middle are shared, and the screen scrolls sideways between the two. Row 0 is Random Level.
     /// Port addition: further pages to the right hold the bonus stages (StageMgr.BONUS_PAGES: Nights
-    /// bonus, Extreme, WoW). Nights bonus has its own labels; Extreme and WoW share theirs, like
-    /// Peggle and Nights.
+    /// bonus, Dual Shot, Extreme, WoW). Nights bonus and Dual Shot have their own labels; Extreme and
+    /// WoW share theirs, like Peggle and Nights.
     /// </summary>
     public class LevelThumbnailsWidget : Widget
     {

@@ -567,6 +567,8 @@ namespace Sexy
             LoadMusic(WOW_OPENING_AMBIENCE_SONG, "music/wow/opening_ambience.caf");
             LoadMusic(NIGHTS_PC_AMBIENCE_SONG, "music/nights/ambience_pc.caf");
             LoadMusic(NIGHTS_CREDITS_SONG, "music/nights/credits.caf");
+            LoadMusic(DUALSHOT_SONG_1, "music/dualshot/bonus1.caf");
+            LoadMusic(DUALSHOT_SONG_2, "music/dualshot/bonus2.caf");
             mMusicLoaded = true;
             mCharacterMgr.Load();
             mHighScoreMgr.Load();
@@ -1126,6 +1128,11 @@ namespace Sexy
 
         /// <summary>Port addition: the PC Nights credits room's music (NightsEndingScreen).</summary>
         public const int NIGHTS_CREDITS_SONG = 36;
+
+        /// <summary>Port addition: the Peggle Dual Shot levels' two songs (one picked at random per level).</summary>
+        public const int DUALSHOT_SONG_1 = 37;
+
+        public const int DUALSHOT_SONG_2 = 38;
 
         /// <summary>Port addition: the opening PlayOpeningMusic is waiting on (-1 for none), the loop that follows it, and whether it has started.</summary>
         private int mOpeningSong = -1;
@@ -3441,6 +3448,22 @@ namespace Sexy
             {
                 PlayMusic(mCurLevel + 8, true);
             }
+        }
+
+        /// <summary>
+        /// Port addition: the level music of a Peggle Dual Shot level, in place of the Peggle songs.
+        /// theNewLevel (a level starting or restarting) picks one of its two songs at random; otherwise
+        /// the one playing carries on.
+        /// </summary>
+        public void PlayDualShotTrack(bool theNewLevel)
+        {
+            mMenuMusicPlaying = false;
+            int aSong = mCurMusic;
+            if (theNewLevel || (aSong != DUALSHOT_SONG_1 && aSong != DUALSHOT_SONG_2))
+            {
+                aSong = SexyUtil.Rand() % 2 == 0 ? DUALSHOT_SONG_1 : DUALSHOT_SONG_2;
+            }
+            PlaySong(aSong, true);
         }
 
         public void PlayVictoryTrack()

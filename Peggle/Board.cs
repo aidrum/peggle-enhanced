@@ -1956,7 +1956,16 @@ namespace Sexy
             if (mGameMode == GameMode.GAMEMODE_ADVENTURE || mGameMode == GameMode.GAMEMODE_ADVENTURE_NIGHTS ||
                 mGameMode == GameMode.GAMEMODE_QUICKPLAY || mGameMode == GameMode.GAMEMODE_DUEL)
             {
-                mApp.PlayLevelMusicTrack(theFromStart);
+                // Port addition: the Peggle Dual Shot levels have their own songs.
+                BonusPage aPage = mApp.GetLevelBonusPage(mLevelName);
+                if (aPage != null && aPage.mLogoCel == GameArrowButton.LOGO_DUALSHOT)
+                {
+                    mApp.PlayDualShotTrack(theFromStart);
+                }
+                else
+                {
+                    mApp.PlayLevelMusicTrack(theFromStart);
+                }
             }
             else if (mGameMode == GameMode.GAMEMODE_CHALLENGE)
             {

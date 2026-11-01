@@ -23,6 +23,8 @@ namespace Sexy
 
         public const int LOGO_WOW = 6;
 
+        public const int LOGO_DUALSHOT = 7;
+
 #if PEGGLE_IPHONE
         // Where a frame sits relative to the original button it replaces, so the arrows line up.
         public static int LEFT_OFFSET_X = 7;
@@ -55,7 +57,7 @@ namespace Sexy
             if (sSheet == null)
             {
                 sSheet = GlobalStaticVars.gSexyAppBase.GetImage("images/" + GlobalStaticVars.mResPathPrefix + "levelselect/gamearrows", true);
-                sSheet.mNumCols = 7;
+                sSheet.mNumCols = 8;
                 sSheet.mNumRows = 2;
             }
             return sSheet;

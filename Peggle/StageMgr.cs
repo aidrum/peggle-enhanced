@@ -138,6 +138,8 @@ namespace Sexy
         public static readonly BonusPage[] BONUS_PAGES =
         {
             new BonusPage("levels/stages_nightsdlc.cfg", 1, GameArrowButton.LOGO_NIGHTSDLC, 0xff55e9),
+            // Peggle Dual Shot (DS) exclusives: no Adventure, so always open; they play as Peggle levels.
+            new BonusPage("levels/stages_dualshot.cfg", 0, GameArrowButton.LOGO_DUALSHOT, 0x9ee02a),
             // Extreme: Bjorn hosts both stages; its win rolls Credit 3 ("Well Done!": Credit 1 promises
             // challenges and Credit 2 the full game, which don't apply here). WoW: Bjorn, then Splork
             // (Space Blast); it has no credits.
