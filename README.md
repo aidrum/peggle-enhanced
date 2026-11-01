@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Peggle Enhanced logo" src="./logo.png"/>
+  <img alt="Peggle Enhanced logo" src="./logo.png" width="350"/>
 </p>
 
 # Peggle Enhanced
