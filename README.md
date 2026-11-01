@@ -23,27 +23,9 @@ Essentially, we wanted to make Peggle more accessible for modern mobile phones.
 
 Additionally, TheAwesomeBlue simply had a strange thought for a while now: It has to be possible to decompile Peggle's iOS version using the Plants vs. Zombies Windows Phone version as a base. Turns out, he was correct!
 
-## Android, iOS, macOS and Linux builds (experimental)
+## Building
 
-GitHub Actions build these for both editions (HD and iPhone). Open the **Actions** tab, pick a workflow, press **Run workflow**, then download the files from the finished run's **Artifacts** section. Pushes and pull requests also start these workflows.
-
-- **Android** (`Android` workflow): signed `PeggleHD-android.apk` / `Peggle-android.apk`. If you build it yourself, install `<package>-Signed.apk`, not the unsigned `<package>.apk` next to it, which Android refuses to install. Without signing secrets (see the top of `.github/workflows/android.yml`) each CI build uses a new debug key, so uninstall the previous build before installing a new one.
-- **iOS / iPadOS** (`iOS (unsigned IPA)` workflow): unsigned `.ipa` files that need iOS 15 or later. Install one with something that signs apps when it installs them: Sideloadly or AltStore/SideStore (with a free Apple ID), or TrollStore. Saves are kept in the app's Documents folder, which you can open in the Files app (On My iPhone/iPad).
-- **macOS** (`macOS` workflow): `.app` bundles for Intel (`osx-x64`) and Apple Silicon (`osx-arm64`). They are only ad-hoc signed, so the first time you open one, right-click it and choose **Open**, or run `xattr -dr com.apple.quarantine "Peggle HD.app"`. Saves are kept in `~/Library/Application Support/Peggle Enhanced/`.
-- **Linux** (`Linux` workflow): x64 builds as an AppImage (make it executable and run it) and as a `.tar.gz` (extract it and run `PeggleHD` or `Peggle`). Saves are kept in `~/.local/share/Peggle Enhanced/`.
-
-To build these yourself:
-
-```sh
-# Linux (any Linux with the .NET 10 SDK): .tar.gz, plus an AppImage if appimagetool is installed
-distribution/build_linux.sh HD
-
-# macOS app: edition HD|iPhone, rid osx-x64|osx-arm64 -> distribution/out/
-distribution/build_macos.sh HD osx-x64
-
-# iOS (needs Xcode and `dotnet workload install ios`)
-dotnet build Peggle.iOS -c Release -r ios-arm64 -p:PeggleEdition=HD -p:EnableCodeSigning=false
-```
+Android, iOS, macOS and Linux builds are made by GitHub Actions. See [BUILDING.md](BUILDING.md) for downloading and installing them, and for building them yourself.
 
 ## FAQ
 
