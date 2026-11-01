@@ -2,7 +2,7 @@
   <!--
     iOS / iPadOS build (MonoGame iOS). Like Peggle.Android, it swaps the DesktopGL MonoGame the shared
     projects compile against for MonoGame.Framework.iOS (same assembly, same API).
-    Unsigned device build (what .github/workflows/ios.yml does, then zips Payload/*.app into an .ipa
+    Unsigned device build (what .github/workflows/build.yml does, then zips Payload/*.app into an .ipa
     that Sideloadly / AltStore / TrollStore re-sign on install):
       dotnet build Peggle.iOS -c Release -r ios-arm64 -p:EnableCodeSigning=false
     Pick the edition with -p:PeggleEdition=iPhone, as for the other platforms.
