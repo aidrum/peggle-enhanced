@@ -13,7 +13,7 @@ The `Build` workflow (`.github/workflows/build.yml`) builds every platform for b
 
 - Every push to `main`, and every manual run (Actions → **Build** → **Run workflow**), publishes a release named `Peggle Enhanced <version>.<n> (build <n>)`, tagged `build-<n>`. Releases from `main` are marked as the latest release. Manual runs on other branches publish a pre-release.
 - Pushing a `v*` tag publishes a release named after the tag.
-- Pull requests and pushes to other branches only build; their files are under the run's **Artifacts** (kept for 14 days, each wrapped in a zip).
+- Pull requests only build; their files are under the run's **Artifacts** (kept for 14 days, each wrapped in a zip). Pushes to other branches don't start a build by themselves (macOS runners are scarce), so test a branch through its pull request or a manual run.
 
 | Platform | Files |
 |---|---|

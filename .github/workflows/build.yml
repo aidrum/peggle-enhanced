@@ -5,7 +5,9 @@
 #     main / manual on main  -> release "build-<run number>", marked as the latest release
 #     manual on other branch -> the same, as a pre-release
 #     v* tag                 -> release named after the tag
-#   Pull requests and pushes to other branches only build (files under the run's Artifacts).
+#   Pull requests only build (files under the run's Artifacts). Other branches build through their pull
+#   request or a manual run, not on every push, so a branch with an open PR isn't built twice: macOS
+#   runners are scarce, and a job that waits too long for one is cancelled.
 #
 # One-time setup:
 #   - Pages: Settings > Pages > Source: "GitHub Actions" (until then the pages job just warns).
@@ -15,7 +17,7 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: ['**']
+    branches: [main]
     tags: ['v*']
     paths-ignore: ['**.md']
   pull_request:
@@ -182,15 +184,15 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  # Both CPU types in one job per edition (the publish cross-compiles), to use fewer macOS runners.
   macos:
-    name: macOS (${{ matrix.edition }}, ${{ matrix.rid }})
+    name: macOS (${{ matrix.edition }})
     runs-on: macos-15
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         edition: [HD, iPhone]
-        rid: [osx-x64, osx-arm64]
     steps:
       - uses: actions/checkout@v5
 
@@ -198,12 +200,14 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Build .app (ad-hoc signed, zipped)
-        run: distribution/build_macos.sh ${{ matrix.edition }} ${{ matrix.rid }}
+      - name: Build .apps for Intel and Apple Silicon (ad-hoc signed, zipped)
+        run: |
+          distribution/build_macos.sh ${{ matrix.edition }} osx-x64
+          distribution/build_macos.sh ${{ matrix.edition }} osx-arm64
 
       - uses: actions/upload-artifact@v5
         with:
-          name: macOS-${{ matrix.edition }}-${{ matrix.rid }}
+          name: macOS-${{ matrix.edition }}
           path: distribution/out/*.zip
           compression-level: 0
           retention-days: 14
