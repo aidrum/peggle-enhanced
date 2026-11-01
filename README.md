@@ -23,9 +23,24 @@ Essentially, we wanted to make Peggle more accessible for modern mobile phones.
 
 Additionally, TheAwesomeBlue simply had a strange thought for a while now: It has to be possible to decompile Peggle's iOS version using the Plants vs. Zombies Windows Phone version as a base. Turns out, he was correct!
 
-## Building
+## Download
 
-Windows, macOS, Linux, Android and iOS builds are made by GitHub Actions and published on the [Releases](../../releases) page. iOS builds can also be installed through an AltStore / SideStore source. See [BUILDING.md](BUILDING.md) for downloading and installing them, and for building them yourself.
+The latest build for each platform, from the [Releases](../../releases) page:
+
+| Platform | Peggle HD | Peggle | Notes |
+|---|---|---|---|
+| Windows (x64) | [Download](../../releases/latest/download/PeggleHD-windows-x64.zip) | [Download](../../releases/latest/download/Peggle-windows-x64.zip) | Extract, then run `PeggleHD.exe` / `Peggle.exe`. |
+| macOS (Apple Silicon) | [Download](../../releases/latest/download/PeggleHD-macOS-osx-arm64.zip) | [Download](../../releases/latest/download/Peggle-macOS-osx-arm64.zip) | The first time, right-click the app and choose **Open**. |
+| macOS (Intel) | [Download](../../releases/latest/download/PeggleHD-macOS-osx-x64.zip) | [Download](../../releases/latest/download/Peggle-macOS-osx-x64.zip) | The first time, right-click the app and choose **Open**. |
+| Linux (x64, AppImage) | [Download](../../releases/latest/download/PeggleHD-x86_64.AppImage) | [Download](../../releases/latest/download/Peggle-x86_64.AppImage) | Make it executable, then run it. |
+| Linux (x64, .tar.gz) | [Download](../../releases/latest/download/PeggleHD-linux-x64.tar.gz) | [Download](../../releases/latest/download/Peggle-linux-x64.tar.gz) | Extract, then run `PeggleHD` / `Peggle`. |
+| Android | [Download](../../releases/latest/download/PeggleHD-android.apk) | [Download](../../releases/latest/download/Peggle-android.apk) | Android 6.0 or later. |
+| iOS / iPadOS | [Download](../../releases/latest/download/PeggleHD-unsigned.ipa) | [Download](../../releases/latest/download/Peggle-unsigned.ipa) | iOS 15 or later. Install with AltStore, SideStore, Sideloadly or TrollStore, or add the [AltStore / SideStore source](https://moondotgz.github.io/peggle-enhanced/) to get updates. |
+
+- **Peggle HD** is the iPad version (4:3), best on tablets and PCs.
+- **Peggle** is the iPhone version, with widescreen and ultrawide support, best on phones.
+
+The two editions are separate apps, so both can be installed side by side. See [BUILDING.md](BUILDING.md) for more on installing each platform, and for building the game yourself.
 
 ## FAQ
 
