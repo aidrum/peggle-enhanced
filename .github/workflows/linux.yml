@@ -1,0 +1,64 @@
+# Linux x64 builds (DesktopGL) of both editions: a self-contained .tar.gz and an AppImage.
+name: Linux
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+    paths-ignore: ['**.md', 'distribution/*.bat', 'Peggle.Android/**', 'Peggle.iOS/**']
+    branches: ['**']
+  pull_request:
+    paths-ignore: ['**.md', 'distribution/*.bat', 'Peggle.Android/**', 'Peggle.iOS/**']
+
+concurrency:
+  group: linux-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    name: Linux (${{ matrix.edition }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        edition: [HD, iPhone]
+    env:
+      DOTNET_NOLOGO: 'true'
+      DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+      # Runs appimagetool (itself an AppImage) without FUSE.
+      APPIMAGE_EXTRACT_AND_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Get appimagetool
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/appimagetool" https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x "$RUNNER_TEMP/appimagetool"
+          echo "APPIMAGETOOL=$RUNNER_TEMP/appimagetool" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: distribution/build_linux.sh ${{ matrix.edition }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Peggle${{ matrix.edition == 'HD' && 'HD' || '' }}-linux-x64
+          path: |
+            distribution/out/*.tar.gz
+            distribution/out/*.AppImage
+          compression-level: 0
+          if-no-files-found: error
+
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          files: |
+            distribution/out/*.tar.gz
+            distribution/out/*.AppImage
