@@ -11,7 +11,7 @@
     <!-- Never glob another edition's (or configuration's) generated files into the build. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);bin/**;obj/**</DefaultItemExcludes>
     <!-- The port's own version (Peggle Enhanced), shown in the Options dialog (SexyUtil.GetPortVersionString). -->
-    <Version>1.0</Version>
+    <Version>1.1</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(PeggleEdition)' == 'iPhone'">
     <DefineConstants>$(DefineConstants);PEGGLE_IPHONE</DefineConstants>
