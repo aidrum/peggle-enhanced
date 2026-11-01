@@ -11,7 +11,7 @@ Pick one with `-p:PeggleEdition=HD` or `-p:PeggleEdition=iPhone` (or the edition
 
 The `Build` workflow (`.github/workflows/build.yml`) builds every platform for both editions and publishes them all as one GitHub release:
 
-- Every push to `main`, and every manual run (Actions → **Build** → **Run workflow**), publishes a release named `Peggle Enhanced <version> (build <n>)`, tagged `build-<n>`. Releases from `main` are marked as the latest release. Manual runs on other branches publish a pre-release.
+- Every push to `main`, and every manual run (Actions → **Build** → **Run workflow**), publishes a release named `Peggle Enhanced <version>.<n> (build <n>)`, tagged `build-<n>`. Releases from `main` are marked as the latest release. Manual runs on other branches publish a pre-release.
 - Pushing a `v*` tag publishes a release named after the tag.
 - Pull requests and pushes to other branches only build; their files are under the run's **Artifacts** (kept for 14 days, each wrapped in a zip).
 
@@ -23,7 +23,7 @@ The `Build` workflow (`.github/workflows/build.yml`) builds every platform for b
 | Android | `PeggleHD-android.apk`, `Peggle-android.apk` |
 | iOS / iPadOS | `PeggleHD-unsigned.ipa`, `Peggle-unsigned.ipa` |
 
-The build number `<n>` (the workflow's run number) is also the Android `versionCode` and the iOS `CFBundleVersion`, so newer builds install as updates.
+Each build's version is `<version>.<n>`: the `<Version>` in `Directory.Build.props` plus the build number `<n>` (the workflow's run number), e.g. `1.0.8` for build 8. It's the iOS `CFBundleShortVersionString`, the Android `versionName` and the macOS app version, and `<n>` alone is the Android `versionCode` and iOS `CFBundleVersion`. So every build installs as an update, and AltStore / SideStore offer it as one.
 
 ## Android (experimental)
 

@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using CoreGraphics;
 using Foundation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -66,11 +68,70 @@ namespace Peggle.iOS
         }
 
         /// <summary>
-        /// Decodes an image file's bytes on the CPU (StbImageSharp). MonoGame's iOS Texture2D.FromStream goes
-        /// through CoreGraphics, which premultiplies alpha; the loader wants straight alpha, packed as
-        /// SurfaceFormat.Color (RGBA bytes, i.e. ABGR in a little-endian uint).
+        /// Decodes an image file's bytes on the CPU into straight-alpha pixels packed as SurfaceFormat.Color (RGBA
+        /// bytes, i.e. ABGR in a little-endian uint). MonoGame's iOS Texture2D.FromStream isn't used because it
+        /// goes through CoreGraphics, which premultiplies alpha.
         /// </summary>
         private static uint[] DecodeImage(byte[] theFileData, out int theWidth, out int theHeight)
+        {
+            return IsJpeg(theFileData)
+                ? DecodeOpaqueImage(theFileData, out theWidth, out theHeight)
+                : DecodeWithStb(theFileData, out theWidth, out theHeight);
+        }
+
+        private static bool IsJpeg(byte[] theFileData)
+        {
+            return theFileData.Length > 3 && theFileData[0] == 0xFF && theFileData[1] == 0xD8 && theFileData[2] == 0xFF;
+        }
+
+        /// <summary>
+        /// JPEGs (the level backgrounds) are decoded by CoreGraphics: StbImageSharp's JPEG decoder corrupts blocks
+        /// of them into bright green on iOS, though it decodes the same files correctly on desktop .NET. A JPEG has
+        /// no alpha, so CoreGraphics' premultiplied output is exact here.
+        /// </summary>
+        private static uint[] DecodeOpaqueImage(byte[] theFileData, out int theWidth, out int theHeight)
+        {
+            theWidth = 0;
+            theHeight = 0;
+            using (CGDataProvider provider = new CGDataProvider(theFileData))
+            using (CGImage image = CGImage.FromJPEG(provider, null, false, CGColorRenderingIntent.Default))
+            {
+                if (image == null)
+                {
+                    return null;
+                }
+                int w = (int)image.Width;
+                int h = (int)image.Height;
+                // Drawn into an sRGB RGBX buffer (also converts grayscale or profiled JPEGs).
+                byte[] rgbx = new byte[w * h * 4];
+                GCHandle pin = GCHandle.Alloc(rgbx, GCHandleType.Pinned);
+                try
+                {
+                    using (CGColorSpace colorSpace = CGColorSpace.CreateSrgb())
+                    using (CGBitmapContext context = new CGBitmapContext(pin.AddrOfPinnedObject(), w, h, 8, w * 4, colorSpace, CGImageAlphaInfo.NoneSkipLast))
+                    {
+                        context.DrawImage(new CGRect(0, 0, w, h), image);
+                    }
+                }
+                finally
+                {
+                    pin.Free();
+                }
+                uint[] pixels = new uint[w * h];
+                System.Buffer.BlockCopy(rgbx, 0, pixels, 0, rgbx.Length);
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    // The skipped fourth byte is undefined; the image is opaque.
+                    pixels[i] |= 0xFF000000u;
+                }
+                theWidth = w;
+                theHeight = h;
+                return pixels;
+            }
+        }
+
+        /// <summary>Everything else (PNGs, which may have alpha) is decoded by StbImageSharp, in straight alpha.</summary>
+        private static uint[] DecodeWithStb(byte[] theFileData, out int theWidth, out int theHeight)
         {
             theWidth = 0;
             theHeight = 0;
