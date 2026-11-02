@@ -3,8 +3,8 @@
 #
 #   Pushes to main, manual runs (Actions > Build > Run workflow) and version tags publish a release,
 #   titled with its tag:
-#     main / manual run       -> pre-release "v<Version>-prerelease+<run number>" (v1.1-prerelease+17)
-#     version tag (v1.2, 1.2) -> full release of that tag, marked as the latest release
+#     main / manual run -> pre-release "<Version>-prerelease+<run number>" (1.1-prerelease+17)
+#     version tag (1.2) -> full release of that tag, marked as the latest release
 #   Automatic builds are never the latest release: that stays the last tagged release, which the
 #   in-game update checker (Peggle/UpdateChecker.cs) reads and compares by its version tag.
 #   Pull requests only build (files under the run's Artifacts). Other branches build through their pull
@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    tags: ['v*', '[0-9]*']
+    tags: ['[0-9]*', '!*-prerelease*']
     paths-ignore: ['**.md']
   pull_request:
     paths-ignore: ['**.md']
@@ -324,7 +324,7 @@ jobs:
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             TAG="$GITHUB_REF_NAME"
           else
-            TAG="v$(VERSION_SUFFIX= port_version)-prerelease+$BUILD_NUMBER"
+            TAG="$(VERSION_SUFFIX= port_version)-prerelease+$BUILD_NUMBER"
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           # Hidden in the notes for make_source.py: the IPAs' CFBundleShortVersionString and

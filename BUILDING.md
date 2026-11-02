@@ -11,8 +11,8 @@ Pick one with `-p:PeggleEdition=HD` or `-p:PeggleEdition=iPhone` (or the edition
 
 The `Build` workflow (`.github/workflows/build.yml`) builds every platform for both editions and publishes them all as one GitHub release:
 
-- Every push to `main`, and every manual run (Actions → **Build** → **Run workflow**), publishes a **pre-release** tagged and titled `v<version>-prerelease+<n>`, e.g. `v1.1-prerelease+17`.
-- Pushing a version tag (`v1.2`, or `1.2`) publishes a full release with that tag as its title, marked as the latest release. Set `<Version>` in `Directory.Build.props` to match before tagging: a tag build's app version is exactly `<Version>`.
+- Every push to `main`, and every manual run (Actions → **Build** → **Run workflow**), publishes a **pre-release** tagged and titled `<version>-prerelease+<n>`, e.g. `1.1-prerelease+17`.
+- Pushing a version tag (e.g. `1.2`, without a `v`, like the existing releases) publishes a full release with that tag as its title, marked as the latest release. Set `<Version>` in `Directory.Build.props` to match before tagging: a tag build's app version is exactly `<Version>`.
 - Automatic builds are never marked as the latest release. The latest release stays the last tagged one: it's what the in-game update checker compares its version with, and what the README's download links serve. The AltStore / SideStore source lists every build, pre-releases included.
 - Pull requests only build; their files are under the run's **Artifacts** (kept for 14 days, each wrapped in a zip). Pushes to other branches don't start a build by themselves (macOS runners are scarce), so test a branch through its pull request or a manual run.
 
