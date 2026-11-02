@@ -709,9 +709,10 @@ namespace Sexy
             if (StageMgr.IsBonusStage(theStage))
             {
                 // Port addition: a bonus page with its own Adventure (Extreme, WoW) unlocks as that
-                // Adventure is played, like Peggle's and Nights' levels; the others are always open.
+                // Adventure is played, like Peggle's and Nights' levels; the others, and the stages
+                // outside the Adventure (the WoW addon levels), are always open.
                 BonusPage aPage = StageMgr.GetBonusPage(theStage);
-                if (aPage == null || !aPage.HasAdventure)
+                if (aPage == null || !aPage.IsAdventureStage(theStage))
                 {
                     return true;
                 }

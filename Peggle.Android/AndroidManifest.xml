@@ -9,6 +9,8 @@
   GameActivity's SetAppIcon enables the chosen one and disables the others.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- The update check (UpdateChecker) asks GitHub for the latest release. -->
+  <uses-permission android:name="android.permission.INTERNET" />
   <application android:icon="@mipmap/icon">
     <activity
         android:name="peggle.android.GameActivity"

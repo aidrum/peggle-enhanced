@@ -112,6 +112,9 @@ namespace Sexy
 
         /// <summary>Port addition: the App Icon page's warning that the game closes to change the icon.</summary>
         public const int DIALOG_CONFIRM_APP_ICON = 61;
+
+        /// <summary>Port addition: a newer Peggle Enhanced release is out (UpdateChecker).</summary>
+        public const int DIALOG_UPDATE_AVAILABLE = 62;
     }
 
     /// <summary>Port addition: the Menu Theme choices of the port options (ThunderballApp.mMenuTheme).</summary>
@@ -567,6 +570,8 @@ namespace Sexy
             LoadMusic(WOW_OPENING_AMBIENCE_SONG, "music/wow/opening_ambience.caf");
             LoadMusic(NIGHTS_PC_AMBIENCE_SONG, "music/nights/ambience_pc.caf");
             LoadMusic(NIGHTS_CREDITS_SONG, "music/nights/credits.caf");
+            LoadMusic(DUALSHOT_SONG_1, "music/dualshot/bonus1.caf");
+            LoadMusic(DUALSHOT_SONG_2, "music/dualshot/bonus2.caf");
             mMusicLoaded = true;
             mCharacterMgr.Load();
             mHighScoreMgr.Load();
@@ -592,6 +597,7 @@ namespace Sexy
             }
             CheckMaxStage();
             ShowLoadingScreen();
+            UpdateChecker.Start();
         }
 
         private void LoadLanguageStrings()
@@ -644,6 +650,14 @@ namespace Sexy
             { "High Quality Pegs", new[] { "Taquets haute qualité", "Hochwertige Spielsteine", "Fichas de alta calidad", "Tondini in alta qualità" } },
             { "More Adventures", new[] { "Plus d'aventures", "Weitere Abenteuer", "Más aventuras", "Altre avventure" } },
             { "Main Adventures", new[] { "Principales", "Hauptstory", "Aventuras base", "Avventure base" } },
+            // The update prompt (UpdateChecker).
+            { "Update Available", new[] { "Mise à jour disponible", "Update verfügbar", "Actualización disponible", "Aggiornamento disponibile" } },
+            { "A new version of Peggle Enhanced is available!", new[] { "Une nouvelle version de Peggle Enhanced est disponible !",
+                "Eine neue Version von Peggle Enhanced ist verfügbar!", "¡Hay una nueva versión de Peggle Enhanced disponible!",
+                "È disponibile una nuova versione di Peggle Enhanced!" } },
+            { "Current version: ", new[] { "Version actuelle : ", "Aktuelle Version: ", "Versión actual: ", "Versione attuale: " } },
+            { "New version: ", new[] { "Nouvelle version : ", "Neue Version: ", "Nueva versión: ", "Nuova versione: " } },
+            { "Download", new[] { "Télécharger", "Herunterladen", "Descargar", "Scarica" } },
         };
 
         /// <summary>Port addition: the bundled language matching the system's, or English (0).</summary>
@@ -1127,6 +1141,11 @@ namespace Sexy
         /// <summary>Port addition: the PC Nights credits room's music (NightsEndingScreen).</summary>
         public const int NIGHTS_CREDITS_SONG = 36;
 
+        /// <summary>Port addition: the Peggle Dual Shot levels' two songs (one picked at random per level).</summary>
+        public const int DUALSHOT_SONG_1 = 37;
+
+        public const int DUALSHOT_SONG_2 = 38;
+
         /// <summary>Port addition: the opening PlayOpeningMusic is waiting on (-1 for none), the loop that follows it, and whether it has started.</summary>
         private int mOpeningSong = -1;
 
@@ -1227,6 +1246,10 @@ namespace Sexy
             if (mResultsMusicPending)
             {
                 UpdateResultsMusic();
+            }
+            if (UpdateChecker.HasUpdate)
+            {
+                CheckUpdatePrompt();
             }
             if (mOpeningSong != -1)
             {
@@ -2549,7 +2572,7 @@ namespace Sexy
 
         /// <summary>
         /// Port: theAdventure (or null) is the bonus Adventure being played (mBonusAdventure). Its stage
-        /// range is its page's, and its last stage is an ordinary one (no Master stage).
+        /// range is its page's Adventure stages, and its last stage is an ordinary one (no Master stage).
         /// </summary>
         public void SetLevelPack(int theLevelPack, BonusPage theAdventure)
         {
@@ -2563,7 +2586,7 @@ namespace Sexy
             {
                 mPlayerInfo.mFirstAdventureStage = theAdventure.mFirstStage;
                 mPlayerInfo.mLastAdventureStage = theAdventure.mLastStage;
-                mPlayerInfo.mNumAdventureStages = theAdventure.mNumStages - 1;
+                mPlayerInfo.mNumAdventureStages = theAdventure.AdventureStages - 1;
             }
             else if (theLevelPack == 1)
             {
@@ -2683,6 +2706,43 @@ namespace Sexy
         }
 
         /// <summary>Port addition: OK applies the icon (closing the game); Cancel goes back to the current icon.</summary>
+        /// <summary>Port addition: the release page of the update the prompt offers.</summary>
+        private string mUpdateUrl = UpdateChecker.RELEASES_PAGE_URL;
+
+        /// <summary>
+        /// Port addition: shows the update prompt (UpdateChecker found a newer release) once the main
+        /// menu is settled: it has the focus, nothing is sliding, no other dialog is up (the new-user
+        /// certificate, for one) and it has been up a second.
+        /// </summary>
+        private void CheckUpdatePrompt()
+        {
+            if (mMainMenu == null || mDialogList.Count != 0 || mWidgetMover.IsRemovingAny() ||
+                mWidgetManager.mFocusWidget != mMainMenu || mMainMenu.mUpdateCnt < 100)
+            {
+                return;
+            }
+            if (!UpdateChecker.TakeUpdate(out string aNewVersion, out mUpdateUrl))
+            {
+                return;
+            }
+            string aText = Loc("A new version of Peggle Enhanced is available!") + "\n\n" +
+                Loc("Current version: ") + SexyUtil.GetPortVersionString() + "\n" +
+                Loc("New version: ") + aNewVersion;
+            ThunderDialog aDialog = (ThunderDialog)DoDialog(DialogId.DIALOG_UPDATE_AVAILABLE, true, Loc("Update Available"), aText, "", 2);
+            aDialog.mYesButton.mLabel = Loc("Download");
+            aDialog.mNoButton.mLabel = Loc("Cancel");
+        }
+
+        /// <summary>Port addition: Download opens the release page; either button closes the prompt.</summary>
+        private void FinishUpdateDialog(bool theDownload)
+        {
+            DoScrollOff(DialogId.DIALOG_UPDATE_AVAILABLE);
+            if (theDownload)
+            {
+                OpenURL(mUpdateUrl);
+            }
+        }
+
         public void FinishConfirmAppIconDialog(bool theOk)
         {
             PortOptionsDialog anOptions = GetDialog(DialogId.DIALOG_PORT_OPTIONS) as PortOptionsDialog;
@@ -3340,6 +3400,9 @@ namespace Sexy
             case DialogId.DIALOG_CONFIRM_APP_ICON:
                 FinishConfirmAppIconDialog(yes);
                 break;
+            case DialogId.DIALOG_UPDATE_AVAILABLE:
+                FinishUpdateDialog(yes);
+                break;
             case DialogId.DIALOG_CONFIRM_RESTART_LEVEL:
                 FinishConfirmRestartLevelDialog(yes);
                 break;
@@ -3441,6 +3504,22 @@ namespace Sexy
             {
                 PlayMusic(mCurLevel + 8, true);
             }
+        }
+
+        /// <summary>
+        /// Port addition: the level music of a Peggle Dual Shot level, in place of the Peggle songs.
+        /// theNewLevel (a level starting or restarting) picks one of its two songs at random; otherwise
+        /// the one playing carries on.
+        /// </summary>
+        public void PlayDualShotTrack(bool theNewLevel)
+        {
+            mMenuMusicPlaying = false;
+            int aSong = mCurMusic;
+            if (theNewLevel || (aSong != DUALSHOT_SONG_1 && aSong != DUALSHOT_SONG_2))
+            {
+                aSong = SexyUtil.Rand() % 2 == 0 ? DUALSHOT_SONG_1 : DUALSHOT_SONG_2;
+            }
+            PlaySong(aSong, true);
         }
 
         public void PlayVictoryTrack()
