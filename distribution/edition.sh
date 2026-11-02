@@ -1,9 +1,9 @@
 # Shared by the build scripts and the Build workflow (sourced, not run). Run from the repository root.
 #
-#   port_version         prints the port's version: Directory.Build.props <Version>, plus ".<n>" when the
-#                        BUILD_NUMBER environment variable is set (CI sets it to the workflow run number), so
-#                        every CI build has a new version (1.0.8 for build 8), which AltStore / SideStore need
-#                        to see an update.
+#   port_version         prints the port's version: Directory.Build.props <Version>, plus VERSION_SUFFIX
+#                        when set. CI sets it to ".<run number>" for automatic builds, so each one has a new
+#                        version (1.1.17 for build 17), which AltStore / SideStore need to see an update; a
+#                        version tag build leaves it empty, so its version is exactly <Version> (1.2).
 #   edition_info HD|iPhone
 #                        sets APP_NAME (display name), EXE (executable / file name prefix), APP_ID (bundle /
 #                        application id) and VERSION (port_version).
@@ -11,7 +11,7 @@
 port_version() {
   local base
   base="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props | head -n1)"
-  echo "$base${BUILD_NUMBER:+.$BUILD_NUMBER}"
+  echo "$base${VERSION_SUFFIX:-}"
 }
 
 edition_info() {

@@ -1,9 +1,10 @@
 # Builds every platform for both editions (HD and iPhone), then publishes them as a GitHub release
 # and updates the AltStore / SideStore source on GitHub Pages. See BUILDING.md.
 #
-#   Pushes to main, manual runs (Actions > Build > Run workflow) and version tags publish a release:
-#     main / manual run      -> pre-release "build-<run number>"
-#     version tag (1.2, v1.2) -> full release named after the tag, marked as the latest release
+#   Pushes to main, manual runs (Actions > Build > Run workflow) and version tags publish a release,
+#   titled with its tag:
+#     main / manual run       -> pre-release "v<Version>-prerelease+<run number>" (v1.1-prerelease+17)
+#     version tag (v1.2, 1.2) -> full release of that tag, marked as the latest release
 #   Automatic builds are never the latest release: that stays the last tagged release, which the
 #   in-game update checker (Peggle/UpdateChecker.cs) reads and compares by its version tag.
 #   Pull requests only build (files under the run's Artifacts). Other branches build through their pull
@@ -40,6 +41,9 @@ env:
   # (<Version>.<n>, distribution/edition.sh), so every build installs as an update, including through
   # AltStore / SideStore.
   BUILD_NUMBER: ${{ github.run_number }}
+  # Appended to <Version> by port_version: automatic builds are <Version>.<n>, a version tag's build is
+  # exactly <Version>.
+  VERSION_SUFFIX: ${{ !startsWith(github.ref, 'refs/tags/') && format('.{0}', github.run_number) || '' }}
 
 jobs:
   android:
@@ -317,19 +321,23 @@ jobs:
         id: meta
         run: |
           source distribution/edition.sh
-          VERSION="$(port_version)"
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then TAG="$GITHUB_REF_NAME"; else TAG="build-$BUILD_NUMBER"; fi
-          # make_source.py reads the version and build number from this name; they match the IPAs'
-          # CFBundleShortVersionString and CFBundleVersion, which AltStore / SideStore compare.
-          echo "name=Peggle Enhanced $VERSION (build $BUILD_NUMBER)" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="$GITHUB_REF_NAME"
+          else
+            TAG="v$(VERSION_SUFFIX= port_version)-prerelease+$BUILD_NUMBER"
+          fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          # Hidden in the notes for make_source.py: the IPAs' CFBundleShortVersionString and
+          # CFBundleVersion, which AltStore / SideStore compare with the source's.
+          echo "body=<!-- peggle-build version=$(port_version) build=$BUILD_NUMBER -->" >> "$GITHUB_OUTPUT"
           echo "prerelease=${{ !startsWith(github.ref, 'refs/tags/') }}" >> "$GITHUB_OUTPUT"
           ls -lh dist
 
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
-          name: ${{ steps.meta.outputs.name }}
+          name: ${{ steps.meta.outputs.tag }}
+          body: ${{ steps.meta.outputs.body }}
           target_commitish: ${{ github.sha }}
           prerelease: ${{ steps.meta.outputs.prerelease }}
           make_latest: ${{ steps.meta.outputs.prerelease == 'true' && 'false' || 'true' }}

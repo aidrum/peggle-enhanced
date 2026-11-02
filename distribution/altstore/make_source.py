@@ -5,8 +5,11 @@ Builds the AltStore / SideStore source (the GitHub Pages site) from the reposito
     make_source.py --repo OWNER/NAME --releases releases.json --out site/
 
 releases.json is a release list from the GitHub API (gh api repos/OWNER/NAME/releases). Every release
-the Build workflow publishes is named "Peggle Enhanced <version> (build <n>)" and carries the unsigned
-IPAs; each becomes a version of the apps in the source, newest first. The output folder gets:
+the Build workflow publishes carries the unsigned IPAs and, in its notes, a hidden
+"<!-- peggle-build version=<v> build=<n> -->" line with the IPAs' CFBundleShortVersionString and
+CFBundleVersion; each such release becomes a version of the apps in the source, newest build first.
+Releases from before that line existed are read from their old "Peggle Enhanced <v> (build <n>)" title.
+The output folder gets:
 
     apps.json   the source (AltStore source format v2, plus the older top-level version fields that
                 SideStore and older AltStore versions read)
@@ -31,8 +34,9 @@ MAX_VERSIONS = 15
 MIN_OS_VERSION = "15.0"
 TINT_COLOR = "E8652B"
 DEVELOPER = "aidrum & TheAwesomeBlue"
-# The Build workflow's release name; the version and build number are read back from it.
-RELEASE_NAME = re.compile(r"Peggle Enhanced (?P<version>\S+) \(build (?P<build>\d+)\)")
+# The Build workflow's marker in each release's notes, and the older releases' title format.
+BUILD_MARKER = re.compile(r"<!-- peggle-build version=(?P<version>\S+) build=(?P<build>\d+) -->")
+LEGACY_RELEASE_NAME = re.compile(r"Peggle Enhanced (?P<version>\S+) \(build (?P<build>\d+)\)")
 
 ADVENTURES = "the complete Peggle, Peggle Nights, Peggle Extreme and Peggle World of Warcraft adventures"
 APPS = [
@@ -86,7 +90,7 @@ def app_versions(app, releases):
     """The app's versions, one per release that has its IPA, newest build first."""
     versions = []
     for release in releases:
-        name = RELEASE_NAME.search(release.get("name") or "")
+        name = BUILD_MARKER.search(release.get("body") or "") or LEGACY_RELEASE_NAME.search(release.get("name") or "")
         if release.get("draft") or not name:
             continue
         ipa = next((a for a in release.get("assets", []) if a.get("name") == app["ipa"]), None)
