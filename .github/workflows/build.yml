@@ -130,18 +130,13 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-  ios:
-    name: iOS (${{ matrix.edition }})
-    runs-on: macos-15
-    timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - edition: HD
-            ipa: PeggleHD
-          - edition: iPhone
-            ipa: Peggle
+  # Everything that needs a Mac (iOS and macOS, both editions) in one job, on an Intel runner: GitHub's
+  # Apple Silicon (arm64) runners are often out of capacity, and a job that isn't given one in 15 minutes
+  # is cancelled. One job means one runner to wait for; the macOS apps are cross-compiled for both CPUs.
+  apple:
+    name: iOS and macOS
+    runs-on: macos-15-intel
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
 
@@ -158,62 +153,47 @@ jobs:
       - name: Install the iOS workload
         run: dotnet workload install ios
 
-      - name: Build (Release, ios-arm64, no code signing)
-        run: |
-          source distribution/edition.sh
-          dotnet build Peggle.iOS/Peggle.iOS.csproj -c Release -r ios-arm64 \
-            -p:PeggleEdition=${{ matrix.edition }} \
-            -p:ApplicationVersion=$BUILD_NUMBER -p:ApplicationDisplayVersion="$(port_version)" \
-            -p:EnableCodeSigning=false -p:CodesignRequireProvisioningProfile=false \
-            -p:BuildIpa=false -p:ValidateXcodeVersion=false
-
-      # Sideloading tools (AltStore, SideStore, Sideloadly, TrollStore) sign the app on install.
-      - name: Package Payload/*.app into an unsigned .ipa
+      # Unsigned: sideloading tools (AltStore, SideStore, Sideloadly, TrollStore) sign the app on install.
+      - name: Build the unsigned IPAs
         run: |
           set -euo pipefail
-          APP="$(find Peggle.iOS/bin -type d -name '*.app' -path '*Release*ios-arm64*' | head -n1)"
-          if [ -z "$APP" ]; then echo "No .app found under Peggle.iOS/bin" >&2; exit 1; fi
-          echo "App bundle: $APP"
-          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" -c "Print :CFBundleVersion" "$APP/Info.plist"
-          rm -rf ipa && mkdir -p ipa/Payload
-          cp -R "$APP" ipa/Payload/
-          rm -rf ipa/Payload/*.app/_CodeSignature ipa/Payload/*.app/embedded.mobileprovision
-          (cd ipa && zip -qry "../${{ matrix.ipa }}-unsigned.ipa" Payload)
-          ls -lh "${{ matrix.ipa }}-unsigned.ipa"
+          source distribution/edition.sh
+          mkdir -p dist
+          for EDITION in HD iPhone; do
+            edition_info "$EDITION"
+            dotnet build Peggle.iOS/Peggle.iOS.csproj -c Release -r ios-arm64 \
+              -p:PeggleEdition="$EDITION" \
+              -p:ApplicationVersion=$BUILD_NUMBER -p:ApplicationDisplayVersion="$VERSION" \
+              -p:EnableCodeSigning=false -p:CodesignRequireProvisioningProfile=false \
+              -p:BuildIpa=false -p:ValidateXcodeVersion=false
+            # bin/Release/... for HD, bin/iPhone/Release/... for the iPhone edition.
+            if [ "$EDITION" = HD ]; then BIN=Peggle.iOS/bin/Release; else BIN=Peggle.iOS/bin/iPhone/Release; fi
+            APP="$(find "$BIN" -type d -name '*.app' -path '*ios-arm64*' | head -n1)"
+            if [ -z "$APP" ]; then echo "No .app found under $BIN" >&2; exit 1; fi
+            echo "$EDITION: $APP"
+            /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" -c "Print :CFBundleVersion" "$APP/Info.plist"
+            rm -rf ipa && mkdir -p ipa/Payload
+            cp -R "$APP" ipa/Payload/
+            rm -rf ipa/Payload/*.app/_CodeSignature ipa/Payload/*.app/embedded.mobileprovision
+            (cd ipa && zip -qry "../dist/$EXE-unsigned.ipa" Payload)
+          done
+          ls -lh dist
 
-      - uses: actions/upload-artifact@v5
-        with:
-          name: ${{ matrix.ipa }}-unsigned.ipa
-          path: ${{ matrix.ipa }}-unsigned.ipa
-          compression-level: 0
-          retention-days: 14
-          if-no-files-found: error
-
-  # Both CPU types in one job per edition (the publish cross-compiles), to use fewer macOS runners.
-  macos:
-    name: macOS (${{ matrix.edition }})
-    runs-on: macos-15
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        edition: [HD, iPhone]
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Build .apps for Intel and Apple Silicon (ad-hoc signed, zipped)
+      - name: Build the macOS apps for Intel and Apple Silicon (ad-hoc signed, zipped)
         run: |
-          distribution/build_macos.sh ${{ matrix.edition }} osx-x64
-          distribution/build_macos.sh ${{ matrix.edition }} osx-arm64
+          set -euo pipefail
+          for EDITION in HD iPhone; do
+            for RID in osx-x64 osx-arm64; do
+              distribution/build_macos.sh "$EDITION" "$RID"
+            done
+          done
+          mv distribution/out/*.zip dist/
+          ls -lh dist
 
       - uses: actions/upload-artifact@v5
         with:
-          name: macOS-${{ matrix.edition }}
-          path: distribution/out/*.zip
+          name: Apple
+          path: dist/*
           compression-level: 0
           retention-days: 14
           if-no-files-found: error
@@ -300,7 +280,7 @@ jobs:
 
   release:
     name: Publish release
-    needs: [android, ios, macos, linux, windows]
+    needs: [android, apple, linux, windows]
     if: >
       github.event_name != 'pull_request' &&
       (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch')
