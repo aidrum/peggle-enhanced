@@ -163,7 +163,7 @@ def app_html(app, entry):
 def build_site(repo, releases, out_dir):
     """Writes apps.json, index.html and the icons to out_dir; returns the source."""
     owner, name = repo.split("/", 1)
-    site_url = f"https://{owner.lower()}.github.io/{name}"
+    site_url = f"https://{owner.lower()}.github.io/{name}/ios"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     entries = [source_app(app, site_url, releases) for app in APPS]

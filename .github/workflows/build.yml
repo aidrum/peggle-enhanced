@@ -362,7 +362,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" > "$RUNNER_TEMP/releases.json"
-          python3 distribution/altstore/make_source.py --repo "$GITHUB_REPOSITORY" --releases "$RUNNER_TEMP/releases.json" --out site
+          python3 distribution/altstore/make_source.py --repo "$GITHUB_REPOSITORY" --releases "$RUNNER_TEMP/releases.json" --out site/ios
 
       - uses: actions/upload-pages-artifact@v3
         if: steps.check.outputs.ok == 'true'

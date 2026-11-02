@@ -35,7 +35,7 @@ The latest release for each platform. Newer automatic builds are on the [Release
 | Linux (x64, AppImage) | [Download](../../releases/latest/download/PeggleHD-x86_64.AppImage) | [Download](../../releases/latest/download/Peggle-x86_64.AppImage) | Make it executable, then run it. |
 | Linux (x64, .tar.gz) | [Download](../../releases/latest/download/PeggleHD-linux-x64.tar.gz) | [Download](../../releases/latest/download/Peggle-linux-x64.tar.gz) | Extract, then run `PeggleHD` / `Peggle`. |
 | Android | [Download](../../releases/latest/download/PeggleHD-android.apk) | [Download](../../releases/latest/download/Peggle-android.apk) | Android 6.0 or later. |
-| iOS / iPadOS | [Download](../../releases/latest/download/PeggleHD-unsigned.ipa) | [Download](../../releases/latest/download/Peggle-unsigned.ipa) | iOS 15 or later. Install with AltStore, SideStore, Sideloadly or TrollStore, or add the [AltStore / SideStore source](https://moondotgz.github.io/peggle-enhanced/) to get updates. |
+| iOS / iPadOS | [Download](../../releases/latest/download/PeggleHD-unsigned.ipa) | [Download](../../releases/latest/download/Peggle-unsigned.ipa) | iOS 15 or later. Install with AltStore, SideStore, Sideloadly or TrollStore, or add the [AltStore / SideStore source](https://aidrum.github.io/peggle-enhanced/ios/) to get updates. |
 
 - **Peggle HD** is the iPad version (4:3), best on tablets and PCs.
 - **Peggle** is the iPhone version, with widescreen and ultrawide support, best on phones.
