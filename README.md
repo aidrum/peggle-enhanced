@@ -25,7 +25,7 @@ Additionally, TheAwesomeBlue simply had a strange thought for a while now: It ha
 
 ## Download
 
-The latest build for each platform, from the [Releases](../../releases) page:
+The latest release for each platform. Newer automatic builds are on the [Releases](../../releases) page as pre-releases.
 
 | Platform | Peggle HD | Peggle | Notes |
 |---|---|---|---|
