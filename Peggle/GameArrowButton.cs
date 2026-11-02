@@ -23,6 +23,8 @@ namespace Sexy
 
         public const int LOGO_WOW = 6;
 
+        public const int LOGO_DUALSHOT = 7;
+
 #if PEGGLE_IPHONE
         // Where a frame sits relative to the original button it replaces, so the arrows line up.
         public static int LEFT_OFFSET_X = 7;
@@ -55,7 +57,7 @@ namespace Sexy
             if (sSheet == null)
             {
                 sSheet = GlobalStaticVars.gSexyAppBase.GetImage("images/" + GlobalStaticVars.mResPathPrefix + "levelselect/gamearrows", true);
-                sSheet.mNumCols = 7;
+                sSheet.mNumCols = 8;
                 sSheet.mNumRows = 2;
             }
             return sSheet;
@@ -63,16 +65,18 @@ namespace Sexy
 
         /// <summary>
         /// The opaque part of a logo cel (normal row), for drawing the logo on its own without the
-        /// cel's blank margins, as the replay list does for the bonus Adventures.
+        /// cel's blank margins, as the replay list does for the Extreme, WoW and Dual Shot levels.
         /// </summary>
         public static TRect GetLogoRect(int theLogo)
         {
             Image aSheet = GetSheet();
             int aCelW = aSheet.mWidth / aSheet.mNumCols;
 #if PEGGLE_IPHONE
-            TRect aBounds = theLogo == LOGO_EXTREME ? new TRect(40, 6, 162, 108) : new TRect(38, 15, 156, 96);
+            TRect aBounds = theLogo == LOGO_EXTREME ? new TRect(40, 6, 162, 108)
+                : theLogo == LOGO_DUALSHOT ? new TRect(48, 15, 157, 94) : new TRect(38, 15, 156, 96);
 #else
-            TRect aBounds = theLogo == LOGO_EXTREME ? new TRect(48, 7, 195, 129) : new TRect(46, 18, 187, 115);
+            TRect aBounds = theLogo == LOGO_EXTREME ? new TRect(48, 7, 195, 129)
+                : theLogo == LOGO_DUALSHOT ? new TRect(58, 18, 188, 112) : new TRect(46, 18, 187, 115);
 #endif
             aBounds.mX += theLogo * aCelW;
             return aBounds;

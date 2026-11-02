@@ -296,7 +296,8 @@ namespace Sexy
         /// <summary>
         /// Port addition: the bonus levels (Nights bonus, Extreme) ship the PC's 800x600-scale art
         /// (tools/import_bonus_levels.py). When an image is missing, this looks for a PC one instead:
-        /// a background "levels/&lt;res&gt;/name" as levels/pc/name, and any other "images/.../name"
+        /// a background "levels/&lt;res&gt;/name" as levels/ds/name (a Peggle Dual Shot screen,
+        /// LoadDSBackground) or else levels/pc/name, and any other "images/.../name"
         /// (level art, emitter particles) as images/pc/name, since the game finds those by file
         /// name. It is scaled as the board is (display height / 600), so it comes out the size of
         /// this edition's own art. Null when there is no such file.
@@ -308,7 +309,13 @@ namespace Sexy
             string aPath;
             if (aName.StartsWith(aLevelsPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                aPath = "levels/pc/" + aName.Substring(aLevelsPrefix.Length);
+                string aLevel = aName.Substring(aLevelsPrefix.Length);
+                Image aDSImage = LoadDSBackground("levels/ds/" + aLevel);
+                if (aDSImage != null)
+                {
+                    return aDSImage;
+                }
+                aPath = "levels/pc/" + aLevel;
             }
             else if (aName.StartsWith("images/", StringComparison.OrdinalIgnoreCase) && !aName.StartsWith("images/pc/", StringComparison.OrdinalIgnoreCase))
             {
@@ -319,6 +326,63 @@ namespace Sexy
                 return null;
             }
             return LoadPCImage(aPath);
+        }
+
+        /// <summary>
+        /// Port addition: board units per Peggle Dual Shot background pixel, and the board point at the
+        /// background's top-left: the DS screen's (3, 4.5), less the one column added on its left.
+        /// </summary>
+        private const float DS_SCALE = 2.53f;
+
+        private const float DS_ORIGIN_X = 3.0f - DS_SCALE;
+
+        private const float DS_ORIGIN_Y = 4.5f;
+
+        /// <summary>
+        /// Port addition: a Peggle Dual Shot level background (levels/ds/, from
+        /// tools/import_dualshot_levels.py) scaled up nearest-neighbour to this edition's background
+        /// size, so it is placed like the edition's own backgrounds. The file is the DS screen (256x192)
+        /// expanded to the whole board at the same pixel size: a column on the left and rows below,
+        /// painted in by hand. Pixel (i, j) shows board point (0.47 + 2.53 i, 4.5 + 2.53 j); anything the
+        /// file doesn't reach is left transparent. Null when there is no such file.
+        /// </summary>
+        public static Image LoadDSBackground(string thePath)
+        {
+            ImageLibImage aSource = ImageLib.GetImage(thePath, false);
+            if (aSource == null)
+            {
+                return null;
+            }
+            int aWidth = BACKGROUND_IMAGE_WIDTH;
+            int aHeight = BACKGROUND_IMAGE_HEIGHT;
+            // The board area an edition background covers: centred on (0x145, 0x118) at 1.28 pixels
+            // per board unit in HD (Board.LoadLevel2).
+            float aBoardW = 827 / 1.28f;
+            float aBoardH = 696 / 1.28f;
+            float aLeft = 0x145 - aBoardW / 2;
+            float aTop = 0x118 - aBoardH / 2;
+            int[] aCols = new int[aWidth];
+            for (int x = 0; x < aWidth; x++)
+            {
+                aCols[x] = (int)Math.Floor((aLeft + (x + 0.5f) * aBoardW / aWidth - DS_ORIGIN_X) / DS_SCALE);
+            }
+            ImageLibImage anImage = new ImageLibImage(aWidth, aHeight);
+            for (int y = 0; y < aHeight; y++)
+            {
+                int aRow = (int)Math.Floor((aTop + (y + 0.5f) * aBoardH / aHeight - DS_ORIGIN_Y) / DS_SCALE);
+                if (aRow < 0 || aRow >= aSource.mHeight)
+                {
+                    continue;
+                }
+                for (int x = 0; x < aWidth; x++)
+                {
+                    if (aCols[x] >= 0 && aCols[x] < aSource.mWidth)
+                    {
+                        anImage.mBits[y * aWidth + x] = aSource.mBits[aRow * aSource.mWidth + aCols[x]];
+                    }
+                }
+            }
+            return LoadResizedImage(anImage, aWidth, aHeight);
         }
 
         /// <summary>Port addition: loads an image file resampled by theScale. Null when missing.</summary>

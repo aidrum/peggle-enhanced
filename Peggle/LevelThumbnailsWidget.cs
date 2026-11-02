@@ -14,8 +14,8 @@ namespace Sexy
     /// Peggle stages sit in a left column and Nights stages in a right one; the stage labels in the
     /// middle are shared, and the screen scrolls sideways between the two. Row 0 is Random Level.
     /// Port addition: further pages to the right hold the bonus stages (StageMgr.BONUS_PAGES: Nights
-    /// bonus, Extreme, WoW). Nights bonus has its own labels; Extreme and WoW share theirs, like
-    /// Peggle and Nights.
+    /// bonus, Dual Shot, Extreme, WoW). Nights bonus and Dual Shot have their own labels; Extreme and
+    /// WoW share theirs, like Peggle and Nights.
     /// </summary>
     public class LevelThumbnailsWidget : Widget
     {
@@ -117,6 +117,11 @@ namespace Sexy
             {
                 return false;
             }
+            // Port addition: a bonus stage can have fewer than five levels (the WoW addon's last).
+            if (StageMgr.IsBonusStage(theStage) && mApp.mStageMgr.GetStageInfo(theStage)?.GetLevelInfo(theLevel) == null)
+            {
+                return false;
+            }
             if (mApp.mPlayerInfo == null)
             {
                 return true;
@@ -174,6 +179,19 @@ namespace Sexy
                 && StageMgr.GetBonusPageAt(anIndex + 1).mLogoCel == GameArrowButton.LOGO_WOW;
         }
 
+        /// <summary>
+        /// Port addition: the alpha of a row (label and box) only the right page of a shared pair has: 0 with the
+        /// view on the left page, 255 on the right one, in between while scrolling (the client is
+        /// moved by minus the scroll position).
+        /// </summary>
+        private int GetRightPageLabelAlpha(int theRightPage)
+        {
+            int aLeftX = GetPageX(theRightPage - 1);
+            int aRightX = GetPageX(theRightPage);
+            float t = (-mX - aLeftX) / (float)(aRightX - aLeftX);
+            return (int)(System.Math.Clamp(t, 0.0f, 1.0f) * 0xff);
+        }
+
         /// <summary>Port addition: true for the WoW page when it shares labels with Extreme.</summary>
         public static bool IsSharedRightPage(int thePage)
         {
@@ -199,6 +217,10 @@ namespace Sexy
             for (int i = 0; i < 5; i++)
             {
                 LevelDisplayInfo anInfo = mLevels[theStage * 5 + i];
+                if (anInfo.mLevelInfo == null && StageMgr.IsBonusStage(theStage))
+                {
+                    break;  // Port addition: a short bonus stage leaves the rest of its row empty.
+                }
                 TRect aRect = new TRect(x, theY, LEVEL_SCREEN_STAGE_THUMB_W, LEVEL_SCREEN_STAGE_THUMB_H);
                 SexyUtil.DrawLevelThumbnail(g, theStage, i, aRect);
                 if (!anInfo.mLocked)
@@ -233,11 +255,11 @@ namespace Sexy
             }
         }
 
-        private void DrawThumbOutlines(Graphics g, int theX, int theY, int theColor)
+        private void DrawThumbOutlines(Graphics g, int theX, int theY, int theColor, int theCount = 5)
         {
             g.SetColor(SexyUtil.MakeColor(theColor));
             int x = theX;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < theCount; i++)
             {
                 g.DrawRect(x, theY, LEVEL_SCREEN_STAGE_THUMB_W - 1, LEVEL_SCREEN_STAGE_THUMB_H - 1);
                 x += LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W;
@@ -253,7 +275,8 @@ namespace Sexy
             new[] { "Peggle Art", "Contest" },
         };
 
-        private void DrawStageLabel(Graphics g, Font theLabelFont, int theLabelX, int theLabelWidth, int theRowY, int theStage, BonusPage theBonusPage = null)
+        private void DrawStageLabel(Graphics g, Font theLabelFont, int theLabelX, int theLabelWidth, int theRowY, int theStage, BonusPage theBonusPage = null,
+            int theAlpha = 0xff)
         {
             string aTop = SexyAppBase.Loc("Stage");
             string aBottom = (theStage + 1).ToString();
@@ -263,7 +286,14 @@ namespace Sexy
                 aBottom = SexyAppBase.Loc(NIGHTSDLC_STAGE_NAMES[theStage][1]);
                 theLabelWidth = theLabelFont.StringWidth(aTop);
             }
-            g.SetColor(Color.White);
+            else if (theBonusPage != null && theBonusPage.HasAdventure && theStage >= theBonusPage.AdventureStages)
+            {
+                // Port addition: the stages after a page's Adventure (the WoW addon levels).
+                aTop = SexyAppBase.Loc("WoW Addon");
+                aBottom = (theStage - theBonusPage.AdventureStages + 1).ToString();
+                theLabelWidth = theLabelFont.StringWidth(aTop);
+            }
+            g.SetColor(new Color(0xff, 0xff, 0xff, theAlpha));
             g.SetFont(theLabelFont);
 #if PEGGLE_IPHONE
             int y = theRowY + ROW_HEIGHT / 2;
@@ -381,7 +411,11 @@ namespace Sexy
                     {
                         continue;
                     }
-                    if (!(isRight && isShared))
+                    // A row only the WoW page has (the WoW addon stages) keeps its label and box off the
+                    // Extreme page, whose view shares the label column: they fade in as the view
+                    // scrolls from Extreme to WoW.
+                    int aRowAlpha = isRight && !isShared ? GetRightPageLabelAlpha(aPage) : 0xff;
+                    if (!(isRight && isShared) && aRowAlpha > 0)
                     {
                         TRect aBoxRect = aRowRect;
                         if (isLeft && isShared)
@@ -389,17 +423,17 @@ namespace Sexy
                             aBoxRect.mWidth += THUMB_STAGE_WIDTH;
                         }
                         g.SetColorizeImages(true);
-                        g.SetColor(SexyUtil.MakeColor(SexyUtil.GetColorForStage(aRow, ThunderballApp.mGameLevelPack, true), 0x7f));
+                        g.SetColor(SexyUtil.MakeColor(SexyUtil.GetColorForStage(aRow, ThunderballApp.mGameLevelPack, true), 0x7f * aRowAlpha / 0xff));
                         SexyUtil.MyDrawImageBox(g, aBoxRect, Res.IMAGE_DLG_GROUPRECT);
                         g.SetColorizeImages(false);
                     }
                     int aThumbX = GetPageThumbX(aPage);
                     int aThumbY = aRowRect.mY + 1;
                     DrawStageThumbs(g, aStage, aThumbX, aThumbY);
-                    DrawThumbOutlines(g, aThumbX, aThumbY, aBonus.mOutlineColor);
-                    if (!(isLeft && isShared))
+                    DrawThumbOutlines(g, aThumbX, aThumbY, aBonus.mOutlineColor, mApp.mStageMgr.GetStageInfo(aStage).mLevels.Count);
+                    if (!(isLeft && isShared) && aRowAlpha > 0)
                     {
-                        DrawStageLabel(g, aLabelFont, aPageLabelX, aLabelWidth, aRowRect.mY, aRow, aBonus);
+                        DrawStageLabel(g, aLabelFont, aPageLabelX, aLabelWidth, aRowRect.mY, aRow, aBonus, aRowAlpha);
                     }
                 }
             }
