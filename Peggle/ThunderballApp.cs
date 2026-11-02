@@ -2094,6 +2094,77 @@ namespace Sexy
             }
         }
 
+        /// <summary>
+        /// Port addition (launch target): where the app that started the game asked it to open (GameActivity reads
+        /// the intent extra "peggle_target"): "peggle" and "nights" (their Adventures), "extreme" and "wow" (the bonus
+        /// Adventures), "dualshot" (Quick Play on the Dual Shot page; it has no Adventure). Null when the game was
+        /// started on its own, as from the home screen: then nothing changes.
+        /// </summary>
+        public static string sLaunchTarget;
+
+        /// <summary>Port addition (launch target): the next StartAdventureGame goes to the board without the story screen.</summary>
+        public static bool sLaunchSkipStory;
+
+        private void LaunchAdventure(int theLevelPack, BonusPage theAdventure)
+        {
+            int aMode = theLevelPack == 1 ? GameMode.GAMEMODE_ADVENTURE_NIGHTS : GameMode.GAMEMODE_ADVENTURE;
+            SetLevelPack(theLevelPack, theAdventure);
+            mGameMode = aMode;
+            // The level the Adventure stands at (as StartAdventureGame works it out), which a save must be of.
+            mCurStage = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageStage(), mPlayerInfo.mFirstAdventureStage, mPlayerInfo.mLastAdventureStage);
+            mCurLevel = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageLevel(), 0, 5);
+            if (CheckSaveGame(false, true))
+            {
+                return;  // the saved level, loaded (FinishContinueDialog)
+            }
+            sLaunchSkipStory = true;
+            StartAdventureGame(aMode);
+        }
+
+        public void RunLaunchTarget()
+        {
+            string aTarget = sLaunchTarget;
+            sLaunchTarget = null;
+            if (mMainMenu == null)
+            {
+                return;
+            }
+            // The Adventures go straight to the board: the level in progress if there is one (no "continue?"
+            // prompt), else where the player's Adventure stands (1-1 the first time). No story screen between.
+            switch (aTarget)
+            {
+            case "peggle":
+            case "nights":
+                LaunchAdventure(aTarget == "nights" ? 1 : 0, null);
+                break;
+            case "extreme":
+            case "wow":
+                {
+                    BonusPage anAdventure = StageMgr.GetAdventurePage(aTarget == "extreme" ? StageMgr.ADVENTURE_EXTREME : StageMgr.ADVENTURE_WOW);
+                    if (anAdventure != null)
+                    {
+                        LaunchAdventure(anAdventure.mLevelPack, anAdventure);
+                    }
+                    break;
+                }
+            case "dualshot":
+                mGameMode = GameMode.GAMEMODE_QUICKPLAY;
+                ShowLevelScreen(false, false, false);
+                if (mLevelScreen != null)
+                {
+                    for (int aPage = 2; aPage < mLevelScreen.GetNumPages(); aPage++)
+                    {
+                        if (LevelScreen.GetPageLogo(aPage) == GameArrowButton.LOGO_DUALSHOT)
+                        {
+                            mLevelScreen.ShowPage(aPage);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
         /// <summary>Port addition: leaves a bonus Adventure (mBonusAdventure), back to its pack's own stage range.</summary>
         public void EndBonusAdventure()
         {
@@ -2549,7 +2620,12 @@ namespace Sexy
                 mCurStage = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageStage(), mPlayerInfo.mFirstAdventureStage, mPlayerInfo.mLastAdventureStage);
                 mCurLevel = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageLevel(), 0, 5);
             }
-            if (mPlayerInfo == null || !mPlayerInfo.GetmNeedShowStory() || mCurLevel != 0)
+            if (sLaunchSkipStory)
+            {
+                sLaunchSkipStory = false;
+                ShowBoard(false, true, false, false);
+            }
+            else if (mPlayerInfo == null || !mPlayerInfo.GetmNeedShowStory() || mCurLevel != 0)
             {
                 ShowBoard(false, true, false, false);
             }

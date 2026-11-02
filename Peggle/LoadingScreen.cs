@@ -77,6 +77,9 @@ namespace Sexy
 
         public bool mLoadingDone;                                 // 0xc4
 
+        /// <summary>Port addition (launch target): "Touch to play" was skipped for ThunderballApp.sLaunchTarget.</summary>
+        private bool mLaunchSkipped;
+
         public string mPhrase = "";                               // 0xc8
 
         public int[] mPhraseOrder = new int[0x1b];                // 0xcc
@@ -361,6 +364,22 @@ namespace Sexy
         public override void Update()
         {
             base.Update();
+            // Port addition (launch target): an app that started the game for a given game skips "Touch to play"
+            // (the main menu then opens it). With no player yet, the press asks for a name, once; the main menu
+            // then opens the target. The suspended game isn't restored here: the target finds its own save.
+            if (mLoadingDone && !mLaunchSkipped && ThunderballApp.sLaunchTarget != null && mPlayButton.mVisible &&
+                !mPlayButton.mDisabled)
+            {
+                mLaunchSkipped = true;
+                if (mApp.mPlayerInfo == null)
+                {
+                    ButtonDepress(0);
+                }
+                else
+                {
+                    mApp.ShowMainMenu();
+                }
+            }
             uint elapsed = 0;
             if (aTickStart == 0)
             {

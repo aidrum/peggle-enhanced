@@ -856,6 +856,12 @@ namespace Sexy
 
         public override void Update()
         {
+            // Port addition (launch target): the game the starting app asked for, once the menu is up with a player
+            // and nothing over it (the new-player dialog).
+            if (ThunderballApp.sLaunchTarget != null && mApp.mPlayerInfo != null && mUpdateCnt > 15 && mApp.mDialogList.Count == 0)
+            {
+                mApp.RunLaunchTarget();
+            }
             if (mWoW)
             {
                 SyncWoWScene();
