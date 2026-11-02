@@ -17,8 +17,14 @@ namespace Sexy
 
         public static Func<Main, SexyAppBase> AppFactory;
 
-        /// <summary>Full-screen platforms (Android): the screen's size in pixels, for the backbuffer.</summary>
+        /// <summary>Full-screen platforms (Android, iOS): the screen's size in pixels, for the backbuffer.</summary>
         public static Point? NativeScreenSize;
+
+        /// <summary>
+        /// Port: phones and tablets (Android, iOS). Full screen, touch only, lazy loading and no PC Controls;
+        /// desktops get a resizable window with mouse, keyboard and text input.
+        /// </summary>
+        public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
 
         /// <summary>Set by the platform (Android's back button); handled as a back press on the next update.</summary>
         public static volatile bool BackRequested;
@@ -81,9 +87,9 @@ namespace Sexy
         public Main()
         {
             Main.graphics = Graphics.GetNew(this);
-            Main.graphics.IsFullScreen = OperatingSystem.IsAndroid();
+            Main.graphics.IsFullScreen = IsMobile;
 #if PEGGLE_IPHONE
-            // A full screen (Android) lays out at its own aspect, as the original did on the device; a
+            // A full screen (Android, iOS) lays out at its own aspect, as the original did on the device; a
             // resizable window switches between the 960 and 1136 layouts (see ChooseScreenWidth).
             if (NativeScreenSize is Point aScreen)
             {
@@ -110,7 +116,7 @@ namespace Sexy
             Window.AllowUserResizing = true;
             base.Window.ClientSizeChanged += OnResize;
             IsMouseVisible = true;
-            if (!OperatingSystem.IsAndroid())
+            if (!IsMobile)
             {
                 HookTextInput();
             }
@@ -119,7 +125,7 @@ namespace Sexy
 
         /// <summary>
         /// Kept out of the constructor: GameWindow.TextInput only exists in the desktop MonoGame
-        /// builds, so referencing it inline would fail when the constructor is compiled on Android.
+        /// builds, so referencing it inline would fail when the constructor is compiled on Android/iOS.
         /// </summary>
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void HookTextInput()
@@ -148,13 +154,13 @@ namespace Sexy
         }
 
         /// <summary>
-        /// On Android the backbuffer must be exactly the surface size. Otherwise MonoGame letterboxes it
+        /// On phones and tablets the backbuffer must be exactly the surface size. Otherwise MonoGame letterboxes it
         /// through the viewport, which is lost whenever a render target is unset, so the picture shrank
         /// and later jumped (black bands at the top when the surface was smaller than the display).
         /// </summary>
         private void MatchBackBufferToWindow(Rectangle theBounds)
         {
-            if (!OperatingSystem.IsAndroid() || theBounds.Width <= 0 || theBounds.Height <= 0)
+            if (!IsMobile || theBounds.Width <= 0 || theBounds.Height <= 0)
             {
                 return;
             }
@@ -318,8 +324,8 @@ namespace Sexy
         {
             SexyAppBase app = GlobalStaticVars.gSexyAppBase;
             ScreenScales s = app.mScreenScales;
-            // Android input is touch only (below); polling the mouse there too would double taps.
-            MouseState msstate = OperatingSystem.IsAndroid() ? previousMouseState : Mouse.GetState();
+            // Mobile input is touch only (below); polling the mouse there too would double taps.
+            MouseState msstate = IsMobile ? previousMouseState : Mouse.GetState();
             CGPoint mouse = s.InvMapTouch(new CGPoint(msstate.Position.X, msstate.Position.Y));
             int mx = (int)mouse.x;
             int my = (int)mouse.y;
@@ -409,7 +415,7 @@ namespace Sexy
                 }
             }
             // Port addition: Alt+Enter toggles full screen on desktops; the Enter press isn't passed on.
-            bool aAltEnter = !OperatingSystem.IsAndroid() && (keys.IsKeyDown(Keys.LeftAlt) || keys.IsKeyDown(Keys.RightAlt)) &&
+            bool aAltEnter = !IsMobile && (keys.IsKeyDown(Keys.LeftAlt) || keys.IsKeyDown(Keys.RightAlt)) &&
                 keys.IsKeyDown(Keys.Enter) && previousKeyboardState.IsKeyUp(Keys.Enter);
             if (aAltEnter)
             {

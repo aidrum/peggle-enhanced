@@ -1,0 +1,374 @@
+# Builds every platform for both editions (HD and iPhone), then publishes them as a GitHub release
+# and updates the AltStore / SideStore source on GitHub Pages. See BUILDING.md.
+#
+#   Pushes to main, manual runs (Actions > Build > Run workflow) and version tags publish a release,
+#   titled with its tag:
+#     main / manual run -> pre-release "<Version>-prerelease+<run number>" (1.1-prerelease+17)
+#     version tag (1.2) -> full release of that tag, marked as the latest release
+#   Automatic builds are never the latest release: that stays the last tagged release, which the
+#   in-game update checker (Peggle/UpdateChecker.cs) reads and compares by its version tag.
+#   Pull requests only build (files under the run's Artifacts). Other branches build through their pull
+#   request or a manual run, not on every push, so a branch with an open PR isn't built twice: macOS
+#   runners are scarce, and a job that waits too long for one is cancelled.
+#
+# One-time setup:
+#   - Pages: Settings > Pages > Source: "GitHub Actions" (until then the pages job just warns).
+#   - Android signing key (optional): see BUILDING.md.
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['[0-9]*', '!*-prerelease*']
+    paths-ignore: ['**.md']
+  pull_request:
+    paths-ignore: ['**.md']
+
+concurrency:
+  # Every main build becomes a release, so those never cancel each other; elsewhere only the newest
+  # push matters.
+  group: build-${{ github.ref == 'refs/heads/main' && github.run_id || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  # The build number: the Android versionCode and iOS CFBundleVersion, and the last part of the version
+  # (<Version>.<n>, distribution/edition.sh), so every build installs as an update, including through
+  # AltStore / SideStore.
+  BUILD_NUMBER: ${{ github.run_number }}
+  # Appended to <Version> by port_version: automatic builds are <Version>.<n>, a version tag's build is
+  # exactly <Version>.
+  VERSION_SUFFIX: ${{ !startsWith(github.ref, 'refs/tags/') && format('.{0}', github.run_number) || '' }}
+
+jobs:
+  android:
+    name: Android (${{ matrix.edition }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - edition: HD
+            package: com.aidrum.peggle.hd
+            apk: PeggleHD-android.apk
+          - edition: iPhone
+            package: com.aidrum.peggle
+            apk: Peggle-android.apk
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install the Android workload and SDK packages
+        run: |
+          # A private SDK folder (the runner's preinstalled one may not be writable or have API 36).
+          echo "ANDROID_SDK_ROOT=$RUNNER_TEMP/android-sdk" >> "$GITHUB_ENV"
+          export ANDROID_SDK_ROOT="$RUNNER_TEMP/android-sdk"
+          mkdir -p "$ANDROID_SDK_ROOT"
+          dotnet workload install android
+          dotnet build Peggle.Android -t:InstallAndroidDependencies -f net10.0-android \
+            -p:AndroidSdkDirectory="$ANDROID_SDK_ROOT" -p:JavaSdkDirectory="$JAVA_HOME" -p:AcceptAndroidSDKLicenses=True
+
+      # Without the ANDROID_KEYSTORE_* secrets each run signs with a throwaway debug key (BUILDING.md).
+      - name: Set up the signing key
+        id: key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/peggle.keystore"
+            echo "args=-p:AndroidKeyStore=true -p:AndroidSigningKeyStore=$RUNNER_TEMP/peggle.keystore -p:AndroidSigningStorePass=env:ANDROID_KEYSTORE_PASSWORD -p:AndroidSigningKeyAlias=$ANDROID_KEY_ALIAS -p:AndroidSigningKeyPass=env:ANDROID_KEY_PASSWORD" >> "$GITHUB_OUTPUT"
+            echo "Signing with the repository's keystore."
+          else
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret: signing with a throwaway debug key (see BUILDING.md)."
+          fi
+
+      - name: Build (Release)
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          source distribution/edition.sh
+          dotnet build Peggle.Android -c Release \
+            -p:PeggleEdition=${{ matrix.edition }} \
+            -p:ApplicationVersion=$BUILD_NUMBER -p:ApplicationDisplayVersion="$(port_version)" \
+            -p:AndroidSdkDirectory="$ANDROID_SDK_ROOT" -p:JavaSdkDirectory="$JAVA_HOME" \
+            ${{ steps.key.outputs.args }}
+
+      # The build also leaves an unsigned <package>.apk, which Android refuses to install.
+      - name: Pick the signed APK and verify it
+        run: |
+          set -euo pipefail
+          SIGNED="$(find Peggle.Android/bin -name '${{ matrix.package }}-Signed.apk' | head -n1)"
+          if [ -z "$SIGNED" ]; then echo "No signed APK found" >&2; exit 1; fi
+          cp "$SIGNED" "${{ matrix.apk }}"
+          BT="$(ls -d "$ANDROID_SDK_ROOT"/build-tools/* | sort -V | tail -n1)"
+          "$BT/apksigner" verify --verbose --print-certs "${{ matrix.apk }}" | grep -E "Verifie|SHA-256 digest|certificate DN"
+          # Android 15+ devices with 16 KB pages need the uncompressed native libraries 16 KB aligned.
+          "$BT/zipalign" -c -P 16 4 "${{ matrix.apk }}" > /dev/null && echo "zipalign (16 KB pages): OK"
+          ls -lh "${{ matrix.apk }}"
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.apk }}
+          path: ${{ matrix.apk }}
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
+
+  # Everything that needs a Mac (iOS and macOS, both editions) in one job, on an Intel runner: GitHub's
+  # Apple Silicon (arm64) runners are often out of capacity, and a job that isn't given one in 15 minutes
+  # is cancelled. One job means one runner to wait for; the macOS apps are cross-compiled for both CPUs.
+  apple:
+    name: iOS and macOS
+    runs-on: macos-15-intel
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      # The .NET iOS workload needs a recent Xcode; the project pins the iOS 26.0 bindings so any
+      # Xcode 26.x or later works.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install the iOS workload
+        run: dotnet workload install ios
+
+      # Unsigned: sideloading tools (AltStore, SideStore, Sideloadly, TrollStore) sign the app on install.
+      - name: Build the unsigned IPAs
+        run: |
+          set -euo pipefail
+          source distribution/edition.sh
+          mkdir -p dist
+          for EDITION in HD iPhone; do
+            edition_info "$EDITION"
+            dotnet build Peggle.iOS/Peggle.iOS.csproj -c Release -r ios-arm64 \
+              -p:PeggleEdition="$EDITION" \
+              -p:ApplicationVersion=$BUILD_NUMBER -p:ApplicationDisplayVersion="$VERSION" \
+              -p:EnableCodeSigning=false -p:CodesignRequireProvisioningProfile=false \
+              -p:BuildIpa=false -p:ValidateXcodeVersion=false
+            # bin/Release/... for HD, bin/iPhone/Release/... for the iPhone edition.
+            if [ "$EDITION" = HD ]; then BIN=Peggle.iOS/bin/Release; else BIN=Peggle.iOS/bin/iPhone/Release; fi
+            APP="$(find "$BIN" -type d -name '*.app' -path '*ios-arm64*' | head -n1)"
+            if [ -z "$APP" ]; then echo "No .app found under $BIN" >&2; exit 1; fi
+            echo "$EDITION: $APP"
+            /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" -c "Print :CFBundleVersion" "$APP/Info.plist"
+            rm -rf ipa && mkdir -p ipa/Payload
+            cp -R "$APP" ipa/Payload/
+            rm -rf ipa/Payload/*.app/_CodeSignature ipa/Payload/*.app/embedded.mobileprovision
+            (cd ipa && zip -qry "../dist/$EXE-unsigned.ipa" Payload)
+          done
+          ls -lh dist
+
+      - name: Build the macOS apps for Intel and Apple Silicon (ad-hoc signed, zipped)
+        run: |
+          set -euo pipefail
+          for EDITION in HD iPhone; do
+            for RID in osx-x64 osx-arm64; do
+              distribution/build_macos.sh "$EDITION" "$RID"
+            done
+          done
+          mv distribution/out/*.zip dist/
+          ls -lh dist
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: Apple
+          path: dist/*
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
+
+  linux:
+    name: Linux (${{ matrix.edition }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        edition: [HD, iPhone]
+    env:
+      # Runs appimagetool (itself an AppImage) without FUSE.
+      APPIMAGE_EXTRACT_AND_RUN: '1'
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Get appimagetool
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/appimagetool" https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x "$RUNNER_TEMP/appimagetool"
+          echo "APPIMAGETOOL=$RUNNER_TEMP/appimagetool" >> "$GITHUB_ENV"
+
+      - name: Build .tar.gz and AppImage
+        run: distribution/build_linux.sh ${{ matrix.edition }}
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: Linux-${{ matrix.edition }}
+          path: |
+            distribution/out/*.tar.gz
+            distribution/out/*.AppImage
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
+
+  windows:
+    name: Windows (${{ matrix.edition }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - edition: HD
+            script: publish_windows_hd.bat
+            name: PeggleHD
+          - edition: iPhone
+            script: publish_windows.bat
+            name: Peggle
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      # The repo's own NativeAOT publish (finds Visual Studio's C++ tools through vswhere).
+      - name: Publish (NativeAOT, win-x64)
+        shell: cmd
+        run: call distribution\${{ matrix.script }}
+
+      - name: Zip
+        shell: pwsh
+        run: |
+          $dir = "Peggle.Desktop\bin\Publish\${{ matrix.name }}"
+          if (-not (Test-Path "$dir\${{ matrix.name }}.exe")) { throw "No ${{ matrix.name }}.exe in $dir" }
+          Remove-Item "$dir\*.pdb" -ErrorAction SilentlyContinue
+          Compress-Archive -Path $dir -DestinationPath "${{ matrix.name }}-windows-x64.zip"
+          Get-Item "${{ matrix.name }}-windows-x64.zip" | Select-Object Name, Length
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.name }}-windows-x64
+          path: ${{ matrix.name }}-windows-x64.zip
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: [android, apple, linux, windows]
+    if: >
+      github.event_name != 'pull_request' &&
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Release name
+        id: meta
+        run: |
+          source distribution/edition.sh
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="$GITHUB_REF_NAME"
+          else
+            TAG="$(VERSION_SUFFIX= port_version)-prerelease+$BUILD_NUMBER"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          # Hidden in the notes for make_source.py: the IPAs' CFBundleShortVersionString and
+          # CFBundleVersion, which AltStore / SideStore compare with the source's.
+          echo "body=<!-- peggle-build version=$(port_version) build=$BUILD_NUMBER -->" >> "$GITHUB_OUTPUT"
+          echo "prerelease=${{ !startsWith(github.ref, 'refs/tags/') }}" >> "$GITHUB_OUTPUT"
+          ls -lh dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.tag }}
+          body: ${{ steps.meta.outputs.body }}
+          target_commitish: ${{ github.sha }}
+          prerelease: ${{ steps.meta.outputs.prerelease }}
+          make_latest: ${{ steps.meta.outputs.prerelease == 'true' && 'false' || 'true' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: dist/*
+
+  pages:
+    name: AltStore / SideStore source (GitHub Pages)
+    needs: release
+    # The github-pages environment only accepts deployments from the default branch.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check that Pages is set up
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TYPE="$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .build_type 2>/dev/null || true)"
+          if [ "$TYPE" = "workflow" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::GitHub Pages isn't set to deploy from GitHub Actions (Settings > Pages > Source: GitHub Actions), so the AltStore/SideStore source wasn't updated."
+          fi
+
+      - name: Build the source from the releases
+        if: steps.check.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" > "$RUNNER_TEMP/releases.json"
+          python3 distribution/altstore/make_source.py --repo "$GITHUB_REPOSITORY" --releases "$RUNNER_TEMP/releases.json" --out site/ios
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.check.outputs.ok == 'true'
+        with:
+          path: site
+
+      - uses: actions/deploy-pages@v4
+        if: steps.check.outputs.ok == 'true'
+        id: deploy

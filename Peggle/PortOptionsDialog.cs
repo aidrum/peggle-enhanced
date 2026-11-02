@@ -177,7 +177,7 @@ namespace Sexy
             mRandomMusicCheckbox = SexyUtil.MakeCheckbox2(PortOptions_RandomMusic, this, SexyAppBase.Loc("Random Music"), 0);
             mRandomMusicCheckbox.mChecked = mApp.mRandomMusic;
             AddWidget(mRandomMusicCheckbox);
-            if (!System.OperatingSystem.IsAndroid())
+            if (!Main.IsMobile)
             {
                 mPCControlsCheckbox = SexyUtil.MakeCheckbox2(PortOptions_PCControls, this, SexyAppBase.Loc("PC Controls"), 0);
                 mPCControlsCheckbox.mChecked = mApp.mPCControls;

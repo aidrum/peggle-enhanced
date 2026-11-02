@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!-- Template for the AltStore / SideStore source page; make_source.py fills in the dollar-sign fields. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peggle Enhanced for iOS</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  .buttons a { display: inline-block; margin: 0 .5rem .5rem 0; padding: .6rem 1rem; border-radius: .6rem;
+               background: #$tint; color: #fff; text-decoration: none; font-weight: 600; }
+  .app { display: flex; gap: 1rem; align-items: center; margin: 1.5rem 0; }
+  .app img { width: 72px; height: 72px; border-radius: 16px; }
+  .app h2 { margin: 0; font-size: 1.15rem; }
+  .app p { margin: .2rem 0; }
+  code { word-break: break-all; }
+</style>
+</head>
+<body>
+<h1>Peggle Enhanced for iOS</h1>
+<p>Add this source to AltStore or SideStore to install Peggle Enhanced and get new builds as updates.</p>
+<p class="buttons">
+  <a href="altstore://source?url=$source_url">Add to AltStore</a>
+  <a href="sidestore://source?url=$source_url">Add to SideStore</a>
+</p>
+<p>Or add the source by hand: <code>$source_url</code></p>
+$apps
+<p>Other platforms (Windows, macOS, Linux, Android): <a href="$releases_url">latest release</a>.</p>
+</body>
+</html>
