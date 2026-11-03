@@ -6,13 +6,13 @@ namespace Sexy
     /// <summary>
     /// Port addition: the port's own options, opened from the main-menu Options dialog and laid out
     /// in its two columns, on two pages. The first holds Low Memory Mode (lazy loading), High Quality Pegs,
-    /// Random Music and (desktop only) PC Controls;
+    /// Random Music, (desktop only) PC Controls and the controller's Stick Aim speed;
     /// the second, Theme Settings, holds the Menu Theme choice (left), and the Nights Menu and Main
     /// Menu Theme ones (right); the third, App Icon (Android, or SEXY_APP_ICONS=1 to preview it), the
     /// launcher icons, each a picture with a radio button below. A button left of DONE, in its row, turns
     /// the pages.
     /// </summary>
-    public class PortOptionsDialog : ThunderDialog, CheckboxListener
+    public class PortOptionsDialog : ThunderDialog, CheckboxListener, SliderListener
     {
         /// <summary>Ids 0-5 are the Menu Theme radio buttons, in MenuTheme order.</summary>
         public const int PortOptions_MenuTheme = 0;
@@ -24,6 +24,8 @@ namespace Sexy
         public const int PortOptions_RandomMusic = 12;
 
         public const int PortOptions_PCControls = 13;
+
+        public const int PortOptions_PadAimSpeed = 14;
 
         /// <summary>Ids 20-21 are the Nights Menu radio buttons: Mobile, then PC.</summary>
         public const int PortOptions_NightsMenu = 20;
@@ -117,6 +119,11 @@ namespace Sexy
         /// <summary>PC Controls; desktop only (null on Android).</summary>
         public ThunderCheckbox mPCControlsCheckbox;
 
+        /// <summary>Port addition (controller): the left stick's aiming speed (ThunderballApp.mPadAimSpeed).</summary>
+        public ThunderSlider mPadAimSlider;
+
+        public string mPadAimLabel;
+
         public ThunderCheckbox[] mAppIconChecks;
 
         /// <summary>The appicons sheet: the icons' plain launcher pictures, one square cel each.</summary>
@@ -183,6 +190,11 @@ namespace Sexy
                 mPCControlsCheckbox.mChecked = mApp.mPCControls;
                 AddWidget(mPCControlsCheckbox);
             }
+            mPadAimLabel = SexyAppBase.Loc("Stick Aim");
+            mPadAimSlider = new ThunderSlider("", PortOptions_PadAimSpeed, this);
+            mPadAimSlider.SetValue(mApp.mPadAimSpeed / 100.0);
+            UpdatePadAimLabel();
+            AddWidget(mPadAimSlider);
             if (HasIconPage())
             {
                 mAppIconLabel = SexyAppBase.Loc("App Icon");
@@ -262,6 +274,7 @@ namespace Sexy
             mHighQualityPegsCheckbox.SetVisible(general);
             mRandomMusicCheckbox.SetVisible(general);
             mPCControlsCheckbox?.SetVisible(general);
+            mPadAimSlider.SetVisible(general);
             if (mAppIconChecks != null)
             {
                 foreach (ThunderCheckbox aCheck in mAppIconChecks)
@@ -336,6 +349,11 @@ namespace Sexy
             mHighQualityPegsCheckbox.Layout(LAY_BESIDE | (int)LayoutFlags.LAY_SameHeight, mLazyLoadingCheckbox, 5, 0, 0, 0);
             mRandomMusicCheckbox.Layout(LAY_STACK_BELOW, mHighQualityPegsCheckbox, 0, 5, 0, 0);
             mPCControlsCheckbox?.Layout(LAY_STACK_BELOW, mRandomMusicCheckbox, 0, 5, 0, 0);
+            // Stick Aim is a row of its own under the checkboxes, placed and sized as the Options dialog's volume
+            // sliders (its plate reaches left of it, under the label).
+            ThunderCheckbox aLast = mPCControlsCheckbox ?? mRandomMusicCheckbox;
+            mPadAimSlider.Resize(OPTIONS_SFX_SLIDER_X + aGutter, aLast.mY + aLast.mHeight + 5 - THUNDER_BUTTON_SLIDER_Y,
+                OPTIONS_SFX_SLIDER_OFFSET_W + Res.IMAGE_DLG_SLIDERHILIGHT.mWidth, OPTIONS_SFX_SLIDER_H);
             if (mAppIconChecks != null)
             {
                 LayoutAppIcons(left, top, pageY - 10, (int)(first.mHeight * APP_ICON_CHECK_SCALE));
@@ -524,6 +542,22 @@ namespace Sexy
             {
                 mApp.SetPCControls(@checked);
             }
+        }
+
+        /// <summary>Port addition (controller): the Stick Aim slider, shown as a factor on the standard speed.</summary>
+        public void SliderVal(int theId, double theVal)
+        {
+            if (theId == PortOptions_PadAimSpeed)
+            {
+                mApp.SetPadAimSpeed((int)Math.Round(theVal * 100.0));
+                UpdatePadAimLabel();
+            }
+        }
+
+        private void UpdatePadAimLabel()
+        {
+            mPadAimSlider.mLabel = string.Format("{0} {1:0.0}x", mPadAimLabel, mApp.GetPadAimScale());
+            MarkDirty();
         }
 
         public override void ButtonPress(int theId)

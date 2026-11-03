@@ -7,6 +7,7 @@ using System.Threading;
 //using Microsoft.Phone.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Input;
 
 namespace Sexy
 {
@@ -345,7 +346,18 @@ namespace Sexy
         {
             GlobalStaticVars.g.BeginFrame();
             mWidgetManager.DrawScreen();
+            // Port addition (controller): the pad's pointer, over everything.
+            GamePadCursor.Draw(this);
             GlobalStaticVars.g.EndFrame();
+        }
+
+        /// <summary>
+        /// Port addition (controller): the game's chance to take the pad this update (the board aims and fires
+        /// with it). False leaves it to the pointer (GamePadCursor). Back and B have already gone to BackButtonPress.
+        /// </summary>
+        public virtual bool GamePadUpdate(GamePadState thePad, GamePadState thePrevPad)
+        {
+            return false;
         }
 
         public void DeviceOrientationChanged(UI_ORIENTATION toOrientation)

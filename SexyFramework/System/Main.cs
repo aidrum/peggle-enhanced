@@ -281,6 +281,10 @@ namespace Sexy
             {
                 HandleInput(gameTime);
             }
+            else if (DebugScript.Pad is GamePadState aPad)
+            {
+                HandleGamePad(GlobalStaticVars.gSexyAppBase, aPad, gameTime);
+            }
             long aStart = System.Diagnostics.Stopwatch.GetTimestamp();
             GlobalStaticVars.gSexyAppBase.UpdateApp();
             mPerfUpdateTicks += System.Diagnostics.Stopwatch.GetTimestamp() - aStart;
@@ -331,6 +335,7 @@ namespace Sexy
             int my = (int)mouse.y;
             if (previousMouseState.Position != msstate.Position)
             {
+                GamePadCursor.Hide(app);
                 app.mWidgetManager.MouseMove(mx, my);
             }
             if (msstate.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released)
@@ -370,12 +375,12 @@ namespace Sexy
             }
             GamePadState pad = GamePad.GetState(PlayerIndex.One);
             KeyboardState keys = Keyboard.GetState();
-            if ((pad.Buttons.Back == ButtonState.Pressed && previousGamepadState.Buttons.Back == ButtonState.Released) ||
-                (keys.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape)) || BackRequested)
+            if ((keys.IsKeyDown(Keys.Escape) && previousKeyboardState.IsKeyUp(Keys.Escape)) || BackRequested)
             {
                 BackRequested = false;
                 app.BackButtonPress();
             }
+            HandleGamePad(app, pad, gameTime);
             bool began = false;
             foreach (TouchLocation touchLocation in TouchPanel.GetState())
             {
@@ -398,6 +403,7 @@ namespace Sexy
                 touch.tapCount = mTouchTapCount;
                 if (touchLocation.State == TouchLocationState.Pressed && !began)
                 {
+                    GamePadCursor.Hide(app);
                     app.TouchBegan(touch);
                     began = true;
                 }
@@ -435,12 +441,33 @@ namespace Sexy
                     app.mWidgetManager.KeyUp((KeyCode)k);
                 }
             }
-            previousGamepadState = pad;
             previousMouseState = msstate;
             previousKeyboardState = keys;
         }
 
         private int mTouchTapCount = 1;
+
+        /// <summary>
+        /// Port addition (controller): Back and B go back (Android's back button); then the game takes the pad if it
+        /// wants it (the board), or else it moves the pointer (GamePadCursor).
+        /// </summary>
+        private void HandleGamePad(SexyAppBase theApp, GamePadState thePad, GameTime theTime)
+        {
+            if ((thePad.Buttons.Back == ButtonState.Pressed && previousGamepadState.Buttons.Back == ButtonState.Released) ||
+                (thePad.Buttons.B == ButtonState.Pressed && previousGamepadState.Buttons.B == ButtonState.Released))
+            {
+                theApp.BackButtonPress();
+            }
+            if (theApp.GamePadUpdate(thePad, previousGamepadState))
+            {
+                GamePadCursor.Hide(theApp);
+            }
+            else
+            {
+                GamePadCursor.Update(theApp, thePad, previousGamepadState, theTime.ElapsedGameTime.TotalSeconds, theTime.TotalGameTime.TotalSeconds);
+            }
+            previousGamepadState = thePad;
+        }
 
         // SEXY_PERF=1 (port debug aid): logs average update/draw CPU time and GPU draw calls once a second.
         private static readonly bool gPerf = Environment.GetEnvironmentVariable("SEXY_PERF") == "1";
