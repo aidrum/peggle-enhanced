@@ -3,8 +3,16 @@
 #
 #   Pushes to main, manual runs (Actions > Build > Run workflow) and version tags publish a release,
 #   titled with its tag:
-#     main / manual run -> pre-release "<Version>-prerelease+<run number>" (1.1-prerelease+17)
-#     version tag (1.2) -> full release of that tag, marked as the latest release
+#     main / manual run -> pre-release "<Version>-prerelease+<run number>" (1.1-prerelease+17), once
+#                          every platform is built, with generated release notes
+#     version tag (1.2) -> full release of that tag. Each platform's files are added as soon as they're
+#                          built. The release is created (as the latest release) if it doesn't exist yet;
+#                          an existing release's title and notes are left as they are (apart from the
+#                          hidden peggle-build line, added if missing), so notes can be written by hand,
+#                          before or after.
+#   A version tag on a commit that already has a pre-release reuses that pre-release's files instead of
+#   building them again (it waits for the commit's main build if that's still running): same source and
+#   workflow, so they'd only differ by the build number.
 #   Automatic builds are never the latest release: that stays the last tagged release, which the
 #   in-game update checker (Peggle/UpdateChecker.cs) reads and compares by its version tag.
 #   Pull requests only build (files under the run's Artifacts). Other branches build through their pull
@@ -46,8 +54,64 @@ env:
   VERSION_SUFFIX: ${{ !startsWith(github.ref, 'refs/tags/') && format('.{0}', github.run_number) || '' }}
 
 jobs:
+  # What this run publishes: release is "prerelease", "release" (a version tag) or empty (pull requests),
+  # tag is the release's tag, notes the hidden line for make_source.py, and copy_from the pre-release
+  # whose files a version tag reuses (then nothing is built).
+  prepare:
+    name: Plan the release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      release: ${{ steps.plan.outputs.release }}
+      tag: ${{ steps.plan.outputs.tag }}
+      notes: ${{ steps.plan.outputs.notes }}
+      copy_from: ${{ steps.plan.outputs.copy_from }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Plan
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PUBLISH: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') }}
+        run: |
+          set -euo pipefail
+          source distribution/edition.sh
+          if [ "$PUBLISH" != true ]; then echo "Nothing is published."; exit 0; fi
+          # The IPAs' CFBundleShortVersionString and CFBundleVersion, which AltStore / SideStore
+          # compare with the source's.
+          NOTES="<!-- peggle-build version=$(port_version) build=$BUILD_NUMBER -->"
+          if [[ "$GITHUB_REF" != refs/tags/* ]]; then
+            { echo "release=prerelease"; echo "tag=$(VERSION_SUFFIX= port_version)-prerelease+$BUILD_NUMBER"; echo "notes=$NOTES"; } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          { echo "release=release"; echo "tag=$GITHUB_REF_NAME"; } >> "$GITHUB_OUTPUT"
+
+          # A main build of this commit that's still running will publish its pre-release: wait for it.
+          RUN="$(gh run list --workflow build.yml --branch main --commit "$GITHUB_SHA" --json databaseId,status \
+            --jq '[.[] | select(.status != "completed")][0].databaseId // empty')"
+          if [ -n "$RUN" ]; then
+            echo "Waiting for this commit's main build (run $RUN)..."
+            gh run watch "$RUN" --interval 30 > /dev/null || true
+          fi
+          # A pre-release only exists once every platform built, so it has all the files.
+          FROM="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq "[.[] | select(.prerelease and (.draft | not)
+            and .target_commitish == \"$GITHUB_SHA\" and (.tag_name | contains(\"-prerelease+\")))][0].tag_name // empty")"
+          if [ -n "$FROM" ]; then
+            echo "Reusing the files of $FROM, built from the same commit."
+            # Its files' versions, not this run's.
+            NOTES="$(gh release view "$FROM" --json body --jq .body | grep -o '<!-- peggle-build [^>]*-->' || true)"
+            echo "copy_from=$FROM" >> "$GITHUB_OUTPUT"
+          fi
+          echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
+
   android:
     name: Android (${{ matrix.edition }})
+    needs: prepare
+    if: needs.prepare.outputs.copy_from == ''
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -135,6 +199,8 @@ jobs:
   # is cancelled. One job means one runner to wait for; the macOS apps are cross-compiled for both CPUs.
   apple:
     name: iOS and macOS
+    needs: prepare
+    if: needs.prepare.outputs.copy_from == ''
     runs-on: macos-15-intel
     timeout-minutes: 120
     steps:
@@ -200,6 +266,8 @@ jobs:
 
   linux:
     name: Linux (${{ matrix.edition }})
+    needs: prepare
+    if: needs.prepare.outputs.copy_from == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -237,6 +305,8 @@ jobs:
 
   windows:
     name: Windows (${{ matrix.edition }})
+    needs: prepare
+    if: needs.prepare.outputs.copy_from == ''
     runs-on: windows-latest
     timeout-minutes: 45
     strategy:
@@ -278,52 +348,118 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  # Pre-releases: published once every platform is built, with generated release notes.
   release:
-    name: Publish release
-    needs: [android, apple, linux, windows]
-    if: >
-      github.event_name != 'pull_request' &&
-      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch')
+    name: Publish pre-release
+    needs: [prepare, android, apple, linux, windows]
+    if: needs.prepare.outputs.release == 'prerelease'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      tag: ${{ steps.meta.outputs.tag }}
     steps:
-      - uses: actions/checkout@v5
-
       - uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
 
-      - name: Release name
-        id: meta
-        run: |
-          source distribution/edition.sh
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            TAG="$GITHUB_REF_NAME"
-          else
-            TAG="$(VERSION_SUFFIX= port_version)-prerelease+$BUILD_NUMBER"
-          fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          # Hidden in the notes for make_source.py: the IPAs' CFBundleShortVersionString and
-          # CFBundleVersion, which AltStore / SideStore compare with the source's.
-          echo "body=<!-- peggle-build version=$(port_version) build=$BUILD_NUMBER -->" >> "$GITHUB_OUTPUT"
-          echo "prerelease=${{ !startsWith(github.ref, 'refs/tags/') }}" >> "$GITHUB_OUTPUT"
-          ls -lh dist
+      - run: ls -lh dist
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.meta.outputs.tag }}
-          name: ${{ steps.meta.outputs.tag }}
-          body: ${{ steps.meta.outputs.body }}
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          name: ${{ needs.prepare.outputs.tag }}
+          body: ${{ needs.prepare.outputs.notes }}
           target_commitish: ${{ github.sha }}
-          prerelease: ${{ steps.meta.outputs.prerelease }}
-          make_latest: ${{ steps.meta.outputs.prerelease == 'true' && 'false' || 'true' }}
+          prerelease: true
+          make_latest: false
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: dist/*
+
+  # Full releases: each platform's files are added as soon as its build is done
+  # (distribution/release_upload.sh), so the slow Apple build doesn't hold up the others.
+  release-android:
+    name: Add Android to the release
+    needs: [prepare, android]
+    if: needs.prepare.outputs.release == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      ARTIFACTS: '*-android.apk'
+    steps: &add-to-release
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: ${{ env.ARTIFACTS }}
+          merge-multiple: true
+
+      - name: Add the files to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          NOTES: ${{ needs.prepare.outputs.notes }}
+        run: distribution/release_upload.sh dist/*
+
+  release-apple:
+    name: Add iOS and macOS to the release
+    needs: [prepare, apple]
+    if: needs.prepare.outputs.release == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      ARTIFACTS: Apple
+    steps: *add-to-release
+
+  release-linux:
+    name: Add Linux to the release
+    needs: [prepare, linux]
+    if: needs.prepare.outputs.release == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      ARTIFACTS: Linux-*
+    steps: *add-to-release
+
+  release-windows:
+    name: Add Windows to the release
+    needs: [prepare, windows]
+    if: needs.prepare.outputs.release == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      ARTIFACTS: '*-windows-x64'
+    steps: *add-to-release
+
+  # A full release of a commit that already has a pre-release: its files, instead of new builds.
+  release-copy:
+    name: Add the pre-release's files to the release
+    needs: prepare
+    if: needs.prepare.outputs.copy_from != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      FROM: ${{ needs.prepare.outputs.copy_from }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download ${{ needs.prepare.outputs.copy_from }}'s files
+        run: gh release download "$FROM" --dir dist
+
+      - name: Add them to the release
+        env:
+          TAG: ${{ needs.prepare.outputs.tag }}
+          NOTES: ${{ needs.prepare.outputs.notes }}
+        run: distribution/release_upload.sh dist/*
 
   pages:
     name: AltStore / SideStore source (GitHub Pages)

@@ -89,13 +89,17 @@ def plain_text(markdown):
 def app_versions(app, releases):
     """The app's versions, one per release that has its IPA, newest build first."""
     versions = []
+    builds = set()
     for release in releases:
         name = BUILD_MARKER.search(release.get("body") or "") or LEGACY_RELEASE_NAME.search(release.get("name") or "")
-        if release.get("draft") or not name:
+        # A full release that reused a pre-release's files has the same build: listed once, from the
+        # newer release (the list is newest first).
+        if release.get("draft") or not name or name["build"] in builds:
             continue
         ipa = next((a for a in release.get("assets", []) if a.get("name") == app["ipa"]), None)
         if ipa is None:
             continue
+        builds.add(name["build"])
         versions.append(
             {
                 "version": name["version"],
