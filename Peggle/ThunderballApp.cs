@@ -205,6 +205,12 @@ namespace Sexy
         public bool mRandomMusic;
 
         /// <summary>
+        /// Port addition (controller): the Stick Aim option, 0 to 100: how fast the left stick turns the gun, from
+        /// 0.4 to 2.5 times the standard speed (50). Saved in the registry.
+        /// </summary>
+        public int mPadAimSpeed = 50;
+
+        /// <summary>
         /// Port addition: the PC Controls option (desktop only, on by default): the gun follows the mouse, a click
         /// on the board fires, a held right button fast-forwards, and the wheel and arrow keys fine-aim.
         /// Off, the mouse acts as a finger, as on the phone. Saved in the registry; always off on Android.
@@ -513,6 +519,8 @@ namespace Sexy
             bool aHighQualityPegs = !Main.IsMobile;
             RegistryReadBoolean("HighQualityPegs", ref aHighQualityPegs);
             RegistryReadBoolean("RandomMusic", ref mRandomMusic);
+            RegistryReadInteger("PadAimSpeed", ref mPadAimSpeed);
+            mPadAimSpeed = Math.Clamp(mPadAimSpeed, 0, 100);
             mPCControls = !Main.IsMobile;
             if (mPCControls)
             {
@@ -815,6 +823,19 @@ namespace Sexy
         {
             mRandomMusic = theOn;
             RegistryWriteBoolean("RandomMusic", theOn);
+        }
+
+        /// <summary>Port addition (controller): sets the Stick Aim option (0 to 100) and saves it; it applies at once.</summary>
+        public void SetPadAimSpeed(int theSpeed)
+        {
+            mPadAimSpeed = Math.Clamp(theSpeed, 0, 100);
+            RegistryWriteInteger("PadAimSpeed", mPadAimSpeed);
+        }
+
+        /// <summary>Port addition (controller): the Stick Aim option as a factor on the stick's speed, 0.4 to 2.5.</summary>
+        public float GetPadAimScale()
+        {
+            return (float)Math.Pow(2.5, mPadAimSpeed / 50.0 - 1.0);
         }
 
         /// <summary>
@@ -2094,6 +2115,77 @@ namespace Sexy
             }
         }
 
+        /// <summary>
+        /// Port addition (launch target): where the app that started the game asked it to open (GameActivity reads
+        /// the intent extra "peggle_target"): "peggle" and "nights" (their Adventures), "extreme" and "wow" (the bonus
+        /// Adventures), "dualshot" (Quick Play on the Dual Shot page; it has no Adventure). Null when the game was
+        /// started on its own, as from the home screen: then nothing changes.
+        /// </summary>
+        public static string sLaunchTarget;
+
+        /// <summary>Port addition (launch target): the next StartAdventureGame goes to the board without the story screen.</summary>
+        public static bool sLaunchSkipStory;
+
+        private void LaunchAdventure(int theLevelPack, BonusPage theAdventure)
+        {
+            int aMode = theLevelPack == 1 ? GameMode.GAMEMODE_ADVENTURE_NIGHTS : GameMode.GAMEMODE_ADVENTURE;
+            SetLevelPack(theLevelPack, theAdventure);
+            mGameMode = aMode;
+            // The level the Adventure stands at (as StartAdventureGame works it out), which a save must be of.
+            mCurStage = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageStage(), mPlayerInfo.mFirstAdventureStage, mPlayerInfo.mLastAdventureStage);
+            mCurLevel = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageLevel(), 0, 5);
+            if (CheckSaveGame(false, true))
+            {
+                return;  // the saved level, loaded (FinishContinueDialog)
+            }
+            sLaunchSkipStory = true;
+            StartAdventureGame(aMode);
+        }
+
+        public void RunLaunchTarget()
+        {
+            string aTarget = sLaunchTarget;
+            sLaunchTarget = null;
+            if (mMainMenu == null)
+            {
+                return;
+            }
+            // The Adventures go straight to the board: the level in progress if there is one (no "continue?"
+            // prompt), else where the player's Adventure stands (1-1 the first time). No story screen between.
+            switch (aTarget)
+            {
+            case "peggle":
+            case "nights":
+                LaunchAdventure(aTarget == "nights" ? 1 : 0, null);
+                break;
+            case "extreme":
+            case "wow":
+                {
+                    BonusPage anAdventure = StageMgr.GetAdventurePage(aTarget == "extreme" ? StageMgr.ADVENTURE_EXTREME : StageMgr.ADVENTURE_WOW);
+                    if (anAdventure != null)
+                    {
+                        LaunchAdventure(anAdventure.mLevelPack, anAdventure);
+                    }
+                    break;
+                }
+            case "dualshot":
+                mGameMode = GameMode.GAMEMODE_QUICKPLAY;
+                ShowLevelScreen(false, false, false);
+                if (mLevelScreen != null)
+                {
+                    for (int aPage = 2; aPage < mLevelScreen.GetNumPages(); aPage++)
+                    {
+                        if (LevelScreen.GetPageLogo(aPage) == GameArrowButton.LOGO_DUALSHOT)
+                        {
+                            mLevelScreen.ShowPage(aPage);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
         /// <summary>Port addition: leaves a bonus Adventure (mBonusAdventure), back to its pack's own stage range.</summary>
         public void EndBonusAdventure()
         {
@@ -2549,7 +2641,12 @@ namespace Sexy
                 mCurStage = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageStage(), mPlayerInfo.mFirstAdventureStage, mPlayerInfo.mLastAdventureStage);
                 mCurLevel = SexyUtil.ClampRange(mPlayerInfo.GetmLastStageLevel(), 0, 5);
             }
-            if (mPlayerInfo == null || !mPlayerInfo.GetmNeedShowStory() || mCurLevel != 0)
+            if (sLaunchSkipStory)
+            {
+                sLaunchSkipStory = false;
+                ShowBoard(false, true, false, false);
+            }
+            else if (mPlayerInfo == null || !mPlayerInfo.GetmNeedShowStory() || mCurLevel != 0)
             {
                 ShowBoard(false, true, false, false);
             }
@@ -2682,6 +2779,24 @@ namespace Sexy
                 DoConfirmQuitDialog();
                 return true;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Port addition (controller): play takes the pad while the board is up with no dialog over it
+        /// (Board.GamePadUpdate); elsewhere the pad moves the pointer.
+        /// </summary>
+        public override bool GamePadUpdate(Microsoft.Xna.Framework.Input.GamePadState thePad, Microsoft.Xna.Framework.Input.GamePadState thePrevPad)
+        {
+            if (mBoard == null)
+            {
+                return false;
+            }
+            if (mBoard.mWidgetManager != null && mDialogMap.Count == 0 && mBoard.GamePadUpdate(thePad, thePrevPad))
+            {
+                return true;
+            }
+            mBoard.ReleasePad();
             return false;
         }
 

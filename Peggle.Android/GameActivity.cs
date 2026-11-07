@@ -100,6 +100,9 @@ namespace Peggle.Android
             // The App Icon page (Extra Options) switches the launcher between the manifest's icon aliases.
             Sexy.Main.SetAppIconHandler = SetAppIcon;
             Sexy.Main.GetAppIconHandler = GetAppIcon;
+            // Port addition (launch target): an app that starts the game can say where it should open, with the
+            // string extra "peggle_target" (ThunderballApp.sLaunchTarget). Without it nothing changes.
+            ThunderballApp.sLaunchTarget = Intent?.GetStringExtra("peggle_target");
             mGame = new Sexy.Main();
             mGame.applicationStoragePath = saveDir;
             View view = (View)mGame.Services.GetService(typeof(View));

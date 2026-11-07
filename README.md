@@ -64,6 +64,10 @@ The two editions are separate apps, so both can be installed side by side. See [
   - Samsung Galaxy Tab S10 FE+ (Android 16): Great performance.
   - iPhone 17 (iOS 27.0.1): Great performance. Peggle HD displays in 4:3, as on the iPad.
 
+- **Does it support controllers?**
+
+  Yes. In a level the left stick aims (hold LT/RT for slow aim), LB/RB or the D-pad nudge the aim, A fires, X fast-forwards, Y zooms and Start pauses. In menus the left stick moves a pointer, A clicks and B goes back. Stick aim speed can be changed in Extra Options. Any controller your device supports should work; on iPhone, iPad and Mac that means Xbox, PlayStation, Switch Pro or MFi controllers.
+
 - **Why do some textures look different from the original iOS version?**
 
   On the non-HD version, a small number of textures were modified or added to make them look better on ultrawide displays. These replacement textures were taken from the Peggle console version.

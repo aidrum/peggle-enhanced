@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Sexy
 {
@@ -28,6 +30,9 @@ namespace Sexy
         public static int Frame { get; private set; }
 
         private static string sPendingShot;
+
+        /// <summary>The pad a pad step set (Main feeds it to the game in place of the real one); null before any.</summary>
+        public static GamePadState? Pad { get; private set; }
 
         /// <summary>A shot is waiting for the next draw; Main holds updates until then, so shots on consecutive frames all get taken.</summary>
         public static bool ShotPending => sPendingShot != null;
@@ -64,6 +69,8 @@ namespace Sexy
             if (Frame == 1)
             {
                 ScreenScales sc = theApp.mScreenScales;
+                GamePadCapabilities aPad = GamePad.GetCapabilities(PlayerIndex.One);
+                Console.WriteLine($"[debug] pad {(aPad.IsConnected ? aPad.DisplayName : "none")}");
                 Console.WriteLine($"[debug] app {theApp.mWidth}x{theApp.mHeight} scale {sc.mScaleFactor} trans {sc.mTransX},{sc.mTransY} screen {sc.mWidth}x{sc.mHeight} bb {GlobalStaticVars.g.GraphicsDevice.PresentationParameters.BackBufferWidth}x{GlobalStaticVars.g.GraphicsDevice.PresentationParameters.BackBufferHeight}");
             }
             if (sDragStep >= 0)
@@ -142,6 +149,11 @@ namespace Sexy
                 case "shot":
                     sPendingShot = s.mArg;
                     break;
+                case "pad":
+                    // pad:F:lx,ly,held... - the pad from this update on: the left stick and the buttons held
+                    // (a b x y lb rb lt rt start back up down left right rup rdown), e.g. "pad:300:0.5,0,a"; "pad:F:0,0" lets go.
+                    Pad = ParsePad(s.mArg);
+                    break;
                 case "size":
                 {
                     // size:F:w,h - resize the backbuffer (e.g. to check letterboxing).
@@ -169,6 +181,42 @@ namespace Sexy
                 }
             }
             return true;
+        }
+
+        private static GamePadState ParsePad(string theArg)
+        {
+            string[] f = theArg.Split(',');
+            Buttons aButtons = 0;
+            bool lt = false, rt = false, up = false, down = false, left = false, right = false;
+            float aScroll = 0f;
+            for (int i = 2; i < f.Length; i++)
+            {
+                switch (f[i])
+                {
+                case "a": aButtons |= Buttons.A; break;
+                case "b": aButtons |= Buttons.B; break;
+                case "x": aButtons |= Buttons.X; break;
+                case "y": aButtons |= Buttons.Y; break;
+                case "lb": aButtons |= Buttons.LeftShoulder; break;
+                case "rb": aButtons |= Buttons.RightShoulder; break;
+                case "start": aButtons |= Buttons.Start; break;
+                case "back": aButtons |= Buttons.Back; break;
+                case "lt": lt = true; break;
+                case "rt": rt = true; break;
+                case "up": up = true; break;
+                case "down": down = true; break;
+                case "left": left = true; break;
+                case "right": right = true; break;
+                case "rup": aScroll = 1f; break;
+                case "rdown": aScroll = -1f; break;
+                }
+            }
+            ButtonState Held(bool theHeld) => theHeld ? ButtonState.Pressed : ButtonState.Released;
+            return new GamePadState(
+                new GamePadThumbSticks(new Vector2(float.Parse(f[0]), float.Parse(f[1])), new Vector2(0f, aScroll)),
+                new GamePadTriggers(lt ? 1f : 0f, rt ? 1f : 0f),
+                new GamePadButtons(aButtons),
+                new GamePadDPad(Held(up), Held(down), Held(left), Held(right)));
         }
 
         /// <summary>Prints the widget tree and the manager's modal/focus/capture state.</summary>

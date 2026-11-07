@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using static Sexy.Layout;
 
 namespace Sexy
@@ -2485,7 +2486,10 @@ namespace Sexy
         // Desktop input: the original is touch-only, so mouse input is fed through the touch handlers.
         private int mTouchClickCount;
 
-        /// <summary>Port addition (PC Controls): the right button is held, fast-forwarding like the on-screen button.</summary>
+        /// <summary>
+        /// Port addition (PC Controls, controller): the right button or the pad's X is held, fast-forwarding like the
+        /// on-screen button.
+        /// </summary>
         public bool mRightFFwd;
 
         /// <summary>
@@ -2509,7 +2513,13 @@ namespace Sexy
         /// <summary>Port addition (PC Controls): 1 when a held key steps this update: when pressed, then repeating.</summary>
         private int PCKeyStep(KeyCode theKey, ref int theHeld)
         {
-            if (!mInputEnabled || !mWidgetManager.mKeyDown[(int)theKey])
+            return HeldStep(mWidgetManager.mKeyDown[(int)theKey], ref theHeld);
+        }
+
+        /// <summary>Port addition (PC Controls, controller): 1 when a held key or button steps this update.</summary>
+        private int HeldStep(bool theDown, ref int theHeld)
+        {
+            if (!mInputEnabled || !theDown)
             {
                 theHeld = 0;
                 return 0;
@@ -2528,6 +2538,13 @@ namespace Sexy
         /// </summary>
         private void UpdatePCArrowSteps()
         {
+            // Port addition (controller): LB/RB and the D-pad step the same way, with PC Controls or without.
+            int aPadLeft = HeldStep(mPadLeft, ref mPadLeftHeld);
+            int aPadRight = HeldStep(mPadRight, ref mPadRightHeld);
+            if (aPadRight != aPadLeft)
+            {
+                mLogicMgr.MouseWheel(aPadRight - aPadLeft);
+            }
             if (!UsePCControls())
             {
                 mPCLeftHeld = mPCRightHeld = 0;
@@ -2539,6 +2556,121 @@ namespace Sexy
             {
                 mLogicMgr.MouseWheel(aRight - aLeft);
             }
+        }
+
+        /// <summary>
+        /// Port addition (controller): wheel steps a tick the left stick turns the gun at full tilt (times the Stick Aim
+        /// option, ThunderballApp.GetPadAimScale), and with LT or RT held.
+        /// </summary>
+        public const float PAD_AIM_SPEED = 8.0f;
+
+        public const float PAD_SLOW_AIM_SPEED = 1.0f;
+
+        /// <summary>Port addition (controller): how far along the aim from the ball Y zooms in, in board units.</summary>
+        public const float PAD_ZOOM_DISTANCE = 200.0f;
+
+        /// <summary>Port addition (controller): the wheel steps the left stick turns the gun each tick (Update).</summary>
+        private float mPadAim;
+
+        private bool mPadLeft;
+
+        private bool mPadRight;
+
+        private int mPadLeftHeld;
+
+        private int mPadRightHeld;
+
+        private bool mPadFFwd;
+
+        /// <summary>Port addition (controller): A pressed the fire button, which its release lets go.</summary>
+        private bool mPadFireDown;
+
+        /// <summary>
+        /// Port addition (controller): play takes the pad, laid out as Peggle 2 on Xbox: the left stick aims (faster
+        /// the further it's pushed, slowly with LT or RT held), LB/RB and the D-pad turn the gun a wheel step a press,
+        /// repeating while held, A is the fire button (it fires, works the flippers, speeds up the intro), X held
+        /// fast-forwards, Y opens or closes the zoom and Start opens the menu (B and Back already did). False with the
+        /// end-of-level, replay or slot machine dialog up, which the pointer works.
+        /// </summary>
+        public bool GamePadUpdate(GamePadState thePad, GamePadState thePrevPad)
+        {
+            if (!thePad.IsConnected || (mEndLevelDialog.mWidgetManager != null && mEndLevelDialog.mVisible) ||
+                mReplayDialog.mWidgetManager != null || mSlotMachineDialog.mWidgetManager != null)
+            {
+                ReleasePad();
+                return false;
+            }
+            Vector2 aStick = thePad.ThumbSticks.Left;
+            bool aSlow = thePad.Triggers.Left > 0.5f || thePad.Triggers.Right > 0.5f;
+            mPadAim = aSlow ? aStick.X * PAD_SLOW_AIM_SPEED : aStick.X * Math.Abs(aStick.X) * PAD_AIM_SPEED * mApp.GetPadAimScale();
+            mPadLeft = thePad.DPad.Left == ButtonState.Pressed || thePad.Buttons.LeftShoulder == ButtonState.Pressed;
+            mPadRight = thePad.DPad.Right == ButtonState.Pressed || thePad.Buttons.RightShoulder == ButtonState.Pressed;
+            mPadFFwd = thePad.Buttons.X == ButtonState.Pressed;
+            if (PadPressed(thePad.Buttons.Start, thePrevPad.Buttons.Start) && mPauseCount == 0)
+            {
+                ReleasePad();
+                mApp.DoOptionsDialog();
+                return true;
+            }
+            if (PadPressed(thePad.Buttons.Y, thePrevPad.Buttons.Y))
+            {
+                PadToggleZoom();
+            }
+            if (PadPressed(thePad.Buttons.A, thePrevPad.Buttons.A))
+            {
+                if (mPauseCount != 0)
+                {
+                    Pause(false);
+                }
+                else if (mLogicMgr.WantTapsAnywhere() || mInputEnabled)
+                {
+                    mPadFireDown = true;
+                    mLogicMgr.MouseDown(0, 0, 1, false, false);
+                }
+            }
+            else if (mPadFireDown && thePad.Buttons.A == ButtonState.Released)
+            {
+                mPadFireDown = false;
+                mLogicMgr.MouseUp(0, 0, 1, false);
+            }
+            return true;
+        }
+
+        /// <summary>Port addition (controller): lets go of everything the pad holds (it went to a dialog or the pointer).</summary>
+        public void ReleasePad()
+        {
+            mPadAim = 0.0f;
+            mPadLeft = mPadRight = mPadFFwd = false;
+            if (mPadFireDown)
+            {
+                mPadFireDown = false;
+                mLogicMgr.MouseUp(0, 0, 1, false);
+            }
+        }
+
+        private static bool PadPressed(ButtonState theNow, ButtonState thePrev)
+        {
+            return theNow == ButtonState.Pressed && thePrev == ButtonState.Released;
+        }
+
+        /// <summary>Port addition (controller): Y zooms in a way along the aim from the ball, or back out.</summary>
+        private void PadToggleZoom()
+        {
+            Ball aBall = mGun.mBall;
+            if (aBall == null && !mPeggleZoom)
+            {
+                return;
+            }
+            int aX = 0;
+            int aY = 0;
+            if (aBall != null)
+            {
+                double aScale = SexyUtil.gPhysicalDisplayHeight / 600.0;
+                double anAngle = mLogicMgr.mGunAngle;
+                aX = (int)((aBall.mX + PAD_ZOOM_DISTANCE * Math.Cos(anAngle)) * aScale);
+                aY = (int)((aBall.mY - PAD_ZOOM_DISTANCE * Math.Sin(anAngle)) * aScale);
+            }
+            PCToggleZoom(aX, aY);
         }
 
         /// <summary>
@@ -4154,8 +4286,8 @@ namespace Sexy
             {
                 return;
             }
-            // Port addition (PC Controls): holding the right button presses the fast-forward button.
-            bool aRight = UsePCControls() && mInputEnabled && mWidgetManager.IsRightButtonDown();
+            // Port addition (PC Controls, controller): holding the right button or X presses the fast-forward button.
+            bool aRight = mInputEnabled && ((UsePCControls() && mWidgetManager.IsRightButtonDown()) || mPadFFwd);
             if (aRight != mRightFFwd)
             {
                 mRightFFwd = aRight;
@@ -4239,6 +4371,11 @@ namespace Sexy
                     {
                         mLogicMgr.MouseWheel(5.0f);
                     }
+                }
+                // Port addition (controller): the left stick turns the gun (GamePadUpdate).
+                if (mPadAim != 0.0f)
+                {
+                    mLogicMgr.MouseWheel(mPadAim);
                 }
                 if (mReplayPauseCount > 0)
                 {
