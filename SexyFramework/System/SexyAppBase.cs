@@ -240,8 +240,23 @@ namespace Sexy
         {
         }
 
+        /// <summary>
+        /// Port addition (web): WebAssembly in the browser has no threads, so there the loading "thread" runs on
+        /// the main thread, a slice of <see cref="LoadingThreadSteps"/> per frame.
+        /// </summary>
+        public static bool SingleThreaded => OperatingSystem.IsBrowser();
+
+        private const double LOADING_SLICE_MS = 15.0;
+
+        private IEnumerator<bool> mLoadingSteps;
+
         public void StartLoadingThread()
         {
+            if (!mLoadingThreadStarted && SingleThreaded)
+            {
+                mLoadingSteps = LoadingThreadSteps().GetEnumerator();
+                mLoadingThreadStarted = true;
+            }
             if (!mLoadingThreadStarted)
             {
                 new Thread(new ThreadStart(LoadingThreadProcStub))
@@ -260,6 +275,33 @@ namespace Sexy
 
         public virtual void LoadingThreadProc()
         {
+        }
+
+        /// <summary>
+        /// The loading thread's work in steps, for <see cref="SingleThreaded"/> platforms: each yield is a point
+        /// where the frame may continue. By default all of LoadingThreadProc in one step.
+        /// </summary>
+        public virtual IEnumerable<bool> LoadingThreadSteps()
+        {
+            LoadingThreadProc();
+            yield break;
+        }
+
+        /// <summary>Runs the single-threaded loading steps for up to a slice of this frame.</summary>
+        private void RunLoadingSlice()
+        {
+            long aStart = System.Diagnostics.Stopwatch.GetTimestamp();
+            do
+            {
+                if (!mLoadingSteps.MoveNext())
+                {
+                    mLoadingSteps.Dispose();
+                    mLoadingSteps = null;
+                    mLoadingThreadCompleted = true;
+                    return;
+                }
+            }
+            while (System.Diagnostics.Stopwatch.GetElapsedTime(aStart).TotalMilliseconds < LOADING_SLICE_MS);
         }
 
         public virtual void LoadingThreadCompleted()
@@ -312,6 +354,10 @@ namespace Sexy
         public virtual bool DoUpdateFrames()
         {
             mUpdateCount++;
+            if (mLoadingSteps != null)
+            {
+                RunLoadingSlice();
+            }
             if (mLoadingThreadCompleted && !mLoaded)
             {
                 if (mLoadingThreadAfterWorksSteps == null) 

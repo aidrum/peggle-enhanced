@@ -8,11 +8,12 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <NoWarn>$(NoWarn);CS0162;CS0168;CS0219;CS0414;CS0649;CS0169</NoWarn>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(PeggleWeb)' != 'true'">
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <Import Project="..\Kni.props" Condition="'$(PeggleWeb)' == 'true'" />
   <ItemGroup>
     <ProjectReference Include="..\SexyFramework\SexyFramework.csproj" />
   </ItemGroup>

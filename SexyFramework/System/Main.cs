@@ -24,7 +24,13 @@ namespace Sexy
         /// Port: phones and tablets (Android, iOS). Full screen, touch only, lazy loading and no PC Controls;
         /// desktops get a resizable window with mouse, keyboard and text input.
         /// </summary>
-        public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+        public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || IsTouchWeb;
+
+        /// <summary>
+        /// Port addition (web): set by the web host when the browser's main pointer is a touch screen (a phone or
+        /// tablet), so the game plays as the mobile versions do; a browser with a mouse plays as a desktop.
+        /// </summary>
+        public static bool IsTouchWeb;
 
         /// <summary>Set by the platform (Android's back button); handled as a back press on the next update.</summary>
         public static volatile bool BackRequested;
@@ -87,7 +93,8 @@ namespace Sexy
         public Main()
         {
             Main.graphics = Graphics.GetNew(this);
-            Main.graphics.IsFullScreen = IsMobile;
+            // A web page's canvas already fills the browser window (the web host sizes it).
+            Main.graphics.IsFullScreen = IsMobile && !OperatingSystem.IsBrowser();
 #if PEGGLE_IPHONE
             // A full screen (Android, iOS) lays out at its own aspect, as the original did on the device; a
             // resizable window switches between the 960 and 1136 layouts (see ChooseScreenWidth).
@@ -116,7 +123,8 @@ namespace Sexy
             Window.AllowUserResizing = true;
             base.Window.ClientSizeChanged += OnResize;
             IsMouseVisible = true;
-            if (!IsMobile)
+            // Web: a touch device may still have a keyboard, so typing is always taken.
+            if (!IsMobile || OperatingSystem.IsBrowser())
             {
                 HookTextInput();
             }
@@ -229,7 +237,7 @@ namespace Sexy
             ExitHandler();
         }
 
-        private void Main_Exiting(object sender, ExitingEventArgs e)
+        private void Main_Exiting(object sender, EventArgs e)
         {
             GlobalStaticVars.gSexyAppBase?.AppExit();
         }
@@ -421,7 +429,7 @@ namespace Sexy
                 }
             }
             // Port addition: Alt+Enter toggles full screen on desktops; the Enter press isn't passed on.
-            bool aAltEnter = !IsMobile && (keys.IsKeyDown(Keys.LeftAlt) || keys.IsKeyDown(Keys.RightAlt)) &&
+            bool aAltEnter = !IsMobile && !OperatingSystem.IsBrowser() && (keys.IsKeyDown(Keys.LeftAlt) || keys.IsKeyDown(Keys.RightAlt)) &&
                 keys.IsKeyDown(Keys.Enter) && previousKeyboardState.IsKeyUp(Keys.Enter);
             if (aAltEnter)
             {
@@ -523,7 +531,12 @@ namespace Sexy
             return mTapCount;
         }
 
+#if PEGGLE_WEB
+        // KNI's Game passes no sender.
+        protected override void OnActivated(EventArgs args)
+#else
         protected override void OnActivated(object sender, EventArgs args)
+#endif
         {
             SexyAppBase app = GlobalStaticVars.gSexyAppBase;
             // Scripted runs ignore real focus changes (their blur/focus steps simulate them).
@@ -535,10 +548,18 @@ namespace Sexy
                     app.mMusicInterface.ResumeMusic();
                 }
             }
+#if PEGGLE_WEB
+            base.OnActivated(args);
+#else
             base.OnActivated(sender, args);
+#endif
         }
 
+#if PEGGLE_WEB
+        protected override void OnDeactivated(EventArgs args)
+#else
         protected override void OnDeactivated(object sender, EventArgs args)
+#endif
         {
             SexyAppBase app = GlobalStaticVars.gSexyAppBase;
             // Scripted runs ignore real focus changes (their blur/focus steps simulate them).
@@ -551,7 +572,11 @@ namespace Sexy
                 }
                 app.AppEnteredBackground();
             }
+#if PEGGLE_WEB
+            base.OnDeactivated(args);
+#else
             base.OnDeactivated(sender, args);
+#endif
         }
     }
 }

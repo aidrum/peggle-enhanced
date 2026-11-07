@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  <!--
+    The web version (Blazor WebAssembly + KNI's WebGL backend). Build it with distribution/build_web.sh,
+    which also adds the game data (Content/) and the edition's icon; it needs -p:PeggleWeb=true so the
+    game libraries are built against KNI as well (Directory.Build.props).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>Peggle.Web</RootNamespace>
+    <AssemblyName>PeggleHD</AssemblyName>
+    <KniPlatform>BlazorGL</KniPlatform>
+    <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+    <!-- GitHub Pages can't serve the precompressed .br/.gz files (it gzips on its own). -->
+    <CompressionEnabled>false</CompressionEnabled>
+    <!-- Fills in the fingerprinted framework script and the import map in wwwroot/index.html. -->
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PeggleEdition)' == 'iPhone'">
+    <AssemblyName>Peggle</AssemblyName>
+  </PropertyGroup>
+  <!-- Release: compiled ahead of time to WebAssembly (the interpreter is too slow for the game and its
+       Vorbis music). The game's own assemblies are kept whole, as on Android. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <TrimMode>partial</TrimMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <TrimmerRootAssembly Include="PeggleGame" RootMode="All" />
+    <TrimmerRootAssembly Include="SexyFramework" RootMode="All" />
+    <TrimmerRootAssembly Include="NVorbis" RootMode="All" />
+  </ItemGroup>
+  <Import Project="..\Kni.props" />
+  <ItemGroup>
+    <PackageReference Include="nkast.Kni.Platform.Blazor.GL" Version="$(KniVersion)" />
+    <PackageReference Include="StbImageSharp" Version="2.30.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Peggle\Peggle.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- distribution/build_web.sh sets the edition (data-edition, title) of the published copy. -->
+<html lang="en" data-edition="HD">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Peggle HD</title>
+    <!-- Relative, so the same build works at any path (/, /hd/, /pre-release/, /pre-release/hd/). -->
+    <base href="./" />
+    <link rel="preload" id="webassembly" />
+    <link rel="icon" type="image/png" href="icon.png" />
+    <link rel="apple-touch-icon" href="icon.png" />
+    <link rel="stylesheet" href="css/app.css" />
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <div id="start">
+        <img src="logo.png" alt="Peggle Enhanced" />
+        <div id="start-loading">Loading…</div>
+        <button id="start-button" type="button" hidden>Play</button>
+    </div>
+
+    <!-- peggle.js first: it keeps track of the audio contexts KNI makes. The KNI scripts are named after
+         the nkast.Wasm.* package version (KNI's dependency, see Kni.props). -->
+    <script src="js/peggle.js"></script>
+    <script src="_content/nkast.Wasm.JSInterop/js/JSObject.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Dom/js/Window.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Dom/js/Document.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Dom/js/Navigator.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Dom/js/Gamepad.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Dom/js/Media.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.XHR/js/XHR.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Canvas/js/Canvas.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Canvas/js/CanvasGLContext.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.Audio/js/Audio.10.0.3.js"></script>
+    <script src="_content/nkast.Wasm.XR/js/XR.10.0.3.js"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+</body>
+
+</html>

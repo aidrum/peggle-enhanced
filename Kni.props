@@ -1,0 +1,17 @@
+<Project>
+  <!-- PeggleWeb=true: KNI (an XNA 4 implementation with a WebAssembly/WebGL backend) in place of MonoGame. -->
+  <PropertyGroup>
+    <KniVersion>4.3.9001</KniVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="nkast.Xna.Framework" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Content" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Graphics" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Audio" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Media" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Input" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Game" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Devices" Version="$(KniVersion)" />
+    <PackageReference Include="nkast.Xna.Framework.Storage" Version="$(KniVersion)" />
+  </ItemGroup>
+</Project>

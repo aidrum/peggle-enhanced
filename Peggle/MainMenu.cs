@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using static Sexy.Layout;
 
@@ -256,6 +257,12 @@ namespace Sexy
             mMoreGamesButton = SexyUtil.MakeEmbeddedButton(MAINMENU_MORE_GAMES, this,
                 mNightsMode ? Res.IMAGE_MM_NIGHTS_MOREGAMES_BUTTON : Res.IMAGE_MM_MOREGAMES_BUTTON, false);
             mQuitButton = MakeModeButton(buttonImage, MAINMENU_QUIT, "QUIT");
+            if (OperatingSystem.IsBrowser())
+            {
+                // Port addition (web): a page can't quit, so the button links to the project instead. A name,
+                // so it isn't translated.
+                mQuitButton.mOverlayText = "GitHub";
+            }
             mReplaysButton = SexyUtil.MakeButton(MAINMENU_REPLAYS, this, SexyAppBase.Loc("Replays"));
 #if !PEGGLE_IPHONE
             // The iPhone menu has no Trophies button.
@@ -980,6 +987,12 @@ namespace Sexy
                 mApp.ShowGameSelectDialog(3);
                 break;
             case MAINMENU_QUIT:
+                if (OperatingSystem.IsBrowser())
+                {
+                    mApp.PlaySample(Res.SOUND_BUTTON1);
+                    mApp.OpenURL(UpdateChecker.REPOSITORY_URL);
+                    break;
+                }
                 mApp.DoConfirmQuitDialog();
                 break;
             case MAINMENU_CHANGE_USER:

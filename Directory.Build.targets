@@ -2,4 +2,8 @@
   <Target Name="CheckPeggleEdition" BeforeTargets="Build;Restore" Condition="'$(PeggleEdition)' != 'HD' And '$(PeggleEdition)' != 'iPhone'">
     <Error Text="PeggleEdition must be HD or iPhone (got '$(PeggleEdition)')." />
   </Target>
+  <!-- The game libraries must be built against KNI too, which only a global property reaches. -->
+  <Target Name="CheckPeggleWeb" BeforeTargets="Build;Restore" Condition="'$(MSBuildProjectName)' == 'Peggle.Web' And '$(PeggleWeb)' != 'true'">
+    <Error Text="Build Peggle.Web with -p:PeggleWeb=true (or distribution/build_web.sh)." />
+  </Target>
 </Project>

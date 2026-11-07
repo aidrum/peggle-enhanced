@@ -281,6 +281,7 @@ namespace Sexy
 
         public override void Update()
         {
+            mPlayer.Update();
             if (mEnabled && mCurrent != -1)
             {
                 if (mVolumeStep > 0.0)

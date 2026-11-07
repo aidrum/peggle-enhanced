@@ -1,0 +1,72 @@
+# Rebuilds the GitHub Pages site from the releases (distribution/make_pages.py) after every Build run that
+# may have published one, or when run by hand (Actions > Pages > Run workflow):
+#   /                  web version of the latest full release (iPhone edition)
+#   /hd/               web version of the latest full release (HD edition)
+#   /pre-release/      web version of the newest pre-release (iPhone edition)
+#   /pre-release/hd/   web version of the newest pre-release (HD edition)
+#   /ios/              AltStore / SideStore source
+# A deployment replaces the whole site, so it's always put together from all of them. This is a workflow of
+# its own because workflow_run runs on the default branch: the github-pages environment refuses deployments
+# from the version tag runs that publish full releases.
+#
+# One-time setup: Settings > Pages > Source: "GitHub Actions" (until then this just warns).
+name: Pages
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  pages:
+    name: Web versions and AltStore / SideStore source
+    # Pull requests publish nothing.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.event != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check that Pages is set up
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TYPE="$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .build_type 2>/dev/null || true)"
+          if [ "$TYPE" = "workflow" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::GitHub Pages isn't set to deploy from GitHub Actions (Settings > Pages > Source: GitHub Actions), so the site wasn't updated."
+          fi
+
+      - name: Build the site from the releases
+        if: steps.check.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 distribution/make_pages.py --repo "$GITHUB_REPOSITORY" --out site
+          du -sh site site/data 2>/dev/null || true
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.check.outputs.ok == 'true'
+        with:
+          path: site
+
+      - uses: actions/deploy-pages@v4
+        if: steps.check.outputs.ok == 'true'
+        id: deploy

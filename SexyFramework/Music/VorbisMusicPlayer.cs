@@ -86,6 +86,7 @@ namespace Sexy
         private const int TARGET_BUFFER_COUNT = 8; // ~750ms of queued audio headroom
         private readonly object mLock = new object();
         private readonly AutoResetEvent mWakeEvent = new AutoResetEvent(false);
+        // Null where there are no threads (the web): Update fills the buffers instead.
         private readonly Thread mStreamingThread;
         private volatile bool mIsRunning = true;
 
@@ -94,6 +95,10 @@ namespace Sexy
 
         public VorbisMusicPlayer()
         {
+            if (SexyAppBase.SingleThreaded)
+            {
+                return;
+            }
             mStreamingThread = new Thread(StreamingThreadProc)
             {
                 IsBackground = true,
@@ -151,6 +156,25 @@ namespace Sexy
                 {
                     Debug.OutputDebug("Vorbis audio thread error: " + e.Message);
                 }
+            }
+        }
+
+        public override void Update()
+        {
+            if (mStreamingThread != null)
+            {
+                return;
+            }
+            try
+            {
+                if (mCurrent != null && mCurrent.Instance != null && !mCurrent.Instance.IsDisposed && mCurrent.Instance.State == SoundState.Playing)
+                {
+                    FillBuffers(mCurrent, TARGET_BUFFER_COUNT);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.OutputDebug("Vorbis audio error: " + e.Message);
             }
         }
 

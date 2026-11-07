@@ -32,5 +32,10 @@ namespace Sexy
         public abstract bool IsStopped();
 
         public abstract void Close(object theTrack);
+
+        /// <summary>Called with StreamMusicInterface.Update (100 times a second).</summary>
+        public virtual void Update()
+        {
+        }
     }
 }

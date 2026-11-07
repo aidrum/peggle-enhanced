@@ -16,6 +16,8 @@ namespace Sexy
     {
         private const string LATEST_RELEASE_URL = "https://api.github.com/repos/aidrum/peggle-enhanced/releases/latest";
 
+        public const string REPOSITORY_URL = "https://github.com/aidrum/peggle-enhanced";
+
         public const string RELEASES_PAGE_URL = "https://github.com/aidrum/peggle-enhanced/releases/latest";
 
         private static int sStarted;
@@ -33,8 +35,9 @@ namespace Sexy
             {
                 return;
             }
-            // Scripted debug runs (clicks and screenshots) must not meet a prompt.
-            if (Environment.GetEnvironmentVariable("SEXY_DEBUG_SCRIPT") != null)
+            // Scripted debug runs (clicks and screenshots) must not meet a prompt; the web version is always
+            // the latest build.
+            if (Environment.GetEnvironmentVariable("SEXY_DEBUG_SCRIPT") != null || OperatingSystem.IsBrowser())
             {
                 return;
             }

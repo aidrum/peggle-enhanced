@@ -512,7 +512,8 @@ namespace Sexy
             RegistryReadBoolean("MainMenuAmbience", ref mMainMenuAmbience);
             // Port: lazy loading is an option, read once here (a change applies on the next start).
             // Phones keep the original's lazy loading; PCs load everything while the loading screen shows.
-            mLazyResourceLoading = Main.IsMobile;
+            // The web loads lazily too: each file is a download.
+            mLazyResourceLoading = Main.IsMobile || OperatingSystem.IsBrowser();
             RegistryReadBoolean("LazyLoading", ref mLazyResourceLoading);
             mLazyLoadingOption = mLazyResourceLoading;
             // Port: High Quality Pegs is on by default on PCs, off on phones.
@@ -1464,6 +1465,14 @@ namespace Sexy
 
         public override void LoadingThreadProc()
         {
+            foreach (bool aStep in LoadingThreadSteps())
+            {
+            }
+        }
+
+        /// <summary>The loading thread's work, yielding after each resource (the web runs it a slice per frame).</summary>
+        public override IEnumerable<bool> LoadingThreadSteps()
+        {
             string[] groups = GetLoadingThreadGroups();
             int first = mLazyResourceLoading ? 4 : 0;
             mNumLoadingThreadTasks = 0;
@@ -1477,24 +1486,26 @@ namespace Sexy
                 while (mResourceManager.LoadNextResource() && !mShutdown)
                 {
                     mCompletedLoadingThreadTasks++;
+                    yield return true;
                 }
                 if (mShutdown)
                 {
-                    return;
+                    yield break;
                 }
                 if (mResourceManager.HadError())
                 {
                     ShowResourceError(false);
                     mLoadingFailed = true;
-                    return;
+                    yield break;
                 }
                 mResourceManager.SetGroupAsLoaded(groups[i]);
                 if (!Res.ExtractResourcesByName(mResourceManager, groups[i], false))
                 {
                     ShowResourceError(false);
                     mLoadingFailed = true;
-                    return;
+                    yield break;
                 }
+                yield return true;
             }
             MakeFeverStars();
         }

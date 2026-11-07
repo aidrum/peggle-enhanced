@@ -5,6 +5,9 @@
       iPhone - Peggle Classic 1.7.2 (iPhone 5, 1136x640 with the 960x640 art).
     Pick with: dotnet build -p:PeggleEdition=iPhone
     Each edition gets its own bin/obj folders so the two builds never mix.
+
+    PeggleWeb=true (only with Peggle.Web, see distribution/build_web.sh) builds the game against KNI
+    (WebAssembly/WebGL) instead of MonoGame DesktopGL, in bin/obj folders of its own.
   -->
   <PropertyGroup>
     <PeggleEdition Condition="'$(PeggleEdition)' == ''">HD</PeggleEdition>
@@ -12,10 +15,17 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);bin/**;obj/**</DefaultItemExcludes>
     <!-- The port's own version (Peggle Enhanced), shown in the Options dialog (SexyUtil.GetPortVersionString). -->
     <Version>1.1.1</Version>
+    <PeggleOutputDir Condition="'$(PeggleWeb)' == 'true'">Web\</PeggleOutputDir>
+    <PeggleOutputDir Condition="'$(PeggleEdition)' == 'iPhone'">$(PeggleOutputDir)iPhone\</PeggleOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(PeggleEdition)' == 'iPhone'">
     <DefineConstants>$(DefineConstants);PEGGLE_IPHONE</DefineConstants>
-    <BaseOutputPath>bin\iPhone\</BaseOutputPath>
-    <BaseIntermediateOutputPath>obj\iPhone\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PeggleWeb)' == 'true'">
+    <DefineConstants>$(DefineConstants);PEGGLE_WEB</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PeggleOutputDir)' != ''">
+    <BaseOutputPath>bin\$(PeggleOutputDir)</BaseOutputPath>
+    <BaseIntermediateOutputPath>obj\$(PeggleOutputDir)</BaseIntermediateOutputPath>
   </PropertyGroup>
 </Project>
