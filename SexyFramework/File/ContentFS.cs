@@ -137,9 +137,9 @@ namespace Sexy
 		private static string Lookup(string rel)
 		{
 			Dictionary<string, string> anIndex = GetIndex();
-			// Port: More Games content (net_content/) is not localized; it always comes from en.lproj.
-			string aLang = rel.StartsWith("net_content/", StringComparison.OrdinalIgnoreCase) ? "en" : Language;
-			if (anIndex.TryGetValue(aLang + ".lproj/" + rel, out string loc))
+			// Port: More Games content (net_content/) is not localized; it lives at the content root.
+			if (!rel.StartsWith("net_content/", StringComparison.OrdinalIgnoreCase)
+				&& anIndex.TryGetValue(Language + ".lproj/" + rel, out string loc))
 			{
 				return loc;
 			}

@@ -6,7 +6,7 @@ namespace Sexy
 {
     /// <summary>
     /// The More Games screen (Sexy::MoreGamesScreen, id 44): a full-screen ThunderDialog with Warren,
-    /// a blurb and a scrolling list of game banners read from net_content/&lt;res&gt;/more_games.xml,
+    /// a blurb and a scrolling list of game banners read from net_content/more_games.xml,
     /// plus a BACK button.
     /// </summary>
     public class MoreGamesScreen : ThunderDialog
@@ -49,7 +49,9 @@ namespace Sexy
         // 00198eb8
         public void LoadGames()
         {
-            string aDir = "net_content/" + GlobalStaticVars.mResPathPrefix;
+            // Port: the original read net_content/<res>/ per language; the port's banners are identical
+            // across versions and untranslated, so they live once at the content root.
+            string aDir = "net_content/";
             XMLParser aParser = new XMLParser();
             if (!aParser.OpenFile(aDir + "more_games.xml"))
             {
