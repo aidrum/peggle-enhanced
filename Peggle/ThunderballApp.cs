@@ -512,9 +512,14 @@ namespace Sexy
             RegistryReadBoolean("MainMenuAmbience", ref mMainMenuAmbience);
             // Port: lazy loading is an option, read once here (a change applies on the next start).
             // Phones keep the original's lazy loading; PCs load everything while the loading screen shows.
-            // The web loads lazily too: each file is a download.
-            mLazyResourceLoading = Main.IsMobile || OperatingSystem.IsBrowser();
+            mLazyResourceLoading = Main.IsMobile;
             RegistryReadBoolean("LazyLoading", ref mLazyResourceLoading);
+            // The web always loads everything during the loading screen (the option is hidden there): loading
+            // lazily stalled the game on downloads whenever a screen opened.
+            if (OperatingSystem.IsBrowser())
+            {
+                mLazyResourceLoading = false;
+            }
             mLazyLoadingOption = mLazyResourceLoading;
             // Port: High Quality Pegs is on by default on PCs, off on phones.
             bool aHighQualityPegs = !Main.IsMobile;

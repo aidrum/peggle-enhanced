@@ -33,6 +33,7 @@ import sys
 import tempfile
 import zipfile
 from pathlib import Path
+from urllib.parse import unquote
 
 HERE = Path(__file__).resolve().parent
 
@@ -75,11 +76,16 @@ def install(repo, tag, asset, dest, site, tmp):
     data = site / DATA_DIR
     data.mkdir(exist_ok=True)
     lines = []
-    for rel in (content / FILE_LIST).read_text(encoding="utf-8").splitlines():
-        rel = rel.split("\t")[0].strip()
+    for line in (content / FILE_LIST).read_text(encoding="utf-8").splitlines():
+        fields = line.split("\t")
+        rel = fields[0].strip()
         if not rel:
             continue
-        source = content.joinpath(*rel.split("/"))
+        # A file stored under another name (a PNG converted to WebP) gives its url, relative to the page.
+        if len(fields) > 1 and fields[1]:
+            source = dest.joinpath(*unquote(fields[1]).split("/"))
+        else:
+            source = content.joinpath(*rel.split("/"))
         name = file_hash(source) + source.suffix.lower()
         target = data / name
         if target.exists():

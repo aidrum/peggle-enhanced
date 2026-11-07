@@ -88,9 +88,9 @@ Both editions run in a browser (WebAssembly and WebGL, through [KNI](https://git
 
 Each release keeps its web build as `Peggle-web.zip` / `PeggleHD-web.zip`, and `distribution/make_pages.py` puts the latest full release's and the newest pre-release's on the site. Until a full release has them, `/` and `/hd/` lead to the pre-release. The four builds would exceed Pages' 1 GB limit, so their game data goes into one shared folder (`/data/`), each file once.
 
-Saves are kept in the browser (IndexedDB), one set per edition, shared by the release and the pre-release. Clearing the site's data deletes them. Phones and tablets play with touch, as the mobile versions do; browsers with a mouse play like the PC version. The game data is downloaded as it's needed, so the first visit loads slower than later ones.
+Saves are kept in the browser (IndexedDB), one set per edition, shared by the release and the pre-release. Clearing the site's data deletes them. Phones and tablets play with touch, as the mobile versions do; browsers with a mouse play like the PC version. Everything loads while the loading screen shows (Low Memory Mode is always off on the web, and hidden), so the first visit takes longer than later ones, which use the browser's cache. Images are converted to WebP when the site is built (`distribution/web_content.py`, Pillow) and decoded with SkiaSharp, which only the web version uses.
 
-To build it (Release needs `dotnet workload install wasm-tools`; it's compiled ahead of time, which takes a while):
+To build it (needs `dotnet workload install wasm-tools`, which links SkiaSharp in, and Python 3 with Pillow; Release is compiled ahead of time, which takes a while):
 
 ```sh
 # -> distribution/out/web/<Exe>/ and distribution/out/<Exe>-web.zip (needs zip)

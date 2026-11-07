@@ -372,10 +372,26 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Install the WebAssembly tools
-        run: dotnet workload install wasm-tools
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install the WebAssembly tools and Pillow
+        run: |
+          dotnet workload install wasm-tools
+          python3 -m pip install pillow
+
+      # The PNGs' WebP encodings, by content (distribution/web_content.py), so unchanged images aren't
+      # encoded again.
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/peggle-webp
+          key: webp-v1-${{ matrix.edition }}-${{ hashFiles('Peggle/Content.Shared/**/*.png', format('Peggle/Content.{0}/**/*.png', matrix.edition)) }}
+          restore-keys: webp-v1-${{ matrix.edition }}-
 
       - name: Build
+        env:
+          WEBP_CACHE: ${{ runner.temp }}/peggle-webp
         run: bash distribution/build_web.sh ${{ matrix.edition }}
 
       - uses: actions/upload-artifact@v5

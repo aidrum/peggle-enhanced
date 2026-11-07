@@ -270,7 +270,8 @@ namespace Sexy
             mPage = thePage;
             bool general = thePage == PAGE_GENERAL;
             bool theme = thePage == PAGE_THEME;
-            mLazyLoadingCheckbox.SetVisible(general);
+            // Web: Low Memory Mode is always off (ThunderballApp), so the option isn't shown; its spot stays empty.
+            mLazyLoadingCheckbox.SetVisible(general && !OperatingSystem.IsBrowser());
             mHighQualityPegsCheckbox.SetVisible(general);
             mRandomMusicCheckbox.SetVisible(general);
             mPCControlsCheckbox?.SetVisible(general);
@@ -454,6 +455,10 @@ namespace Sexy
             g.SetColor(SexyUtil.MakeColor(0x9090d0));
             Font font = g.GetFont();
             ThunderCheckbox lazy = mLazyLoadingCheckbox;
+            if (!lazy.mVisible)
+            {
+                return;
+            }
             g.DrawString(mRestartLabel, lazy.mX + (lazy.mWidth - font.StringWidth(mRestartLabel)) / 2, lazy.mY + lazy.mHeight + font.GetAscent() + 2);
         }
 

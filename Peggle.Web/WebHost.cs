@@ -1,8 +1,8 @@
 using System;
-using System.Runtime.InteropServices;
 using Microsoft.JSInterop;
 using Microsoft.Xna.Framework;
 using Sexy;
+using SkiaSharp;
 
 namespace Peggle.Web
 {
@@ -46,13 +46,35 @@ namespace Peggle.Web
             return aGame;
         }
 
-        /// <summary>Decodes an image on the CPU, straight alpha packed as SurfaceFormat.Color.</summary>
-        private static uint[] DecodeImage(byte[] theFileData, out int theWidth, out int theHeight)
+        /// <summary>
+        /// Decodes an image (PNG, WebP, JPEG, GIF) with SkiaSharp, straight into straight-alpha pixels packed as
+        /// SurfaceFormat.Color (RGBA bytes); null hands it to the default loader.
+        /// </summary>
+        private static unsafe uint[] DecodeImage(byte[] theFileData, out int theWidth, out int theHeight)
         {
-            StbImageSharp.ImageResult anImage = StbImageSharp.ImageResult.FromMemory(theFileData, StbImageSharp.ColorComponents.RedGreenBlueAlpha);
-            theWidth = anImage.Width;
-            theHeight = anImage.Height;
-            return MemoryMarshal.Cast<byte, uint>(anImage.Data).ToArray();
+            theWidth = 0;
+            theHeight = 0;
+            using (SKData aData = SKData.CreateCopy(theFileData))
+            using (SKCodec aCodec = SKCodec.Create(aData))
+            {
+                if (aCodec == null)
+                {
+                    return null;
+                }
+                SKImageInfo anInfo = new SKImageInfo(aCodec.Info.Width, aCodec.Info.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+                uint[] aPixels = new uint[anInfo.Width * anInfo.Height];
+                fixed (uint* aDest = aPixels)
+                {
+                    SKCodecResult aResult = aCodec.GetPixels(anInfo, (System.IntPtr)aDest);
+                    if (aResult != SKCodecResult.Success && aResult != SKCodecResult.IncompleteInput)
+                    {
+                        return null;
+                    }
+                }
+                theWidth = anInfo.Width;
+                theHeight = anInfo.Height;
+                return aPixels;
+            }
         }
     }
 }

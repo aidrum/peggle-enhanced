@@ -8,6 +8,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>Peggle.Web</RootNamespace>
     <AssemblyName>PeggleHD</AssemblyName>
     <KniPlatform>BlazorGL</KniPlatform>
@@ -34,7 +35,11 @@
   <Import Project="..\Kni.props" />
   <ItemGroup>
     <PackageReference Include="nkast.Kni.Platform.Blazor.GL" Version="$(KniVersion)" />
-    <PackageReference Include="StbImageSharp" Version="2.30.15" />
+    <!-- Images are decoded with SkiaSharp (native libpng/libwebp/libjpeg in WebAssembly, much faster than a
+         managed decoder); only the web version uses it. Its native library is linked into the runtime,
+         which needs the wasm-tools workload. -->
+    <PackageReference Include="SkiaSharp" Version="4.155.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.155.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" PrivateAssets="all" />
   </ItemGroup>
