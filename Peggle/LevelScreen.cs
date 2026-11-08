@@ -46,6 +46,8 @@ namespace Sexy
             mApp.LoadQuickplayResources();
             mThumbnails = new LevelThumbnailsWidget(mApp, this);
             mNewGame = newGame;
+            // Port addition: the web demo rows under Peggle's stages, where the bonus pages are shown.
+            mThumbnails.mShowPeggleRows = HasBonusPages();
             mScrollWidget = new ThunderScrollWidget();
             mScrollWidget.SetScrollMode(ScrollWidget.ScrollMode.Vertical);
             mScrollWidget.AddWidget(mThumbnails);
@@ -183,7 +185,8 @@ namespace Sexy
             int aBottom = mYesButton.mY - LEVEL_SCREEN_OFFSET_BOTTOM_Y;
             int aLeft = mContentInsets.mLeft + 2;
             int aRight = mWidth - mContentInsets.mRight - 2;
-            int aRows = Math.Max(NUM_STAGES_NIGHTS, NUM_STAGES_PEGGLE) + 1;
+            // Port: the Peggle page can have the web demo rows under its stages.
+            int aRows = Math.Max(NUM_STAGES_NIGHTS, mThumbnails.GetNumPeggleRows()) + 1;
             if (mNewGame && ThunderballApp.mGameLevelPack == 0)
             {
                 aRows = Math.Max(NUM_STAGES_NIGHTS, NUM_STAGES_PEGGLE);

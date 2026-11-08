@@ -84,6 +84,12 @@ namespace Sexy
         /// </summary>
         public int mAdventureStageCount;
 
+        /// <summary>
+        /// True for a page shown on the Peggle Quick Play page, under Peggle's stages, instead of on a
+        /// page of its own (the web demo levels). It isn't one of the paged ones (GetNumBonusPages).
+        /// </summary>
+        public bool mOnPeggleRows;
+
         public BonusPage(string theConfig, int theLevelPack, int theLogoCel, int theOutlineColor, string theAdventureKey = null,
             int[] theStageCharacters = null, int theCreditsEnding = -1, int theAdventureStageCount = -1)
         {
@@ -143,7 +149,7 @@ namespace Sexy
     /// The stage/level catalogue read from levels/stages.cfg (Sexy::StageMgr): stages 0-10 are
     /// Peggle, 11-22 Peggle Nights. Also owns the loading-screen tips and random level picking.
     /// Stage 23 holds the challenge-only Tilt level. Port addition: the bonus pages (BONUS_PAGES)
-    /// follow as stages 24+.
+    /// follow as stages 24+, the web demo levels (shown on the Peggle page) last.
     /// </summary>
     public class StageMgr
     {
@@ -162,6 +168,9 @@ namespace Sexy
             new BonusPage("levels/stages_extreme.cfg", 0, GameArrowButton.LOGO_EXTREME, 0xff8a2a, ADVENTURE_EXTREME, new[] { 0, 0 }, 2),
             // Its Adventure is the first two stages; the WoW addon levels follow, outside it.
             new BonusPage("levels/stages_wow.cfg", 1, GameArrowButton.LOGO_WOW, 0xf0b030, ADVENTURE_WOW, new[] { 0, 3 }, -1, 2),
+            // The Peggle web demo's own levels: under Peggle's stages on the Peggle page, always open.
+            // Last, so the other pages' stage numbers don't move.
+            new BonusPage("levels/stages_demo.cfg", 0, -1, 0xeac76a) { mOnPeggleRows = true },
         };
 
         /// <summary>Port addition: the bonus Adventures' keys (BonusPage.mAdventureKey).</summary>
@@ -242,7 +251,15 @@ namespace Sexy
 
         private static readonly List<BonusPage> sBonusPages = new List<BonusPage>();
 
-        /// <summary>Port addition: the bonus pages that were loaded, in page order.</summary>
+        private static BonusPage sPeggleRowsPage;
+
+        /// <summary>Port addition: the loaded bonus stages shown on the Peggle page (the web demo levels), or null.</summary>
+        public static BonusPage GetPeggleRowsPage()
+        {
+            return sPeggleRowsPage;
+        }
+
+        /// <summary>Port addition: the bonus pages that were loaded, in page order (not the Peggle page's rows).</summary>
         public static int GetNumBonusPages()
         {
             return sBonusPages.Count;
@@ -253,7 +270,7 @@ namespace Sexy
             return sBonusPages[theIndex];
         }
 
-        /// <summary>Port addition: the index of the bonus page a stage is on, or -1.</summary>
+        /// <summary>Port addition: the index of the bonus page a stage is on, or -1 (also for the Peggle page's rows).</summary>
         public static int GetBonusPageIndex(int theStage)
         {
             for (int i = 0; i < sBonusPages.Count; i++)
@@ -286,11 +303,16 @@ namespace Sexy
             return theStage > 10 ? theStage - 10 : theStage + 1;
         }
 
-        /// <summary>Port addition: the bonus page a stage is on, or null.</summary>
+        /// <summary>Port addition: the bonus page a stage is on (or the Peggle page's rows), or null.</summary>
         public static BonusPage GetBonusPage(int theStage)
         {
             int anIndex = GetBonusPageIndex(theStage);
-            return anIndex < 0 ? null : sBonusPages[anIndex];
+            if (anIndex >= 0)
+            {
+                return sBonusPages[anIndex];
+            }
+            BonusPage aRows = sPeggleRowsPage;
+            return aRows != null && theStage >= aRows.mFirstStage && theStage < aRows.mFirstStage + aRows.mNumStages ? aRows : null;
         }
 
         /// <summary>Port addition: true for a bonus level name.</summary>
@@ -639,6 +661,7 @@ namespace Sexy
             // Port addition: the bonus pages, after the Peggle, Nights and Tilt stages.
             bool aLoadBonus = theFileName == null && mStages.Count == BONUS_FIRST_STAGE;
             sBonusPages.Clear();
+            sPeggleRowsPage = null;
             foreach (BonusPage aPage in BONUS_PAGES)
             {
                 aPage.mFirstStage = mStages.Count;
@@ -647,7 +670,14 @@ namespace Sexy
                 {
                     ReadConfigFile(aPage.mConfig);
                     aPage.mNumStages = mStages.Count - aPage.mFirstStage;
-                    sBonusPages.Add(aPage);
+                    if (aPage.mOnPeggleRows)
+                    {
+                        sPeggleRowsPage = aPage.mNumStages > 0 ? aPage : null;
+                    }
+                    else
+                    {
+                        sBonusPages.Add(aPage);
+                    }
                 }
             }
         }

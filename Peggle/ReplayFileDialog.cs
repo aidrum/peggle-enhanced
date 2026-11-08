@@ -437,7 +437,9 @@ namespace Sexy
                 }
                 else
                 {
-                    Image aLogo = anInfo.mStage < 0xb ? Res.IMAGE_DLG_REPLAY_LOGO_PEGGLE : Res.IMAGE_DLG_REPLAY_LOGO_NIGHTS;
+                    // Port: the other bonus levels by the game they play as (the web demo's: Peggle).
+                    bool isPeggle = aBonusPage != null ? aBonusPage.mLevelPack == 0 : anInfo.mStage < 0xb;
+                    Image aLogo = isPeggle ? Res.IMAGE_DLG_REPLAY_LOGO_PEGGLE : Res.IMAGE_DLG_REPLAY_LOGO_NIGHTS;
                     g.DrawImage(aLogo, anInner.mX + anInner.mWidth - aLogo.mWidth, anInner.mY + (anInner.mHeight - aLogo.mHeight) / 2);
                 }
 

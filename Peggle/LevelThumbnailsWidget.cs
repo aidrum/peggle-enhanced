@@ -15,7 +15,8 @@ namespace Sexy
     /// middle are shared, and the screen scrolls sideways between the two. Row 0 is Random Level.
     /// Port addition: further pages to the right hold the bonus stages (StageMgr.BONUS_PAGES: Nights
     /// bonus, Dual Shot, Extreme, WoW). Nights bonus and Dual Shot have their own labels; Extreme and
-    /// WoW share theirs, like Peggle and Nights.
+    /// WoW share theirs, like Peggle and Nights. The web demo levels (StageMgr.GetPeggleRowsPage) are
+    /// rows under Peggle's stages on the Peggle page.
     /// </summary>
     public class LevelThumbnailsWidget : Widget
     {
@@ -53,6 +54,9 @@ namespace Sexy
         public bool mThumbnailDirty;                              // 0x90
 
         public MemoryImage mSelectedThumbnail;                    // 0x94
+
+        /// <summary>Port addition: the web demo rows are shown on the Peggle page (Quick Play and Duel, LevelScreen.HasBonusPages).</summary>
+        public bool mShowPeggleRows;
 
         public LevelThumbnailsWidget(ThunderballApp theApp, LevelThumbnailsWidgetListener theListener)
         {
@@ -129,6 +133,19 @@ namespace Sexy
             return mApp.mPlayerInfo.IsLevelUnlocked(theStage, theLevel);
         }
 
+        /// <summary>Port addition: the bonus stages shown under Peggle's (the web demo levels), or null when they aren't shown.</summary>
+        public BonusPage GetPeggleRows()
+        {
+            return mShowPeggleRows ? StageMgr.GetPeggleRowsPage() : null;
+        }
+
+        /// <summary>Port addition: the number of rows of stages on the Peggle page.</summary>
+        public int GetNumPeggleRows()
+        {
+            BonusPage aRows = GetPeggleRows();
+            return 0xb + (aRows != null ? aRows.mNumStages : 0);
+        }
+
         public int GetRandomLevelIndex()
         {
             // Port: the bonus levels aren't counted, so the index stays clear of their slots.
@@ -190,6 +207,12 @@ namespace Sexy
             int aRightX = GetPageX(theRightPage);
             float t = (-mX - aLeftX) / (float)(aRightX - aLeftX);
             return (int)(System.Math.Clamp(t, 0.0f, 1.0f) * 0xff);
+        }
+
+        /// <summary>Port addition: the alpha of the Nights page's own rows and labels: 0 on the Peggle page, 255 on Nights.</summary>
+        private int GetNightsLabelAlpha()
+        {
+            return GetRightPageLabelAlpha(1);
         }
 
         /// <summary>Port addition: true for the WoW page when it shares labels with Extreme.</summary>
@@ -286,6 +309,12 @@ namespace Sexy
                 aBottom = SexyAppBase.Loc(NIGHTSDLC_STAGE_NAMES[theStage][1]);
                 theLabelWidth = theLabelFont.StringWidth(aTop);
             }
+            else if (theBonusPage != null && theBonusPage.mOnPeggleRows)
+            {
+                // Port addition: the web demo rows under Peggle's stages.
+                aTop = SexyAppBase.Loc("Demo Levels");
+                theLabelWidth = theLabelFont.StringWidth(aTop);
+            }
             else if (theBonusPage != null && theBonusPage.HasAdventure && theStage >= theBonusPage.AdventureStages)
             {
                 // Port addition: the stages after a page's Adventure (the WoW addon levels).
@@ -364,6 +393,42 @@ namespace Sexy
                 DrawStageLabel(g, aLabelFont, aLabelX, aLabelWidth, aRowRect.mY, aStage);
             }
 
+            // Port addition: the web demo rows under Peggle's stages. The first shares its row with
+            // Nights' twelfth stage: one box across both pages, and the label changes from "Demo Levels"
+            // to Nights' "Stage 12" as the view scrolls over. The rows only Peggle has fade out, box and
+            // label, as the view leaves the Peggle page (like the WoW addon rows from the WoW page).
+            BonusPage aDemo = GetPeggleRows();
+            int aNightsAlpha = GetNightsLabelAlpha();
+            int aDemoRows = aDemo != null ? aDemo.mNumStages : 0;
+            for (int aRow = 0; aRow < aDemoRows; aRow++)
+            {
+                int aPageRow = 0xb + aRow;
+                TRect aRowRect = new TRect(0, (aPageRow + 1) * aRowStep, mWidth, ROW_HEIGHT);
+                if (!aRowRect.Intersects(aVisible))
+                {
+                    continue;
+                }
+                bool isShared = aPageRow < 0xc;
+                int aRowAlpha = 0xff - aNightsAlpha;
+                if (isShared || aRowAlpha > 0)
+                {
+                    g.SetColorizeImages(true);
+                    g.SetColor(SexyUtil.MakeColor(SexyUtil.GetColorForStage(aPageRow, ThunderballApp.mGameLevelPack, true),
+                        isShared ? 0x7f : 0x7f * aRowAlpha / 0xff));
+                    SexyUtil.MyDrawImageBox(g, new TRect(0, aRowRect.mY, isShared ? THUMB_STAGE_WIDTH + aParent.mWidth : aParent.mWidth, ROW_HEIGHT),
+                        Res.IMAGE_DLG_GROUPRECT);
+                    g.SetColorizeImages(false);
+                }
+                int aStage = aDemo.mFirstStage + aRow;
+                int aThumbY = aRowRect.mY + 1;
+                DrawStageThumbs(g, aStage, LEVEL_SCREEN_STAGE_THUMB_INSET, aThumbY);
+                DrawThumbOutlines(g, LEVEL_SCREEN_STAGE_THUMB_INSET, aThumbY, aDemo.mOutlineColor, mApp.mStageMgr.GetStageInfo(aStage).mLevels.Count);
+                if (aRowAlpha > 0)
+                {
+                    DrawStageLabel(g, aLabelFont, aLabelX, aLabelWidth, aRowRect.mY, aRow, aDemo, aRowAlpha);
+                }
+            }
+
             for (int aRow = 0; aRow < 0xc; aRow++)
             {
                 int aStage = aRow + 0xb;
@@ -374,9 +439,10 @@ namespace Sexy
                 }
                 g.SetColorizeImages(true);
                 g.SetColor(SexyUtil.MakeColor(SexyUtil.GetColorForStage(aRow, ThunderballApp.mGameLevelPack, true), 0x7f));
-                if (aRow > 10)
+                if (aRow > 10 && aDemoRows == 0)
                 {
-                    // Nights has a twelfth stage with no Peggle row to share its box.
+                    // Nights has a twelfth stage with no Peggle row to share its box (port: unless the
+                    // web demo rows are shown, whose first draws it across both pages).
                     SexyUtil.MyDrawImageBox(g, new TRect(THUMB_STAGE_WIDTH, aRowRect.mY, aParent.mWidth, ROW_HEIGHT), Res.IMAGE_DLG_GROUPRECT);
                 }
                 g.SetColorizeImages(false);
@@ -385,9 +451,11 @@ namespace Sexy
                 int aThumbY = aRowRect.mY + 1;
                 DrawStageThumbs(g, aStage, aThumbX, aThumbY);
                 DrawThumbOutlines(g, aThumbX, aThumbY, 0xff55e9);
-                if (aRow > 10)
+                // Port: sharing its row with the first web demo row, the label fades in from the Peggle page.
+                int aLabelAlpha = aDemoRows > 0 ? aNightsAlpha : 0xff;
+                if (aRow > 10 && aLabelAlpha > 0)
                 {
-                    DrawStageLabel(g, aLabelFont, aLabelX, aLabelWidth, aRowRect.mY, aRow);
+                    DrawStageLabel(g, aLabelFont, aLabelX, aLabelWidth, aRowRect.mY, aRow, null, aLabelAlpha);
                 }
             }
 
@@ -499,7 +567,13 @@ namespace Sexy
             int aRow = mSelected / 5 + 1;
             int aCol = mSelected % 5;
             int x = LEVEL_SCREEN_STAGE_THUMB_INSET + aCol * (LEVEL_SCREEN_STAGE_THUMB_W + LEVEL_SCREEN_STAGE_THUMB_GAP);
-            if (StageMgr.IsBonusStage(mSelected / 5))
+            BonusPage aSelectedPage = StageMgr.GetBonusPage(mSelected / 5);
+            if (aSelectedPage != null && aSelectedPage.mOnPeggleRows)
+            {
+                // Port addition: the web demo rows follow Peggle's stages on the Peggle page.
+                aRow = 0xb + mSelected / 5 - aSelectedPage.mFirstStage + 1;
+            }
+            else if (StageMgr.IsBonusStage(mSelected / 5))
             {
                 // Port addition: a bonus page puts its thumbnails where the Nights page does.
                 // The Extreme page, when it shares labels with WoW, puts them where the Peggle page does.
@@ -581,12 +655,23 @@ namespace Sexy
                 {
                     return;
                 }
+                if (aRow > 0xc)
+                {
+                    return;  // Port: below Nights' last stage (the list is taller with the web demo rows).
+                }
                 aRow += 0xb;
                 aCol = (x - aParent.mWidth) / (LEVEL_SCREEN_STAGE_THUMB_GAP + LEVEL_SCREEN_STAGE_THUMB_W);
             }
             else if (aRow > 0xb)
             {
-                return;
+                // Port addition: the web demo rows under Peggle's stages.
+                BonusPage aDemo = GetPeggleRows();
+                if (aDemo == null || aRow > GetNumPeggleRows())
+                {
+                    return;
+                }
+                aBonus = aDemo;
+                aRow = aDemo.mFirstStage + (aRow - 0xb);
             }
             int anIndex = isRandom ? GetRandomLevelIndex() : (aRow - 1) * 5 + aCol;
             if (!CanSelectItem(anIndex))
@@ -604,7 +689,11 @@ namespace Sexy
                 mSelected = anIndex;
                 int aScrollX = 0;
                 int aScrollRow = aRow;
-                if (aBonus != null)
+                if (aBonus != null && aBonus.mOnPeggleRows)
+                {
+                    aScrollRow = aRow - aBonus.mFirstStage + 0xb;
+                }
+                else if (aBonus != null)
                 {
                     aScrollRow = aRow - aBonus.mFirstStage;
                     aScrollX = GetPageX(aPage);
