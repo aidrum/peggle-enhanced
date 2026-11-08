@@ -57,6 +57,20 @@
     <ImageAsset Include="Icons\$(PeggleEdition)\Assets.xcassets\**\*" Link="Assets.xcassets\%(RecursiveDir)%(Filename)%(Extension)" />
     <None Remove="Icons\**" />
   </ItemGroup>
+  <PropertyGroup>
+    <AppIcon>AppIcon</AppIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Alternate icons (Extra Options' App Icon page, AppDelegate's SetAppIconHandler), named as
+         PortOptionsDialog.APP_ICONS' aliases; made by tools/convert_icons.py from the Android legacy icons.
+         The transparent ones have no iOS version (iOS icons are opaque). -->
+    <AlternateAppIcon Include="IconIOSOld" />
+    <AlternateAppIcon Include="IconAndroid" />
+    <AlternateAppIcon Include="IconPC" />
+    <AlternateAppIcon Include="IconNights" />
+    <AlternateAppIcon Include="IconPlayStore" />
+    <AlternateAppIcon Include="IconJava" />
+  </ItemGroup>
   <ItemGroup>
     <!-- Converted game assets, read as loose files from the app bundle's Content folder
          (ContentFS's default: AppContext.BaseDirectory/Content). -->

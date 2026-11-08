@@ -42,7 +42,6 @@
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>XSAppIconAssets</key>
-	<string>Assets.xcassets/AppIcon.appiconset</string>
+	<!-- The app icon and its alternates come from the project (AppIcon, AlternateAppIcon). -->
 </dict>
 </plist>

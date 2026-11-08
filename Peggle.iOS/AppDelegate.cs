@@ -51,11 +51,38 @@ namespace Peggle.iOS
                     app.OpenUrl(url, new UIApplicationOpenUrlOptions(), null);
                 }
             });
+            if (app.SupportsAlternateIcons)
+            {
+                SetUpAppIcons(app);
+            }
 
             sGame = new Sexy.Main();
             sGame.applicationStoragePath = saveDir;
             GraphicsState.mGraphicsDeviceManager.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
             sGame.Run();
+        }
+
+        /// <summary>
+        /// The App Icon page (Extra Options): the aliases are the alternate icon sets' names (Peggle.iOS.csproj's
+        /// AlternateAppIcon), the first one (IconIOS) being the main icon. The switch happens in place, with
+        /// iOS's own "You have changed the icon" notice, so the game neither confirms nor closes.
+        /// </summary>
+        private static void SetUpAppIcons(UIApplication app)
+        {
+            Sexy.Main.AppIconChangeQuits = false;
+            Sexy.Main.TransparentAppIcons = false;
+            Sexy.Main.SetAppIconHandler = (theAlias, theAll) => app.BeginInvokeOnMainThread(() =>
+            {
+                string aName = theAlias == theAll[0] ? null : theAlias;
+                app.SetAlternateIconName(aName, theError =>
+                {
+                    if (theError != null)
+                    {
+                        Console.WriteLine("Could not switch the app icon: " + theError.LocalizedDescription);
+                    }
+                });
+            });
+            Sexy.Main.GetAppIconHandler = theAll => app.AlternateIconName ?? theAll[0];
         }
 
         /// <summary>The whole screen in landscape, in pixels.</summary>

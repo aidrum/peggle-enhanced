@@ -50,11 +50,21 @@ namespace Sexy
             /// <summary>The appicons sheet cel shown for it (tools/build_app_icon_sheet.py); a transparent icon shares its opaque one's.</summary>
             public int mPicture;
 
-            public AppIcon(string theLabel, string theAlias, int thePicture)
+            /// <summary>A transparent icon: only offered where the platform allows one (Main.TransparentAppIcons).</summary>
+            public bool mTransparent;
+
+            public AppIcon(string theLabel, string theAlias, int thePicture, bool theTransparent = false)
             {
                 mLabel = theLabel;
                 mAlias = theAlias;
                 mPicture = thePicture;
+                mTransparent = theTransparent;
+            }
+
+            /// <summary>Whether it gets a radio button here.</summary>
+            public bool IsOffered()
+            {
+                return !mTransparent || Main.TransparentAppIcons;
             }
         }
 
@@ -68,9 +78,9 @@ namespace Sexy
             new AppIcon("iOS Old", "IconIOSOld", 1),
             new AppIcon("Android", "IconAndroid", 2),
             new AppIcon("PC", "IconPC", 3),
-            new AppIcon("Transparent", "IconPCTransparent", 3),
+            new AppIcon("Transparent", "IconPCTransparent", 3, true),
             new AppIcon("Nights", "IconNights", 4),
-            new AppIcon("Transparent", "IconNightsTransparent", 4),
+            new AppIcon("Transparent", "IconNightsTransparent", 4, true),
             new AppIcon("Play Store", "IconPlayStore", 5),
             new AppIcon("Java", "IconJava", 6),
         };
@@ -207,6 +217,11 @@ namespace Sexy
                 mAppIconChecks = new ThunderCheckbox[aCount];
                 for (int i = 0; i < aCount; i++)
                 {
+                    // Icons not offered here (the transparent ones on iOS) get no radio button.
+                    if (!APP_ICONS[i].IsOffered())
+                    {
+                        continue;
+                    }
                     mAppIconChecks[i] = SexyUtil.MakeRadioButton(PortOptions_AppIcon + i, this, SexyAppBase.Loc(APP_ICONS[i].mLabel), 0);
                     mAppIconChecks[i].mDrawScale = APP_ICON_CHECK_SCALE;
                     mAppIconChecks[i].mChecked = APP_ICONS[i].mAlias == aCurrent;
@@ -279,7 +294,7 @@ namespace Sexy
             {
                 foreach (ThunderCheckbox aCheck in mAppIconChecks)
                 {
-                    aCheck.SetVisible(thePage == PAGE_ICONS);
+                    aCheck?.SetVisible(thePage == PAGE_ICONS);
                 }
             }
             foreach (ThunderCheckbox aCheck in mMenuThemeChecks)
@@ -388,7 +403,10 @@ namespace Sexy
             int[] aStack = new int[APP_ICON_PICTURES];
             foreach (AppIcon anIcon in APP_ICONS)
             {
-                aStack[anIcon.mPicture]++;
+                if (anIcon.IsOffered())
+                {
+                    aStack[anIcon.mPicture]++;
+                }
             }
             int aRows = APP_ICON_ROWS.Length;
             int aButtonsH = 0;
@@ -422,7 +440,7 @@ namespace Sexy
                     aMost = Math.Max(aMost, aStack[aPicture]);
                     for (int i = 0; i < APP_ICONS.Length; i++)
                     {
-                        if (APP_ICONS[i].mPicture == aPicture)
+                        if (APP_ICONS[i].mPicture == aPicture && mAppIconChecks[i] != null)
                         {
                             int aY = y + anIconSize + 5 + aStacked[aPicture]++ * (theCheckH + 5);
                             mAppIconChecks[i].Resize(aSlotX + 3, aY, aButtonW - 6, theCheckH);
@@ -496,7 +514,10 @@ namespace Sexy
             {
                 for (int i = 0; i < mAppIconChecks.Length; i++)
                 {
-                    mAppIconChecks[i].mChecked = PortOptions_AppIcon + i == theId;
+                    if (mAppIconChecks[i] != null)
+                    {
+                        mAppIconChecks[i].mChecked = PortOptions_AppIcon + i == theId;
+                    }
                 }
                 // Only picked here: DONE applies it (closing the game, after a warning).
                 mAppIconPicked = APP_ICONS[theId - PortOptions_AppIcon].mAlias;
@@ -570,7 +591,8 @@ namespace Sexy
 
         /// <summary>
         /// The confirm dialog's OK: Android switches the launcher to the picked icon's alias (the adaptive icon),
-        /// which closes the game; the preview (SEXY_APP_ICONS) just closes the dialog as DONE does.
+        /// which closes the game. iOS (DONE, unconfirmed) switches it in place and the dialog closes as DONE does,
+        /// as does the preview (SEXY_APP_ICONS).
         /// </summary>
         public void ApplyAppIcon()
         {
@@ -578,7 +600,10 @@ namespace Sexy
             if (Main.SetAppIconHandler != null)
             {
                 Main.SetAppIconHandler(mAppIconPicked, GetAppIconAliases());
-                return;
+                if (Main.AppIconChangeQuits)
+                {
+                    return;
+                }
             }
             base.ButtonDepress(mDoneButton.mId);
         }
@@ -589,7 +614,10 @@ namespace Sexy
             mAppIconPicked = mAppIconCurrent;
             for (int i = 0; i < mAppIconChecks.Length; i++)
             {
-                mAppIconChecks[i].mChecked = APP_ICONS[i].mAlias == mAppIconCurrent;
+                if (mAppIconChecks[i] != null)
+                {
+                    mAppIconChecks[i].mChecked = APP_ICONS[i].mAlias == mAppIconCurrent;
+                }
             }
             MarkDirty();
         }
@@ -602,6 +630,12 @@ namespace Sexy
             }
             if (theId == mDoneButton.mId && mAppIconChecks != null && mAppIconPicked != mAppIconCurrent)
             {
+                if (Main.SetAppIconHandler != null && !Main.AppIconChangeQuits)
+                {
+                    // iOS: applied right away (iOS shows its own notice), closing the dialog.
+                    ApplyAppIcon();
+                    return;
+                }
                 // A new icon: warn that the game closes to change it (OK applies it, Cancel restores the selection).
                 mApp.DoConfirmAppIconDialog();
                 return;

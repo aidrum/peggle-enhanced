@@ -42,14 +42,23 @@ namespace Sexy
         public static Action<string> OpenUrlHandler;
 
         /// <summary>
-        /// Port addition (Android): switches the launcher icon to the alias named first (one of the second's,
+        /// Port addition (Android, iOS): switches the launcher icon to the alias named first (one of the second's,
         /// the app's icon aliases, which are all others disabled). Null where the platform can't. Android ends
         /// the app's task when its launcher alias changes, so the game quits (saving) to apply it.
         /// </summary>
         public static Action<string, string[]> SetAppIconHandler;
 
-        /// <summary>Port addition (Android): which of the given icon aliases the launcher shows.</summary>
+        /// <summary>Port addition (Android, iOS): which of the given icon aliases the launcher shows.</summary>
         public static Func<string[], string> GetAppIconHandler;
+
+        /// <summary>
+        /// Port addition: whether SetAppIconHandler closes the game (Android), so it's confirmed first. iOS
+        /// switches the icon in place and shows its own notice.
+        /// </summary>
+        public static bool AppIconChangeQuits = true;
+
+        /// <summary>Port addition: whether the transparent icons are offered (not on iOS, whose icons are opaque).</summary>
+        public static bool TransparentAppIcons = true;
 
         public static bool LOW_MEMORY_DEVICE { get; private set; }
 
