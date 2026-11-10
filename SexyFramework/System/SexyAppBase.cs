@@ -346,16 +346,28 @@ namespace Sexy
         {
             GlobalStaticVars.g.BeginFrame();
             mWidgetManager.DrawScreen();
-            // Port addition (controller): the pad's pointer, over everything.
-            GamePadCursor.Draw(this);
+            // Port addition (controller/keyboard): the menu selection's frame, over everything.
+            MenuNav.Draw(this);
             GlobalStaticVars.g.EndFrame();
         }
 
         /// <summary>
         /// Port addition (controller): the game's chance to take the pad this update (the board aims and fires
-        /// with it). False leaves it to the pointer (GamePadCursor). Back and B have already gone to BackButtonPress.
+        /// with it). False leaves it to the menus (MenuNav). Back and B have already gone to BackButtonPress.
         /// </summary>
         public virtual bool GamePadUpdate(GamePadState thePad, GamePadState thePrevPad)
+        {
+            return false;
+        }
+
+        /// <summary>Port addition (controller/keyboard): true while the menus take the pad and keys (MenuNav), not the game.</summary>
+        public virtual bool WantsMenuNav()
+        {
+            return true;
+        }
+
+        /// <summary>Port addition (controller): Start in the menus, when the screen on top has no use for it; false sends Enter.</summary>
+        public virtual bool NavStart()
         {
             return false;
         }

@@ -11,7 +11,7 @@ namespace Sexy
     /// replay files in userdata/replays with Edit (rename) and Delete buttons; Play loads the
     /// selected file into a (possibly new) Board and starts it in replay mode.
     /// </summary>
-    public class ReplayFileDialog : ThunderDialog, EditListener, DialogListener
+    public class ReplayFileDialog : ThunderDialog, EditListener, DialogListener, INavHandler
     {
         public const int DIALOG_DELETE_REPLAY = 29;
         public const int DIALOG_EDIT_REPLAY = 31;
@@ -331,6 +331,77 @@ namespace Sexy
                 aDialog.mDialogListener = this;
                 RepositionDialog(aDialog);
             }
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): Play is selected first.</summary>
+        NavTarget INavHandler.NavDefault()
+        {
+            return new NavTarget(mYesButton);
+        }
+
+        /// <summary>
+        /// Port addition (menu navigation): up and down pick the replay, left and right go round the buttons (Edit,
+        /// Delete, Play, Main Menu), and B or Start is Main Menu.
+        /// </summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            switch (theAction)
+            {
+                case NavAction.Up:
+                case NavAction.Down:
+                {
+                    int aCount = mThumbnails.mFiles.Count;
+                    if (aCount == 0)
+                    {
+                        return true;
+                    }
+                    int aRow = Math.Clamp(mThumbnails.mSelected + (theAction == NavAction.Up ? -1 : 1), 0, aCount - 1);
+                    if (aRow != mThumbnails.mSelected)
+                    {
+                        mApp.PlaySample(Res.SOUND_BUTTON1);
+                        mThumbnails.MouseUp(mThumbnails.mWidth / 2, aRow * (REPLAY_FILE_ROW_GAP_W + ReplayThumbnailsWidget.ROW_HEIGHT) + ReplayThumbnailsWidget.ROW_HEIGHT / 2, 1);
+                    }
+                    return true;
+                }
+                case NavAction.Left:
+                case NavAction.Right:
+                {
+                    List<NavTarget> aButtons = new List<NavTarget>();
+                    foreach (Widget aButton in new Widget[] { mEditButton, mDeleteButton, mYesButton, mNoButton })
+                    {
+                        if (MenuNav.IsTarget(aButton))
+                        {
+                            aButtons.Add(new NavTarget(aButton));
+                        }
+                    }
+                    if (aButtons.Count == 0)
+                    {
+                        return true;
+                    }
+                    // Reading order on the screen: upper left, upper right, bottom left, bottom right (then round again).
+                    aButtons.Sort((a, b) =>
+                    {
+                        TRect aRectA = MenuNav.GetRect(a);
+                        TRect aRectB = MenuNav.GetRect(b);
+                        if (Math.Abs(aRectA.mY - aRectB.mY) > aRectA.mHeight / 2)
+                        {
+                            return aRectA.mY.CompareTo(aRectB.mY);
+                        }
+                        return aRectA.mX.CompareTo(aRectB.mX);
+                    });
+                    int anIndex = aButtons.IndexOf(MenuNav.Selected);
+                    anIndex = anIndex < 0 ? 0 : (anIndex + (theAction == NavAction.Left ? aButtons.Count - 1 : 1)) % aButtons.Count;
+                    MenuNav.Select(aButtons[anIndex]);
+                    return true;
+                }
+                case NavAction.Back:
+                case NavAction.Start:
+                    MenuNav.Press(mNoButton);
+                    return true;
+            }
+            return false;
         }
     }
 

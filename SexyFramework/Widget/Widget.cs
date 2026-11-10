@@ -372,6 +372,27 @@ namespace Sexy
             return true;
         }
 
+        /// <summary>Port addition (menu navigation): true for widgets the pad and keyboard can select (MenuNav).</summary>
+        public virtual bool IsNavigable()
+        {
+            return false;
+        }
+
+        /// <summary>Port addition (menu navigation): true when the widget draws its own highlight (MenuNav.IsHighlighted).</summary>
+        public virtual bool DrawsNavHighlight => false;
+
+        /// <summary>Port addition (menu navigation): a direction while selected, kept by the widget (a slider's left/right) when true.</summary>
+        public virtual bool NavAdjust(NavAction theAction)
+        {
+            return false;
+        }
+
+        /// <summary>Port addition (menu navigation): A while selected; false makes it a click in its middle.</summary>
+        public virtual bool NavActivate()
+        {
+            return false;
+        }
+
         public virtual TRect WriteCenteredLine(Graphics g, int anOffset, string theLine)
         {
             Font font = g.GetFont();
@@ -736,6 +757,9 @@ namespace Sexy
         public bool mDoFinger;
 
         public bool mWantsFocus;
+
+        /// <summary>Port addition (menu navigation): the widget and all inside it are never selected (MenuNav).</summary>
+        public bool mNavIgnore;
 
         public Widget mTabPrev;
 

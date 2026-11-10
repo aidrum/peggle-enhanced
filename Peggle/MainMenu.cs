@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using static Sexy.Layout;
 
@@ -9,7 +10,7 @@ namespace Sexy
     /// The original's Store button (in-app purchases) is replaced by a QUIT button in the same spot;
     /// its "rate me" and update-available elements are online features and are not part of this port.
     /// </summary>
-    public class MainMenu : Widget, ButtonListener
+    public class MainMenu : Widget, ButtonListener, INavHandler
     {
         public const int MAINMENU_ADVENTURE = 0;
 
@@ -1088,6 +1089,198 @@ namespace Sexy
 
         public override void KeyChar(SexyChar theChar)
         {
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        private ThunderButton[] GetNavModeButtons()
+        {
+            return new[] { mAdventureButton, mQuickPlayButton, mChallengeButton, mDuelButton, mQuitButton };
+        }
+
+        /// <summary>Port addition (menu navigation): the orange buttons: Stats, Trophies, Replays and Options.</summary>
+        private List<NavTarget> GetNavCluster()
+        {
+            List<NavTarget> aList = new List<NavTarget>();
+            foreach (Widget aWidget in new Widget[] { mStatsButton, mTrophiesButton, mReplaysButton, mOptionsButton })
+            {
+                if (aWidget != null && MenuNav.IsTarget(aWidget))
+                {
+                    aList.Add(new NavTarget(aWidget));
+                }
+            }
+            return aList;
+        }
+
+        NavTarget INavHandler.NavDefault()
+        {
+            return new NavTarget(mAdventureButton);
+        }
+
+        /// <summary>
+        /// Port addition (menu navigation): the mode buttons (Adventure .. Quit) on the right; on the left, from the top,
+        /// Change User, More Games (when shown) and the orange buttons, which are moved round spatially. Left from a mode
+        /// button goes by its height: Adventure to Change User, Quick Play and Challenge to More Games, Duel and Quit to
+        /// the orange buttons (the next one down when one is missing). Right from the left side goes to the mode
+        /// button nearest in height.
+        /// </summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            NavTarget aSel = MenuNav.Selected;
+            if (aSel.IsNone)
+            {
+                return false;
+            }
+            ThunderButton[] aModes = GetNavModeButtons();
+            int aMode = System.Array.IndexOf(aModes, aSel.mWidget as ThunderButton);
+            bool isMore = aSel.mWidget == mMoreGamesButton;
+            bool isUser = aSel.mWidget == mChangeUserLink;
+            bool hasMore = MenuNav.IsTarget(mMoreGamesButton);
+            bool hasUser = mChangeUserLink != null && MenuNav.IsTarget(mChangeUserLink);
+            List<NavTarget> aCluster = GetNavCluster();
+            if (aMode >= 0)
+            {
+                switch (theAction)
+                {
+                    case NavAction.Up:
+                    case NavAction.Down:
+                    {
+                        int aStep = theAction == NavAction.Up ? -1 : 1;
+                        for (int i = aMode + aStep; i >= 0 && i < aModes.Length; i += aStep)
+                        {
+                            if (MenuNav.IsTarget(aModes[i]))
+                            {
+                                MenuNav.Select(aModes[i]);
+                                break;
+                            }
+                        }
+                        return true;
+                    }
+                    case NavAction.Left:
+                        if (aSel.mWidget == mAdventureButton && hasUser)
+                        {
+                            MenuNav.Select(mChangeUserLink);
+                        }
+                        else if ((aSel.mWidget == mAdventureButton || aSel.mWidget == mQuickPlayButton || aSel.mWidget == mChallengeButton) && hasMore)
+                        {
+                            MenuNav.Select(mMoreGamesButton);
+                        }
+                        else
+                        {
+                            MenuNav.Select(GetNavEntry(aSel, NavAction.Left, aCluster));
+                        }
+                        return true;
+                    case NavAction.Right:
+                        return true;
+                }
+                return false;
+            }
+            switch (theAction)
+            {
+                case NavAction.Up:
+                    if (isUser)
+                    {
+                        return true;
+                    }
+                    if (!isMore)
+                    {
+                        NavTarget anUp = MenuNav.FindInDirection(aSel, theAction, aCluster);
+                        if (!anUp.IsNone)
+                        {
+                            MenuNav.Select(anUp);
+                            return true;
+                        }
+                        if (hasMore)
+                        {
+                            MenuNav.Select(mMoreGamesButton);
+                            return true;
+                        }
+                    }
+                    if (hasUser)
+                    {
+                        MenuNav.Select(mChangeUserLink);
+                    }
+                    return true;
+                case NavAction.Down:
+                    if (isUser && hasMore)
+                    {
+                        MenuNav.Select(mMoreGamesButton);
+                    }
+                    else if (isUser || isMore)
+                    {
+                        MenuNav.Select(GetNavEntry(aSel, NavAction.Down, aCluster));
+                    }
+                    else
+                    {
+                        MenuNav.Select(MenuNav.FindInDirection(aSel, theAction, aCluster));
+                    }
+                    return true;
+                case NavAction.Left:
+                    if (isMore)
+                    {
+                        MenuNav.Select(GetNavEntry(aSel, NavAction.Left, aCluster));
+                    }
+                    else if (!isUser)
+                    {
+                        MenuNav.Select(MenuNav.FindInDirection(aSel, theAction, aCluster));
+                    }
+                    return true;
+                case NavAction.Right:
+                {
+                    NavTarget aNext = isUser || isMore ? NavTarget.None : MenuNav.FindInDirection(aSel, theAction, aCluster);
+                    MenuNav.Select(aNext.IsNone ? GetNavModeAtHeight(aSel) : aNext);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>Port addition (menu navigation): the mode button nearest theFrom in height.</summary>
+        private NavTarget GetNavModeAtHeight(NavTarget theFrom)
+        {
+            TRect aFrom = MenuNav.GetRect(theFrom);
+            float aFromY = aFrom.mY + aFrom.mHeight / 2f;
+            NavTarget aBest = NavTarget.None;
+            float aBestDist = float.MaxValue;
+            foreach (ThunderButton aButton in GetNavModeButtons())
+            {
+                if (!MenuNav.IsTarget(aButton))
+                {
+                    continue;
+                }
+                float aDist = System.Math.Abs(aButton.GetAbsPos().y + aButton.mHeight / 2f - aFromY);
+                if (aDist < aBestDist)
+                {
+                    aBestDist = aDist;
+                    aBest = new NavTarget(aButton);
+                }
+            }
+            return aBest;
+        }
+
+        /// <summary>Port addition (menu navigation): the orange button in theDir from theFrom, else the nearest one.</summary>
+        private static NavTarget GetNavEntry(NavTarget theFrom, NavAction theDir, List<NavTarget> theCluster)
+        {
+            NavTarget aTarget = MenuNav.FindInDirection(theFrom, theDir, theCluster);
+            if (!aTarget.IsNone)
+            {
+                return aTarget;
+            }
+            TRect aFrom = MenuNav.GetRect(theFrom);
+            float aBestDist = float.MaxValue;
+            foreach (NavTarget aCandidate in theCluster)
+            {
+                TRect aRect = MenuNav.GetRect(aCandidate);
+                float dx = aRect.mX + aRect.mWidth / 2f - (aFrom.mX + aFrom.mWidth / 2f);
+                float dy = aRect.mY + aRect.mHeight / 2f - (aFrom.mY + aFrom.mHeight / 2f);
+                float aDist = dx * dx + dy * dy;
+                if (aDist < aBestDist)
+                {
+                    aBestDist = aDist;
+                    aTarget = aCandidate;
+                }
+            }
+            return aTarget;
         }
     }
 }

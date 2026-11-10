@@ -7,7 +7,7 @@ namespace Sexy
     /// The How to Play screen (Sexy::HelpScreen, id 42): a full-screen dialog with a page title,
     /// the scrolling HelpWidget, Previous/Next arrow buttons and OK.
     /// </summary>
-    public class HelpScreen : ThunderDialog
+    public class HelpScreen : ThunderDialog, INavHandler
     {
         public ThunderballApp mApp;                               // 0x128
 
@@ -150,6 +150,23 @@ namespace Sexy
             {
                 mApp.EndHelpScreen();
             }
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): LB/RB (Q/E) are Previous and Next.</summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            if (theAction == NavAction.PageLeft || theAction == NavAction.PageRight)
+            {
+                ThunderButton aButton = theAction == NavAction.PageLeft ? mPrevButton : mNextButton;
+                if (MenuNav.IsTarget(aButton))
+                {
+                    MenuNav.Activate(aButton);
+                }
+                return true;
+            }
+            return false;
         }
     }
 

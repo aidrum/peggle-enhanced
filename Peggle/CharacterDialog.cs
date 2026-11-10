@@ -11,7 +11,7 @@ namespace Sexy
     /// asks friend/computer and difficulty, then player one, then player two. Holding the dialog
     /// fades it out so the board can be seen behind it.
     /// </summary>
-    public class CharacterDialog : ThunderDialog, CheckboxListener
+    public class CharacterDialog : ThunderDialog, CheckboxListener, INavHandler
     {
         public const int CHARACTER_RANDOM = 0xb;
 
@@ -101,6 +101,9 @@ namespace Sexy
                 mNextButton.SetVisible(true);
                 mDoneButton.SetVisible(false);
             }
+            // Port addition (menu navigation): A on a character or option presses these, so they are never selected.
+            mNextButton.mNavIgnore = true;
+            mDoneButton.mNavIgnore = true;
             AddWidget(mNextButton);
             AddWidget(mDoneButton);
             mWidth = SCREEN_WIDTH;
@@ -125,6 +128,8 @@ namespace Sexy
                     mCharButtons[anIndex] = aButton;
                     aButton.Resize(x, y, aCel.mWidth, aCel.mHeight);
                     aButton.SetDraw(false);
+                    // Port addition (menu navigation): the picked character's own border shows the selection.
+                    aButton.mNavNoHighlight = true;
                     if (anIndex < 0xb && mPlayerInfo != null && !mPlayerInfo.CheckCharacterUnlocked(anIndex))
                     {
                         aButton.SetDisabled(true);
@@ -732,6 +737,62 @@ namespace Sexy
                     }
                 }
             }
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): the character picked now is selected first.</summary>
+        NavTarget INavHandler.NavDefault()
+        {
+            int aChar = mSelCharacters[mSelIdx];
+            if (aChar >= 0 && aChar < mCharButtons.Length && mCharButtons[aChar] != null && MenuNav.IsTarget(mCharButtons[aChar]))
+            {
+                return new NavTarget(mCharButtons[aChar]);
+            }
+            // The duel options page: the option already checked (selecting one checks it).
+            foreach (ThunderCheckbox aCheck in new[] { mComputerCheck, mFriendCheck })
+            {
+                if (aCheck.mChecked && MenuNav.IsTarget(aCheck))
+                {
+                    return new NavTarget(aCheck);
+                }
+            }
+            return NavTarget.None;
+        }
+
+        /// <summary>Port addition (menu navigation): the character button selected, or -1.</summary>
+        private int GetNavCharacter()
+        {
+            Widget aSel = MenuNav.Selected.mWidget;
+            return aSel == null ? -1 : System.Array.IndexOf(mCharButtons, aSel as ThunderButton);
+        }
+
+        /// <summary>
+        /// Port addition (menu navigation): highlighting a character picks it, as a click on it does; highlighting one of
+        /// the duel options (Play a Friend / Play Computer, the difficulty) checks it.
+        /// </summary>
+        void INavHandler.NavSelectionChanged()
+        {
+            int aChar = GetNavCharacter();
+            if (aChar >= 0 && mSelCharacters[mSelIdx] != aChar)
+            {
+                ButtonPress(aChar, 1);
+            }
+            else if (MenuNav.Selected.mWidget is ThunderCheckbox aCheck && !aCheck.mChecked && MenuNav.IsInside(aCheck, this))
+            {
+                MenuNav.Activate(aCheck);
+            }
+        }
+
+        /// <summary>Port addition (menu navigation): A is DONE (NEXT when choosing the duel opponent comes next).</summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            if (theAction == NavAction.Confirm)
+            {
+                MenuNav.Press(mDoneButton.mVisible ? mDoneButton : mNextButton);
+                return true;
+            }
+            return false;
         }
     }
 }

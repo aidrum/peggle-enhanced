@@ -20,6 +20,12 @@ namespace Sexy
             MarkDirty();
         }
 
+        /// <summary>Port addition (menu navigation).</summary>
+        public override bool IsNavigable()
+        {
+            return !mDisabled;
+        }
+
         public virtual bool IsChecked()
         {
             return mChecked;

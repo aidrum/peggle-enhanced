@@ -7,7 +7,7 @@ namespace Sexy
     /// Demo, Colorblind/Left Handed and a Credits link; opened from the board it becomes the pause
     /// "MENU" with Main Menu and Restart/Next Level (or Restart/New Challenge) buttons.
     /// </summary>
-    public class OptionsDialog : ThunderDialog, SliderListener, CheckboxListener
+    public class OptionsDialog : ThunderDialog, SliderListener, CheckboxListener, INavHandler
     {
         public const int OptionsDialog_MusicSlider = 0;
 
@@ -530,6 +530,30 @@ namespace Sexy
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Port addition (menu navigation): B (Escape) is DONE; Start is too in the pause menu (opened from the board),
+        /// whatever is selected, so Start both pauses and unpauses.
+        /// </summary>
+        /// <summary>Port addition (menu navigation): the pause menu opens on MAIN MENU; the main-menu Options on its first control.</summary>
+        NavTarget INavHandler.NavDefault()
+        {
+            return mFromBoard ? new NavTarget(mMainMenuButton) : NavTarget.None;
+        }
+
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            if (theAction == NavAction.Back || (theAction == NavAction.Start && mFromBoard))
+            {
+                if (mScrollingOff)
+                {
+                    return true;
+                }
+                ((ThunderballApp)GlobalStaticVars.gSexyAppBase).FinishOptionsDialog(true, true);
+                return true;
+            }
+            return false;
         }
     }
 }

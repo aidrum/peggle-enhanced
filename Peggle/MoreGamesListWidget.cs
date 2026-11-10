@@ -6,7 +6,7 @@ namespace Sexy
     /// The More Games list (Sexy::MoreGamesListWidget): one banner image per game, stacked 2px apart and
     /// centred; tapping a banner opens its link.
     /// </summary>
-    public class MoreGamesListWidget : Widget
+    public class MoreGamesListWidget : Widget, INavCells
     {
         public class GameInfo
         {
@@ -77,6 +77,37 @@ namespace Sexy
         public void AddRow(Image theImage, string theLink)
         {
             mGames.Add(new GameInfo { mImage = theImage, mLink = theLink });
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): each game banner.</summary>
+        public int GetNavCellCount()
+        {
+            return mGames.Count;
+        }
+
+        public TRect GetNavCellRect(int theCell)
+        {
+            int y = 0;
+            for (int i = 0; i < theCell; i++)
+            {
+                y += mGames[i].mImage.mHeight + 2;
+            }
+            Image anImage = mGames[theCell].mImage;
+            return new TRect(mWidth / 2 - anImage.mWidth / 2, y, anImage.mWidth, anImage.mHeight);
+        }
+
+        /// <summary>A on a banner: a click on it.</summary>
+        public void NavCellActivate(int theCell)
+        {
+            TRect aRect = GetNavCellRect(theCell);
+            MouseUp(aRect.mX + aRect.mWidth / 2, aRect.mY + aRect.mHeight / 2, 1);
+        }
+
+        public override bool IsNavigable()
+        {
+            return true;
         }
     }
 }

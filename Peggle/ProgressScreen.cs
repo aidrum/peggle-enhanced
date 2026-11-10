@@ -10,7 +10,7 @@ namespace Sexy
     /// masters revealed so far, the four Nights trophies, idle speech bubbles, and the spotlight
     /// sequences that reveal a newly beaten master or a newly won trophy.
     /// </summary>
-    public class ProgressScreen : Widget, ButtonListener
+    public class ProgressScreen : Widget, ButtonListener, INavHandler
     {
 #if PEGGLE_IPHONE
         // The iPhone's GetPortraitSpeechInfo offsets (literals there).
@@ -1476,6 +1476,22 @@ namespace Sexy
 
         public override void KeyChar(SexyChar theChar)
         {
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): B is the OK link, once it is shown.</summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            if (theAction == NavAction.Back)
+            {
+                if (MenuNav.IsTarget(mOkLink))
+                {
+                    MenuNav.Activate(mOkLink);
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

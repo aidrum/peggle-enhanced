@@ -9,7 +9,7 @@ namespace Sexy
     /// inside a ThunderScrollWidget), with a fixed item height and the selected/hilited row drawn
     /// over a tinted IMAGE_DLG_GROUPRECT box. Linked lists (mParentList/mChild) share rows as columns.
     /// </summary>
-    public class ThunderListWidget : Widget
+    public class ThunderListWidget : Widget, INavCells
     {
         public const int COLOR_BKG = 0;
 
@@ -443,6 +443,39 @@ namespace Sexy
                 list.mSelectIdx = theSelectIdx;
                 list.MarkDirty();
             }
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): each line in view.</summary>
+        public int GetNavCellCount()
+        {
+            return mLines.Count;
+        }
+
+        public TRect GetNavCellRect(int theCell)
+        {
+            int y = 4 + (int)((theCell - mPosition) * GetItemHeight());
+            if (y < 0 || y + GetItemHeight() > mHeight + 4)
+            {
+                return default(TRect);
+            }
+            return new TRect(0, y, mWidth, GetItemHeight());
+        }
+
+        /// <summary>A on a line: a click on it (picks the profile, or Create New User).</summary>
+        public void NavCellActivate(int theCell)
+        {
+            TRect aRect = GetNavCellRect(theCell);
+            if (aRect.mHeight > 0)
+            {
+                MouseDown(aRect.mX + aRect.mWidth / 2, aRect.mY + aRect.mHeight / 2, 1);
+            }
+        }
+
+        public override bool IsNavigable()
+        {
+            return true;
         }
     }
 }

@@ -2782,6 +2782,11 @@ namespace Sexy
         /// </summary>
         public override bool BackButtonPress()
         {
+            // Port addition (controller/keyboard): the screen's or dialog's own back action (B, Back, Escape).
+            if (MenuNav.Back(this))
+            {
+                return true;
+            }
             if (base.BackButtonPress() || mDialogMap.Count > 0)
             {
                 return true;
@@ -2805,8 +2810,17 @@ namespace Sexy
         }
 
         /// <summary>
+        /// Port addition (controller/keyboard): the menus take the pad and keys except during play (the board up with
+        /// no dialog over it and none of its own up; Board.WantsPad).
+        /// </summary>
+        public override bool WantsMenuNav()
+        {
+            return !(mBoard != null && mBoard.mWidgetManager != null && mDialogMap.Count == 0 && mBoard.WantsPad());
+        }
+
+        /// <summary>
         /// Port addition (controller): play takes the pad while the board is up with no dialog over it
-        /// (Board.GamePadUpdate); elsewhere the pad moves the pointer.
+        /// (Board.GamePadUpdate); elsewhere the pad works the menus (MenuNav).
         /// </summary>
         public override bool GamePadUpdate(Microsoft.Xna.Framework.Input.GamePadState thePad, Microsoft.Xna.Framework.Input.GamePadState thePrevPad)
         {

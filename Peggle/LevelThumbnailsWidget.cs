@@ -18,7 +18,7 @@ namespace Sexy
     /// WoW share theirs, like Peggle and Nights. The web demo levels (StageMgr.GetPeggleRowsPage) are
     /// rows under Peggle's stages on the Peggle page.
     /// </summary>
-    public class LevelThumbnailsWidget : Widget
+    public class LevelThumbnailsWidget : Widget, INavCells
     {
         public class LevelDisplayInfo
         {
@@ -775,6 +775,188 @@ namespace Sexy
                     aParent.mWidth, ROW_HEIGHT), true);
             }
             mListener.SelectionChanged();
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): one thumbnail, or a page's Random Level row (row 0).</summary>
+        public struct NavCell
+        {
+            public int mIndex;
+
+            public int mPage;
+
+            public int mRow;
+
+            public int mCol;
+
+            public TRect mRect;
+
+            /// <summary>Where A clicks, when not mRect (the Random Level row).</summary>
+            public TRect? mClickRect;
+        }
+
+        /// <summary>Port addition (menu navigation): only this page's cells can be selected (-1 for all pages).</summary>
+        public int mNavOnlyPage = -1;
+
+        private readonly List<NavCell> mNavCells = new List<NavCell>();
+
+        public int GetNumNavPages()
+        {
+            return 2 + (mShowPeggleRows ? StageMgr.GetNumBonusPages() : 0);
+        }
+
+        /// <summary>Port addition (menu navigation): the x of a page's first thumbnail, in the widget.</summary>
+        private int GetNavThumbX(int thePage)
+        {
+            if (thePage == 0)
+            {
+                return LEVEL_SCREEN_STAGE_THUMB_INSET;
+            }
+            return GetPageThumbX(thePage);
+        }
+
+        /// <summary>Port addition (menu navigation): the stages shown on a page, top to bottom.</summary>
+        public List<int> GetNavPageStages(int thePage)
+        {
+            List<int> aStages = new List<int>();
+            if (thePage == 0)
+            {
+                for (int i = 0; i < NUM_STAGES_PEGGLE; i++)
+                {
+                    aStages.Add(i);
+                }
+                BonusPage aRows = GetPeggleRows();
+                if (aRows != null)
+                {
+                    for (int i = 0; i < aRows.mNumStages; i++)
+                    {
+                        aStages.Add(aRows.mFirstStage + i);
+                    }
+                }
+            }
+            else if (thePage == 1)
+            {
+                for (int i = 0; i < NUM_STAGES_NIGHTS; i++)
+                {
+                    aStages.Add(NUM_STAGES_PEGGLE + i);
+                }
+            }
+            else if (thePage - 2 < StageMgr.GetNumBonusPages())
+            {
+                BonusPage aPage = StageMgr.GetBonusPageAt(thePage - 2);
+                for (int i = 0; i < aPage.mNumStages; i++)
+                {
+                    aStages.Add(aPage.mFirstStage + i);
+                }
+            }
+            return aStages;
+        }
+
+        private void BuildNavCells()
+        {
+            mNavCells.Clear();
+            if (mParent == null)
+            {
+                return;
+            }
+            int aStep = LEVEL_SCREEN_STAGE_THUMB_W + LEVEL_SCREEN_STAGE_THUMB_GAP;
+            int aRowStep = LEVEL_SCREEN_STAGE_ROW_GAP + ROW_HEIGHT;
+            for (int aPage = 0; aPage < GetNumNavPages(); aPage++)
+            {
+                if (mNavOnlyPage >= 0 && aPage != mNavOnlyPage)
+                {
+                    continue;
+                }
+                int aX = GetNavThumbX(aPage);
+                // The highlight hugs the RANDOM LEVEL text (centred in the view, as Draw puts it); A still clicks the
+                // row where its thumbnails are, which is where MouseUp looks.
+                Font aRandomFont = Res.FONT_OVERLOAD16OUTLINE;
+                int aTextW = aRandomFont.StringWidth(SexyAppBase.Loc("RANDOM LEVEL"));
+                int aTextH = aRandomFont.GetHeight();
+                int aPad = LEVEL_SCREEN_STAGE_THUMB_GAP;
+                mNavCells.Add(new NavCell
+                {
+                    mIndex = GetRandomLevelIndex(), mPage = aPage, mRow = 0, mCol = 2,
+                    mRect = new TRect(GetPageX(aPage) + ((Widget)mParent).mWidth / 2 - aTextW / 2 - aPad,
+                        System.Math.Max(0, ROW_HEIGHT / 2 - aTextH / 2 - aPad / 2), aTextW + aPad * 2,
+                        System.Math.Min(ROW_HEIGHT, aTextH + aPad)),
+                    mClickRect = new TRect(aX, 0, aStep * 5 - LEVEL_SCREEN_STAGE_THUMB_GAP, ROW_HEIGHT)
+                });
+                List<int> aStages = GetNavPageStages(aPage);
+                for (int aRow = 0; aRow < aStages.Count; aRow++)
+                {
+                    int aStage = aStages[aRow];
+                    for (int aCol = 0; aCol < 5; aCol++)
+                    {
+                        int anIndex = aStage * 5 + aCol;
+                        if (anIndex >= mLevels.Count ||
+                            (StageMgr.IsBonusStage(aStage) && mApp.mStageMgr.GetStageInfo(aStage)?.GetLevelInfo(aCol) == null))
+                        {
+                            continue;
+                        }
+                        mNavCells.Add(new NavCell
+                        {
+                            mIndex = anIndex, mPage = aPage, mRow = aRow + 1, mCol = aCol,
+                            mRect = new TRect(aX + aCol * aStep, (aRow + 1) * aRowStep + 1, LEVEL_SCREEN_STAGE_THUMB_W, LEVEL_SCREEN_STAGE_THUMB_H)
+                        });
+                    }
+                }
+            }
+        }
+
+        public NavCell GetNavCell(int theCell)
+        {
+            return mNavCells[theCell];
+        }
+
+        /// <summary>Port addition (menu navigation): the cell on a page nearest a row and column, or -1.</summary>
+        public int FindNavCell(int thePage, int theRow, int theCol)
+        {
+            int aBest = -1;
+            int aBestScore = int.MaxValue;
+            for (int i = 0; i < mNavCells.Count; i++)
+            {
+                NavCell aCell = mNavCells[i];
+                if (aCell.mPage != thePage)
+                {
+                    continue;
+                }
+                int aScore = System.Math.Abs(aCell.mRow - theRow) * 10 + System.Math.Abs(aCell.mCol - theCol);
+                if (aScore < aBestScore)
+                {
+                    aBestScore = aScore;
+                    aBest = i;
+                }
+            }
+            return aBest;
+        }
+
+        public int GetNavCellCount()
+        {
+            BuildNavCells();
+            return mNavCells.Count;
+        }
+
+        public TRect GetNavCellRect(int theCell)
+        {
+            return theCell >= 0 && theCell < mNavCells.Count ? mNavCells[theCell].mRect : default(TRect);
+        }
+
+        /// <summary>A on a thumbnail or the Random Level row: a click on it.</summary>
+        public void NavCellActivate(int theCell)
+        {
+            if (theCell < 0 || theCell >= mNavCells.Count)
+            {
+                return;
+            }
+            TRect aRect = mNavCells[theCell].mClickRect ?? mNavCells[theCell].mRect;
+            MouseUp(aRect.mX + aRect.mWidth / 2, aRect.mY + aRect.mHeight / 2, 1);
+        }
+
+        public override bool IsNavigable()
+        {
+            return true;
         }
     }
 }

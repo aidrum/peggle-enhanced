@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using static Sexy.Layout;
 
 namespace Sexy
@@ -10,7 +11,7 @@ namespace Sexy
     /// Port addition: in Quick Play further pages hold the bonus levels (Nights bonus, Extreme), and the two jump
     /// buttons are GameArrowButtons showing the logo of the page they go to.
     /// </summary>
-    public class LevelScreen : ThunderDialog, ThumbnailDialogListener, LevelThumbnailsWidgetListener
+    public class LevelScreen : ThunderDialog, ThumbnailDialogListener, LevelThumbnailsWidgetListener, INavHandler
     {
         public ThunderballApp mApp;                               // 0x130
 
@@ -54,6 +55,10 @@ namespace Sexy
             AddWidget(mScrollWidget);
             mLeftButton = new GameArrowButton(GameArrowButton.ARROW_LEFT, 0, this);
             mRightButton = new GameArrowButton(GameArrowButton.ARROW_RIGHT, 1, this);
+            // Port addition (menu navigation): the arrows are for clicks and taps; the pad and keys turn pages by
+            // going past a page's edge, or with LB/RB (Q/E).
+            mLeftButton.mNavIgnore = true;
+            mRightButton.mNavIgnore = true;
             mPage = 0;
             mShowArrows = !newGame;
             if (!newGame)
@@ -155,6 +160,8 @@ namespace Sexy
             {
                 mRightButton.mLogo = GetPageLogo(mPage + 1);
             }
+            // Port addition (menu navigation): without the arrows the page can't change.
+            mThumbnails.mNavOnlyPage = mShowArrows ? -1 : mPage;
         }
 
         /// <summary>Port addition: scrolls to a page (the original's buttons 0 and 1 did this for Peggle and Nights).</summary>
@@ -340,6 +347,101 @@ namespace Sexy
             {
                 FinishBuyFullGameDialog(false);
             }
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): the thumbnail last chosen on this page, else its first.</summary>
+        NavTarget INavHandler.NavDefault()
+        {
+            int aCount = mThumbnails.GetNavCellCount();
+            for (int i = 0; i < aCount; i++)
+            {
+                LevelThumbnailsWidget.NavCell aCell = mThumbnails.GetNavCell(i);
+                if (aCell.mPage == mPage && aCell.mIndex == mThumbnails.mSelected && aCell.mRow > 0)
+                {
+                    return new NavTarget(mThumbnails, i);
+                }
+            }
+            int aFirst = mThumbnails.FindNavCell(mPage, 1, 0);
+            return aFirst >= 0 ? new NavTarget(mThumbnails, aFirst) : NavTarget.None;
+        }
+
+        /// <summary>Port addition (menu navigation): a thumbnail on another page turns to it; the page is kept in view.</summary>
+        void INavHandler.NavSelectionChanged()
+        {
+            NavTarget aSel = MenuNav.Selected;
+            if (aSel.mWidget != mThumbnails || aSel.mCell < 0)
+            {
+                return;
+            }
+            LevelThumbnailsWidget.NavCell aCell = mThumbnails.GetNavCell(aSel.mCell);
+            if (aCell.mPage != mPage)
+            {
+                mPage = aCell.mPage;
+                UpdateArrows();
+            }
+            mScrollWidget.ScrollRectIntoView(new TRect(mThumbnails.GetPageX(mPage), aCell.mRect.mY, mScrollWidget.mWidth, aCell.mRect.mHeight), true);
+        }
+
+        /// <summary>
+        /// Port addition (menu navigation): the thumbnails are moved round spatially, so going past the edge of a page
+        /// goes on to the next or previous one; LB/RB (Q/E) turn a page keeping the row and column; B is Main Menu.
+        /// </summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            NavTarget aSel = MenuNav.Selected;
+            bool onCell = aSel.mWidget == mThumbnails && aSel.mCell >= 0;
+            switch (theAction)
+            {
+                case NavAction.Back:
+                    MenuNav.Press(mYesButton);
+                    return true;
+                case NavAction.PageLeft:
+                case NavAction.PageRight:
+                {
+                    if (!mShowArrows)
+                    {
+                        return true;
+                    }
+                    int aPage = mPage + (theAction == NavAction.PageLeft ? -1 : 1);
+                    if (aPage < 0 || aPage >= GetNumPages())
+                    {
+                        return true;
+                    }
+                    if (onCell)
+                    {
+                        LevelThumbnailsWidget.NavCell aCell = mThumbnails.GetNavCell(aSel.mCell);
+                        int aNew = mThumbnails.FindNavCell(aPage, aCell.mRow, aCell.mCol);
+                        if (aNew >= 0)
+                        {
+                            MenuNav.Select(new NavTarget(mThumbnails, aNew));
+                            return true;
+                        }
+                    }
+                    ShowPage(aPage);
+                    return true;
+                }
+                case NavAction.Up:
+                case NavAction.Down:
+                case NavAction.Left:
+                case NavAction.Right:
+                {
+                    if (aSel.IsNone)
+                    {
+                        return false;
+                    }
+                    // From a button, only the thumbnails of the page in view.
+                    List<NavTarget> aTargets = MenuNav.GetTargets(this);
+                    if (!onCell)
+                    {
+                        aTargets.RemoveAll(t => t.mWidget == mThumbnails && mThumbnails.GetNavCell(t.mCell).mPage != mPage);
+                    }
+                    MenuNav.Select(MenuNav.FindInDirection(aSel, theAction, aTargets));
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

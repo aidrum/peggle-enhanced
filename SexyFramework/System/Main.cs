@@ -294,6 +294,8 @@ namespace Sexy
             {
                 HandleGamePad(GlobalStaticVars.gSexyAppBase, aPad, gameTime);
             }
+            // Port addition: held menu directions repeat, and the selection follows the screen on top.
+            MenuNav.Update(GlobalStaticVars.gSexyAppBase, gameTime.ElapsedGameTime.TotalSeconds);
             long aStart = System.Diagnostics.Stopwatch.GetTimestamp();
             GlobalStaticVars.gSexyAppBase.UpdateApp();
             mPerfUpdateTicks += System.Diagnostics.Stopwatch.GetTimestamp() - aStart;
@@ -344,8 +346,16 @@ namespace Sexy
             int my = (int)mouse.y;
             if (previousMouseState.Position != msstate.Position)
             {
-                GamePadCursor.Hide(app);
+                MenuNav.Cancel();
                 app.mWidgetManager.MouseMove(mx, my);
+            }
+            // Port addition: any click or wheel turn hides the menu selection too.
+            if ((msstate.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released) ||
+                (msstate.RightButton == ButtonState.Pressed && previousMouseState.RightButton == ButtonState.Released) ||
+                (msstate.MiddleButton == ButtonState.Pressed && previousMouseState.MiddleButton == ButtonState.Released) ||
+                msstate.ScrollWheelValue != previousMouseState.ScrollWheelValue)
+            {
+                MenuNav.Cancel();
             }
             if (msstate.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released)
             {
@@ -412,7 +422,7 @@ namespace Sexy
                 touch.tapCount = mTouchTapCount;
                 if (touchLocation.State == TouchLocationState.Pressed && !began)
                 {
-                    GamePadCursor.Hide(app);
+                    MenuNav.Cancel();
                     app.TouchBegan(touch);
                     began = true;
                 }
@@ -436,9 +446,11 @@ namespace Sexy
             {
                 ToggleFullscreen();
             }
+            // Port addition: the menus take the arrows/WASD, Space/Z/Enter and Q/E (MenuNav) unless text is typed.
+            MenuNav.UpdateKeys(app, keys);
             foreach (Keys k in keys.GetPressedKeys())
             {
-                if (previousKeyboardState.IsKeyUp(k) && !(aAltEnter && k == Keys.Enter))
+                if (previousKeyboardState.IsKeyUp(k) && !(aAltEnter && k == Keys.Enter) && !MenuNav.KeyDown(app, k))
                 {
                     app.mWidgetManager.KeyDown((KeyCode)k);
                 }
@@ -458,7 +470,7 @@ namespace Sexy
 
         /// <summary>
         /// Port addition (controller): Back and B go back (Android's back button); then the game takes the pad if it
-        /// wants it (the board), or else it moves the pointer (GamePadCursor).
+        /// wants it (the board), or else it works the menus (MenuNav).
         /// </summary>
         private void HandleGamePad(SexyAppBase theApp, GamePadState thePad, GameTime theTime)
         {
@@ -469,11 +481,11 @@ namespace Sexy
             }
             if (theApp.GamePadUpdate(thePad, previousGamepadState))
             {
-                GamePadCursor.Hide(theApp);
+                MenuNav.PadTaken(thePad);
             }
             else
             {
-                GamePadCursor.Update(theApp, thePad, previousGamepadState, theTime.ElapsedGameTime.TotalSeconds, theTime.TotalGameTime.TotalSeconds);
+                MenuNav.UpdatePad(theApp, thePad, previousGamepadState);
             }
             previousGamepadState = thePad;
         }

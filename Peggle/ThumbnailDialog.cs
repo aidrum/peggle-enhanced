@@ -16,7 +16,7 @@ namespace Sexy
     /// Details popup that flips open out of a thumbnail (Sexy::ThumbnailDialog): a framed picture
     /// with a caption, a content area for subclasses, and PLAY / BACK buttons.
     /// </summary>
-    public class ThumbnailDialog : ThunderDialog
+    public class ThumbnailDialog : ThunderDialog, INavHandler
     {
         public ThumbnailDialogListener mListener;                 // 0x128
 
@@ -255,6 +255,25 @@ namespace Sexy
             mListener.GetThumbnailInfo(out Image anImage, out TRect aRect);
             GetPicture();
             mFlipper.StartFlip(anImage, aRect, mPicture, mPictureRect, ImageFlipper.FLIP_FORWARD, 0x19);
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): PLAY is selected first.</summary>
+        NavTarget INavHandler.NavDefault()
+        {
+            return new NavTarget(mPlayButton);
+        }
+
+        /// <summary>Port addition (menu navigation): B is BACK (once the buttons are up).</summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            if (theAction == NavAction.Back)
+            {
+                MenuNav.Press(mBackButton);
+                return true;
+            }
+            return false;
         }
     }
 }

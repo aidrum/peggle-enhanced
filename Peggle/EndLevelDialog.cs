@@ -26,7 +26,7 @@ namespace Sexy
     /// high score table, and the follow-up buttons. The Nights trial / store branches are stripped
     /// (the full game is always owned in this port).
     /// </summary>
-    public class EndLevelDialog : ThunderDialog
+    public class EndLevelDialog : ThunderDialog, INavHandler
     {
         public const int MODE_LEVEL_COMPLETE = 0;
 
@@ -1504,6 +1504,23 @@ namespace Sexy
         public override void MouseDown(int x, int y, int theClickCount)
         {
             base.MouseDown(x, y, theClickCount);
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>
+        /// Port addition (menu navigation): B does nothing here (the No button is Continue / Next Level, not a way back);
+        /// the buttons are chosen with A.
+        /// </summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            return theAction == NavAction.Back;
+        }
+
+        /// <summary>Port addition (menu navigation): the No button (Continue, Next Level, Retry...) is selected first.</summary>
+        NavTarget INavHandler.NavDefault()
+        {
+            return new NavTarget(mNoButton);
         }
     }
 }

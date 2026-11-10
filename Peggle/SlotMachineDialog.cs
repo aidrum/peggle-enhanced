@@ -8,7 +8,7 @@ namespace Sexy
     /// score, wizard hat, random power-up, extra ball) and slows to a stop while a ring of 40 rim
     /// lights chases it; the winning sector blinks, then the result goes to LogicMgr.
     /// </summary>
-    public class SlotMachineDialog : ThunderDialog
+    public class SlotMachineDialog : ThunderDialog, INavHandler
     {
 #if PEGGLE_IPHONE
         // The iPhone's light positions (480x320 units, scaled by mLayoutScaleFactor).
@@ -357,6 +357,19 @@ namespace Sexy
                 }
                 CalcCurLight();
             }
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): A is a tap on the spinner (skips the spin, or unpauses).</summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            if (theAction == NavAction.Confirm)
+            {
+                MouseDown(0, 0, 1);
+                return true;
+            }
+            return false;
         }
     }
 }

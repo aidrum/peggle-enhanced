@@ -9,7 +9,7 @@ namespace Sexy
     /// a blurb and a scrolling list of game banners read from net_content/more_games.xml,
     /// plus a BACK button.
     /// </summary>
-    public class MoreGamesScreen : ThunderDialog
+    public class MoreGamesScreen : ThunderDialog, INavHandler
     {
         public ThunderballApp mApp;                               // 0x128
 
@@ -167,6 +167,19 @@ namespace Sexy
             g.SetColor(SexyUtil.MakeColor(0, 0x7f));
             SexyUtil.MyDrawImageBox(g, aRect, Res.IMAGE_DLG_TEXTRECT);
             g.SetColorizeImages(false);
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): B is the back button.</summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            if (theAction == NavAction.Back)
+            {
+                MenuNav.Press(mBackButton);
+                return true;
+            }
+            return false;
         }
     }
 }

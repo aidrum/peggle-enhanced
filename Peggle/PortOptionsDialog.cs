@@ -12,7 +12,7 @@ namespace Sexy
     /// launcher icons, each a picture with a radio button below. A button left of DONE, in its row, turns
     /// the pages.
     /// </summary>
-    public class PortOptionsDialog : ThunderDialog, CheckboxListener, SliderListener
+    public class PortOptionsDialog : ThunderDialog, CheckboxListener, SliderListener, INavHandler
     {
         /// <summary>Ids 0-5 are the Menu Theme radio buttons, in MenuTheme order.</summary>
         public const int PortOptions_MenuTheme = 0;
@@ -663,6 +663,27 @@ namespace Sexy
                 return;
             }
             base.ButtonDepress(theId);
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): B is DONE; LB/RB (Q/E) turn the page.</summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            switch (theAction)
+            {
+                case NavAction.Back:
+                    MenuNav.Press(mDoneButton);
+                    return true;
+                case NavAction.PageLeft:
+                case NavAction.PageRight:
+                    if (MenuNav.IsTarget(mPageButton))
+                    {
+                        MenuNav.Activate(mPageButton);
+                    }
+                    return true;
+            }
+            return false;
         }
     }
 }

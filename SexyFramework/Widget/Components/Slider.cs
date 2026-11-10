@@ -47,6 +47,30 @@ namespace Sexy
             MarkDirtyFull();
         }
 
+        /// <summary>Port addition (menu navigation): left and right move the slider a tenth.</summary>
+        public override bool IsNavigable()
+        {
+            return !mDisabled;
+        }
+
+        public override bool NavAdjust(NavAction theAction)
+        {
+            if (theAction != NavAction.Left && theAction != NavAction.Right)
+            {
+                return false;
+            }
+            double aVal = Math.Round(mVal * 10.0) / 10.0 + (theAction == NavAction.Right ? 0.1 : -0.1);
+            SetValue(aVal);
+            mListener.SliderVal(mId, mVal);
+            return true;
+        }
+
+        /// <summary>A does nothing on a slider.</summary>
+        public override bool NavActivate()
+        {
+            return true;
+        }
+
         public virtual bool HasTransparencies()
         {
             return true;

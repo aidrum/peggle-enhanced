@@ -110,6 +110,21 @@ namespace Sexy
             return true;
         }
 
+        /// <summary>
+        /// Port addition (menu navigation): not while faded out. A button that isn't drawn (SetDraw(false)) is a click
+        /// area over art its owner draws (the character portraits, the replay controls), so it can still be selected.
+        /// </summary>
+        public override bool IsNavigable()
+        {
+            return base.IsNavigable() && (!mDraw || mFadeAlpha > 0.5f);
+        }
+
+        /// <summary>Port addition (menu navigation): the selected button glows (Draw); an undrawn one gets MenuNav's frame.</summary>
+        public override bool DrawsNavHighlight => mDraw || mNavNoHighlight;
+
+        /// <summary>Port addition (menu navigation): no highlight at all when selected (its owner shows the selection).</summary>
+        public bool mNavNoHighlight;
+
         public override void MouseEnter()
         {
         }
@@ -217,6 +232,22 @@ namespace Sexy
                 }
                 mIsOver = wasOver;
                 mOverAlpha = overAlpha;
+            }
+            // Port addition (menu navigation): the selected button is drawn again, added on, pulsing.
+            if (MenuNav.IsHighlighted(this) && !(mIsDown && mIsOver))
+            {
+                int aGlow = (int)((0x38 + 0x48 * MenuNav.Pulse) * mFadeAlpha);
+                g.SetDrawMode(Graphics.DrawMode.DRAWMODE_ADDITIVE);
+                g.SetColorizeImages(true);
+                g.SetColor(SexyUtil.MakeColor((aGlow << 16) | (aGlow << 8) | aGlow, (int)(mFadeAlpha * 255.0f)));
+                // Only the button art glows; the label (the orange pill buttons) stays readable.
+                string aLabel = mLabel;
+                mLabel = "";
+                base.Draw(g);
+                mLabel = aLabel;
+                g.SetDrawMode(Graphics.DrawMode.DRAWMODE_NORMAL);
+                g.SetColorizeImages(true);
+                g.SetColor(new Color(255, 255, 255, (int)(mFadeAlpha * 255.0f)));
             }
             if (mHasOverlay && mFadeAlpha == 1.0f)
             {
@@ -392,6 +423,9 @@ namespace Sexy
             mClickSound = theSound;
         }
 
+        /// <summary>Port addition (menu navigation): the selected toggle glows (DrawScaled).</summary>
+        public override bool DrawsNavHighlight => true;
+
         public override void Draw(Graphics g)
         {
             if (mDrawScale == 1)
@@ -463,6 +497,15 @@ namespace Sexy
                 }
                 g.SetColor(new Color(255, 255, 255, (int)(mOverAlpha * 255.0 * mFadeAlpha)));
                 g.DrawImageBox(over, dest, mUncheckedImage);
+            }
+            // Port addition (menu navigation): the selected toggle glows like the buttons; its label stays as it is.
+            if (MenuNav.IsHighlighted(this))
+            {
+                int aGlow = (int)((0x38 + 0x48 * MenuNav.Pulse) * mFadeAlpha);
+                g.SetDrawMode(Graphics.DrawMode.DRAWMODE_ADDITIVE);
+                g.SetColor(SexyUtil.MakeColor((aGlow << 16) | (aGlow << 8) | aGlow, (int)(mFadeAlpha * 255.0f)));
+                g.DrawImageBox(mIsOver && over.mHeight >= 1 ? over : normal, dest, mUncheckedImage);
+                g.SetDrawMode(Graphics.DrawMode.DRAWMODE_NORMAL);
             }
             g.SetColorizeImages(false);
             g.SetFont(mFont);

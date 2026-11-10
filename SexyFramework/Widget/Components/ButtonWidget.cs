@@ -76,6 +76,12 @@ namespace Sexy
             mFont = theFont.Duplicate();
         }
 
+        /// <summary>Port addition (menu navigation).</summary>
+        public override bool IsNavigable()
+        {
+            return !mDisabled;
+        }
+
         public virtual bool IsButtonDown()
         {
             return mIsDown && mIsOver && !mDisabled;

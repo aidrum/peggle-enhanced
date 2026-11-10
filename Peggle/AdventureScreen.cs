@@ -10,7 +10,7 @@ namespace Sexy
     /// after picking Peggle or Nights. Four swipeable pages in a paging ScrollWidget: high scores,
     /// the player's best scores, all-time stats and current adventure stats.
     /// </summary>
-    public class AdventureScreen : Widget, ButtonListener
+    public class AdventureScreen : Widget, ButtonListener, INavHandler
     {
         // 0x78: ButtonListener sub-object
 
@@ -164,6 +164,55 @@ namespace Sexy
 
         public override void KeyChar(SexyChar theChar)
         {
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): Back is selected first.</summary>
+        NavTarget INavHandler.NavDefault()
+        {
+            return new NavTarget(mBackButton);
+        }
+
+        /// <summary>
+        /// Port addition (menu navigation): left and right turn the stats pages; up and down go between the buttons
+        /// (the iPhone has Trophies beside Back); B is Back.
+        /// </summary>
+        bool INavHandler.NavAction(NavAction theAction)
+        {
+            switch (theAction)
+            {
+                case NavAction.Left:
+                case NavAction.Right:
+                case NavAction.PageLeft:
+                case NavAction.PageRight:
+                {
+                    int aPage = (int)Math.Round(-mStatsWidget.mX / (double)DIALOG_STATS_PAGE_WIDTH);
+                    bool aLeft = theAction == NavAction.Left || theAction == NavAction.PageLeft;
+                    int aNew = Math.Clamp(aPage + (aLeft ? -1 : 1), 0, 3);
+                    if (aNew != aPage)
+                    {
+                        mApp.PlaySample(Res.SOUND_BUTTON1);
+                        mScrollWidget.ScrollRectIntoView(new TRect(aNew * DIALOG_STATS_PAGE_WIDTH, 0, DIALOG_STATS_PAGE_WIDTH, DIALOG_STATS_PAGE_HEIGHT), true);
+                    }
+                    return true;
+                }
+                case NavAction.Up:
+                case NavAction.Down:
+                {
+                    List<NavTarget> aButtons = MenuNav.GetTargets(this);
+                    if (aButtons.Count > 1)
+                    {
+                        int anIndex = aButtons.IndexOf(MenuNav.Selected);
+                        MenuNav.Select(aButtons[(anIndex + 1) % aButtons.Count]);
+                    }
+                    return true;
+                }
+                case NavAction.Back:
+                    MenuNav.Press(mBackButton);
+                    return true;
+            }
+            return false;
         }
     }
 

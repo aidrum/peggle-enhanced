@@ -167,7 +167,7 @@ namespace Sexy
     /// captioned row of five per trophy page, a question mark for random/pick challenges, a level
     /// count for multi-level challenges and a gold star on challenges already won.
     /// </summary>
-    public class TrophyThumbnailsWidget : Widget
+    public class TrophyThumbnailsWidget : Widget, INavCells
     {
         public static int ROW_HEIGHT;
 
@@ -391,6 +391,42 @@ namespace Sexy
             }
             return new TRect(aCol * (TROPHY_SCR_THUMB_GAP_W + TROPHY_SCR_THUMB_W) + TROPHY_SCR_THUMB_INSET_W,
                 TROPHY_SCR_CAPTION_H + aRow * (TROPHY_SCR_ROW_GAP_W + ROW_HEIGHT), TROPHY_SCR_THUMB_W, TROPHY_SCR_THUMB_H);
+        }
+
+        // ---------------------------------------------------------------- port addition: menu navigation
+
+        /// <summary>Port addition (menu navigation): the challenges of the game shown, five a row.</summary>
+        public int GetNavCellCount()
+        {
+            return TrophyMgr.GetNumPagesCurGame() * 5;
+        }
+
+        public TRect GetNavCellRect(int theCell)
+        {
+            int aRow = theCell / 5;
+            int aCol = theCell % 5;
+            int aPage = ThunderballApp.mGameLevelPack == 1 ? aRow + 8 : aRow;
+            if (aPage * 5 + aCol >= mTrophies.Count)
+            {
+                return default(TRect);
+            }
+            return new TRect(aCol * (TROPHY_SCR_THUMB_GAP_W + TROPHY_SCR_THUMB_W) + TROPHY_SCR_THUMB_INSET_W,
+                TROPHY_SCR_CAPTION_H + aRow * (TROPHY_SCR_ROW_GAP_W + ROW_HEIGHT), TROPHY_SCR_THUMB_W, TROPHY_SCR_THUMB_H);
+        }
+
+        /// <summary>A on a challenge: a click on it.</summary>
+        public void NavCellActivate(int theCell)
+        {
+            TRect aRect = GetNavCellRect(theCell);
+            if (aRect.mWidth > 0)
+            {
+                MouseUp(aRect.mX + aRect.mWidth / 2, aRect.mY + aRect.mHeight / 2, 1);
+            }
+        }
+
+        public override bool IsNavigable()
+        {
+            return true;
         }
     }
 

@@ -273,6 +273,8 @@ namespace Sexy
         public Board(ThunderballApp theApp)
         {
             mApp = theApp;
+            // Port addition (menu navigation): play takes the pad itself; the menus never select the board's buttons.
+            mNavIgnore = true;
             mHasReplay = false;
             mApp.UnloadMainMenuResources();
             mApp.UnloadQuickplayResources();
@@ -2535,6 +2537,46 @@ namespace Sexy
         }
 
         /// <summary>
+        /// Held keys and the left stick turn the gun (Port: PC Controls: up/down five wheel steps a tick, the rate Peggle
+        /// Nights PC uses for held left/right, up to the left and down to the right as in the PC games; left/right step,
+        /// UpdatePCArrowSteps. Port addition (controller): the left stick, GamePadUpdate). Port: once an update, not
+        /// once a board step, so fast-forward doesn't speed the aiming up.
+        /// </summary>
+        private void UpdateHeldAim()
+        {
+            if (mWidgetManager == null || mPauseCount != 0 || mSlotMachineDialog.mWidgetManager != null)
+            {
+                return;
+            }
+            if (UsePCControls())
+            {
+                if (mWidgetManager.mKeyDown[(int)KeyCode.Up])
+                {
+                    mLogicMgr.MouseWheel(-5.0f);
+                }
+                if (mWidgetManager.mKeyDown[(int)KeyCode.Down])
+                {
+                    mLogicMgr.MouseWheel(5.0f);
+                }
+            }
+            else
+            {
+                if (mWidgetManager.mKeyDown[(int)KeyCode.Left])
+                {
+                    mLogicMgr.MouseWheel(-5.0f);
+                }
+                if (mWidgetManager.mKeyDown[(int)KeyCode.Right])
+                {
+                    mLogicMgr.MouseWheel(5.0f);
+                }
+            }
+            if (mPadAim != 0.0f)
+            {
+                mLogicMgr.MouseWheel(mPadAim);
+            }
+        }
+
+        /// <summary>
         /// Port addition (PC Controls): left/right turn the gun one wheel step a press, repeating while held,
         /// like the PC games' key-repeat stepping. Once an update, however fast the board runs.
         /// </summary>
@@ -2596,8 +2638,7 @@ namespace Sexy
         /// </summary>
         public bool GamePadUpdate(GamePadState thePad, GamePadState thePrevPad)
         {
-            if (!thePad.IsConnected || (mEndLevelDialog.mWidgetManager != null && mEndLevelDialog.mVisible) ||
-                mReplayDialog.mWidgetManager != null || mSlotMachineDialog.mWidgetManager != null)
+            if (!thePad.IsConnected || !WantsPad())
             {
                 ReleasePad();
                 return false;
@@ -2638,7 +2679,17 @@ namespace Sexy
             return true;
         }
 
-        /// <summary>Port addition (controller): lets go of everything the pad holds (it went to a dialog or the pointer).</summary>
+        /// <summary>
+        /// Port addition (controller/keyboard): false with the end-of-level, replay or slot machine dialog up; the menu
+        /// selection (MenuNav) works those.
+        /// </summary>
+        public bool WantsPad()
+        {
+            return !((mEndLevelDialog.mWidgetManager != null && mEndLevelDialog.mVisible) ||
+                mReplayDialog.mWidgetManager != null || mSlotMachineDialog.mWidgetManager != null);
+        }
+
+        /// <summary>Port addition (controller): lets go of everything the pad holds (it went to a dialog or the menus).</summary>
         public void ReleasePad()
         {
             mPadAim = 0.0f;
@@ -4337,6 +4388,7 @@ namespace Sexy
                 mExtraUpdates = 0;
             }
             UpdatePCArrowSteps();
+            UpdateHeldAim();
             for (int i = 0; i < aSteps; i++)
             {
                 if (mWidgetManager == null)
@@ -4348,36 +4400,6 @@ namespace Sexy
                     mCharacterMgr.UpdatePaused();
                     InterfaceMgr.UpdatePaused();
                     break;
-                }
-                if (UsePCControls())
-                {
-                    // Port: PC Controls: held up/down turn the gun five wheel steps a tick (the rate Peggle Nights
-                    // PC uses for held left/right), up to the left and down to the right as in the PC games.
-                    // Left/right step (UpdatePCArrowSteps).
-                    if (mWidgetManager.mKeyDown[(int)KeyCode.Up])
-                    {
-                        mLogicMgr.MouseWheel(-5.0f);
-                    }
-                    if (mWidgetManager.mKeyDown[(int)KeyCode.Down])
-                    {
-                        mLogicMgr.MouseWheel(5.0f);
-                    }
-                }
-                else
-                {
-                    if (mWidgetManager.mKeyDown[(int)KeyCode.Left])
-                    {
-                        mLogicMgr.MouseWheel(-5.0f);
-                    }
-                    if (mWidgetManager.mKeyDown[(int)KeyCode.Right])
-                    {
-                        mLogicMgr.MouseWheel(5.0f);
-                    }
-                }
-                // Port addition (controller): the left stick turns the gun (GamePadUpdate).
-                if (mPadAim != 0.0f)
-                {
-                    mLogicMgr.MouseWheel(mPadAim);
                 }
                 if (mReplayPauseCount > 0)
                 {
