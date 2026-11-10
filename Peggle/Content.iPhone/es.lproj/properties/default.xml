@@ -769,7 +769,7 @@
 	<String id="479">Jugador1</String><!-- Sexy::GetLocalizedPlayerName:1063 -->
 	<String id="480">Jugador 1</String><!-- Sexy::GetLocalizedPlayerName:1064 -->
 <!-- File: ThunderballApp.cpp -->
-	<String id="396">¿Salir de Peggle¿</String><!-- ThunderballApp::DoConfirmQuitDialog:2191 -->
+	<String id="396">¿Salir de Peggle?</String><!-- ThunderballApp::DoConfirmQuitDialog:2191 -->
 	<String id="397">¿Seguro que quieres&cr;salir del juego?</String><!-- ThunderballApp::DoConfirmQuitDialog:2191 -->
 	<String id="398">¿Quieres ^00FF00^continuar^oldclr^ con la partida actual o empezar una ^00FF00^nueva^oldclr^?&cr;&cr;</String><!-- ThunderballApp::CheckSaveGame:2289 -->
 	<String id="399">Desafío:&nbsp;</String><!-- ThunderballApp::CheckSaveGame:2291 -->
