@@ -28,7 +28,7 @@ namespace Sexy
                 if (mStateCount - theBall.mValue114 < 0x14)
                 {
                     float aSpeedSq = theBall.mVelX * theBall.mVelX + theBall.mVelY * theBall.mVelY;
-                    if (aSpeedSq < 2.5f)
+                    if (aSpeedSq > 2.5f)
                     {
                         theBall.mCount10C = 0x14;
                     }
