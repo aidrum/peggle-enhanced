@@ -459,6 +459,16 @@ namespace Sexy
                 return false;
             }
             DeleteImage();
+            // Port addition: a custom level pack's own art for this image comes first, as when the PC game
+            // mounts a pak over its files (ImageMgr.GetImage loads it from the pack).
+            if (CustomLevelPacks.GetActivePackImage(mImageName) != null)
+            {
+                mImage = GetImageMgr().GetImage(mImageName, out mImageCached, true);
+                if (mImage != null)
+                {
+                    return true;
+                }
+            }
             mImage = GetLevelImage(SexyUtil.GetFileName(mImageName, false));
             if (mImage == null)
             {

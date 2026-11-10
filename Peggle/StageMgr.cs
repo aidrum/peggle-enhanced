@@ -90,6 +90,13 @@ namespace Sexy
         /// </summary>
         public bool mOnPeggleRows;
 
+        /// <summary>
+        /// True for the page the custom level packs' stages are added to, under its own (the Nights DLC page):
+        /// they come from the level packs in the levelpacks folder (CustomLevelPacks) and are labelled with
+        /// their stage names (StageInfo.mCustomName).
+        /// </summary>
+        public bool mHostsCustomLevels;
+
         public BonusPage(string theConfig, int theLevelPack, int theLogoCel, int theOutlineColor, string theAdventureKey = null,
             int[] theStageCharacters = null, int theCreditsEnding = -1, int theAdventureStageCount = -1)
         {
@@ -127,6 +134,9 @@ namespace Sexy
 
         public List<LevelInfo> mLevels = new List<LevelInfo>();  // 0x44
 
+        /// <summary>Port addition: a custom level pack stage's name (shown instead of "Stage N"), or null.</summary>
+        public string mCustomName;
+
         public StageInfo()
         {
             for (int i = 0; i < NUM_STORY_TEXTS; i++)
@@ -159,7 +169,8 @@ namespace Sexy
         /// <summary>Port addition: the bonus Quick Play pages, in page (and stage) order.</summary>
         public static readonly BonusPage[] BONUS_PAGES =
         {
-            new BonusPage("levels/stages_nightsdlc.cfg", 1, GameArrowButton.LOGO_NIGHTSDLC, 0xff55e9),
+            // The custom level packs (Peggle Nights packs, so they play as Nights, always open) follow its stages.
+            new BonusPage("levels/stages_nightsdlc.cfg", 1, GameArrowButton.LOGO_NIGHTSDLC, 0xff55e9) { mHostsCustomLevels = true },
             // Peggle Dual Shot (DS) exclusives: no Adventure, so always open; they play as Peggle levels.
             new BonusPage("levels/stages_dualshot.cfg", 0, GameArrowButton.LOGO_DUALSHOT, 0x9ee02a),
             // Extreme: Bjorn hosts both stages; its win rolls Credit 3 ("Well Done!": Credit 1 promises
@@ -172,6 +183,27 @@ namespace Sexy
             // Last, so the other pages' stage numbers don't move.
             new BonusPage("levels/stages_demo.cfg", 0, -1, 0xeac76a) { mOnPeggleRows = true },
         };
+
+        /// <summary>
+        /// Port addition: the custom level pack stages (on the Nights DLC page, after its own): the first and
+        /// how many. The bonus thumbnail sheet has no rows for them (BonusThumbnailRow).
+        /// </summary>
+        public static int sCustomFirstStage;
+
+        public static int sNumCustomStages;
+
+        /// <summary>Port addition: true for a custom level pack stage.</summary>
+        public static bool IsCustomStage(int theStage)
+        {
+            return sNumCustomStages > 0 && theStage >= sCustomFirstStage && theStage < sCustomFirstStage + sNumCustomStages;
+        }
+
+        /// <summary>Port addition: a bonus stage's row in the bonus thumbnail sheet, which leaves out the custom stages.</summary>
+        public static int BonusThumbnailRow(int theStage)
+        {
+            int aRow = theStage - BONUS_FIRST_STAGE;
+            return theStage >= sCustomFirstStage + sNumCustomStages ? aRow - sNumCustomStages : aRow;
+        }
 
         /// <summary>Port addition: the bonus Adventures' keys (BonusPage.mAdventureKey).</summary>
         public const string ADVENTURE_EXTREME = "extreme";
@@ -662,6 +694,8 @@ namespace Sexy
             bool aLoadBonus = theFileName == null && mStages.Count == BONUS_FIRST_STAGE;
             sBonusPages.Clear();
             sPeggleRowsPage = null;
+            sCustomFirstStage = 0;
+            sNumCustomStages = 0;
             foreach (BonusPage aPage in BONUS_PAGES)
             {
                 aPage.mFirstStage = mStages.Count;
@@ -669,6 +703,12 @@ namespace Sexy
                 if (aLoadBonus && ContentFS.Exists(aPage.mConfig))
                 {
                     ReadConfigFile(aPage.mConfig);
+                    if (aPage.mHostsCustomLevels)
+                    {
+                        // Port addition: the custom level packs' stages, under the page's own.
+                        sCustomFirstStage = mStages.Count;
+                        sNumCustomStages = CustomLevelPacks.AddStages(this);
+                    }
                     aPage.mNumStages = mStages.Count - aPage.mFirstStage;
                     if (aPage.mOnPeggleRows)
                     {

@@ -61,6 +61,7 @@ namespace Peggle.Android
             // internal storage if shared storage is unavailable.
             string saveDir = GetExternalFilesDir(null)?.AbsolutePath ?? FilesDir.AbsolutePath;
             Directory.CreateDirectory(saveDir);
+            SetUpLevelPackFolder(saveDir);
 
             // Text fields open the system keyboard prompt, as iOS showed its keyboard.
             EditManager.TextPromptHandler = (theText, theDone) =>
@@ -114,6 +115,38 @@ namespace Peggle.Android
                 OnBackInvokedDispatcher.RegisterOnBackInvokedCallback(0, new BackCallback());
             }
             mGame.Run();
+        }
+
+        /// <summary>
+        /// Port addition: custom level packs (.pak, CustomLevelPacks) go in Android/media/&lt;package&gt;/levelpacks
+        /// on shared storage: unlike Android/data, file managers and USB transfers can still reach it, and the
+        /// app needs no storage permission for its own media folder. Falls back to the save folder.
+        /// </summary>
+        private void SetUpLevelPackFolder(string theSaveDir)
+        {
+            string aMediaDir = null;
+            try
+            {
+#pragma warning disable CA1422
+                Java.IO.File[] aMediaDirs = GetExternalMediaDirs();
+#pragma warning restore CA1422
+                if (aMediaDirs != null && aMediaDirs.Length > 0 && aMediaDirs[0] != null)
+                {
+                    aMediaDir = aMediaDirs[0].AbsolutePath;
+                }
+            }
+            catch (Java.Lang.Exception)
+            {
+            }
+            string aFolder = System.IO.Path.Combine(aMediaDir ?? theSaveDir, "levelpacks");
+            try
+            {
+                Directory.CreateDirectory(aFolder);
+            }
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+            {
+            }
+            CustomLevelPacks.sFolders.Add(aFolder);
         }
 
 #pragma warning disable CA1422, CS0672

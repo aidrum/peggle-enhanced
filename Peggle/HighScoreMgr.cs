@@ -259,6 +259,13 @@ namespace Sexy
 
         public Image GetImage(string theFileName, out bool wasCached, bool loadIfMissing)
         {
+            // Port addition: art a custom level pack has for the level being played comes from the pack, at PC
+            // resolution like the other PC levels' art; it is cached under its path in the pack.
+            string aPackImage = CustomLevelPacks.GetActivePackImage(theFileName);
+            if (aPackImage != null)
+            {
+                return GetPackImage(aPackImage, out wasCached, loadIfMissing);
+            }
             if (!mImageMap.TryGetValue(theFileName, out Image image))
             {
                 mImageMap[theFileName] = null;
@@ -275,6 +282,18 @@ namespace Sexy
             else
             {
                 wasCached = true;
+            }
+            return image;
+        }
+
+        private Image GetPackImage(string thePath, out bool wasCached, bool loadIfMissing)
+        {
+            mImageMap.TryGetValue(thePath, out Image image);
+            wasCached = image != null;
+            if (image == null && loadIfMissing)
+            {
+                image = SexyUtil.LoadPCImage(thePath);
+                mImageMap[thePath] = image;
             }
             return image;
         }

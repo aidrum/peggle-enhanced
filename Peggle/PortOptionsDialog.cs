@@ -5,7 +5,7 @@ namespace Sexy
 {
     /// <summary>
     /// Port addition: the port's own options, opened from the main-menu Options dialog and laid out
-    /// in its two columns, on two pages. The first holds Low Memory Mode (lazy loading), High Quality Pegs,
+    /// in its two columns, on two pages. The first holds Check for Updates, Low Memory Mode (lazy loading), High Quality Pegs,
     /// Random Music, (desktop only) PC Controls and the controller's Stick Aim speed;
     /// the second, Theme Settings, holds the Menu Theme choice (left), and the Nights Menu and Main
     /// Menu Theme ones (right); the third, App Icon (Android, or SEXY_APP_ICONS=1 to preview it), the
@@ -26,6 +26,8 @@ namespace Sexy
         public const int PortOptions_PCControls = 13;
 
         public const int PortOptions_PadAimSpeed = 14;
+
+        public const int PortOptions_CheckForUpdates = 15;
 
         /// <summary>Ids 20-21 are the Nights Menu radio buttons: Mobile, then PC.</summary>
         public const int PortOptions_NightsMenu = 20;
@@ -122,6 +124,9 @@ namespace Sexy
 
         public ThunderCheckbox mLazyLoadingCheckbox;
 
+        /// <summary>Check for Updates (UpdateChecker), above Low Memory Mode.</summary>
+        public ThunderCheckbox mCheckForUpdatesCheckbox;
+
         public ThunderCheckbox mHighQualityPegsCheckbox;
 
         public ThunderCheckbox mRandomMusicCheckbox;
@@ -188,6 +193,9 @@ namespace Sexy
             mLazyLoadingCheckbox = SexyUtil.MakeCheckbox2(PortOptions_LazyLoading, this, SexyAppBase.Loc("Low Memory Mode"), 0);
             mLazyLoadingCheckbox.mChecked = mApp.mLazyLoadingOption;
             AddWidget(mLazyLoadingCheckbox);
+            mCheckForUpdatesCheckbox = SexyUtil.MakeCheckbox2(PortOptions_CheckForUpdates, this, SexyAppBase.Loc("Check for Updates"), 0);
+            mCheckForUpdatesCheckbox.mChecked = mApp.mCheckForUpdates;
+            AddWidget(mCheckForUpdatesCheckbox);
             mHighQualityPegsCheckbox = SexyUtil.MakeCheckbox2(PortOptions_HighQualityPegs, this, SexyAppBase.Loc("High Quality Pegs"), 0);
             mHighQualityPegsCheckbox.mChecked = PegInfo.mHighQualityPegs;
             AddWidget(mHighQualityPegsCheckbox);
@@ -286,6 +294,7 @@ namespace Sexy
             bool general = thePage == PAGE_GENERAL;
             bool theme = thePage == PAGE_THEME;
             mLazyLoadingCheckbox.SetVisible(general);
+            mCheckForUpdatesCheckbox.SetVisible(general);
             mHighQualityPegsCheckbox.SetVisible(general);
             mRandomMusicCheckbox.SetVisible(general);
             mPCControlsCheckbox?.SetVisible(general);
@@ -359,15 +368,19 @@ namespace Sexy
             {
                 mMainMenuMusicChecks[i].Layout(LAY_STACK_BELOW, mMainMenuMusicChecks[i - 1], 0, 5, 0, 0);
             }
-            // The first page's option takes the first spot of the left column.
-            mLazyLoadingCheckbox.Resize(left, top, OPTIONS_CHECKBOX_W, first.mHeight);
-            mHighQualityPegsCheckbox.Layout(LAY_BESIDE | (int)LayoutFlags.LAY_SameHeight, mLazyLoadingCheckbox, 5, 0, 0, 0);
+            // The first page's options: Check for Updates, then Low Memory Mode (its restart note below it, see
+            // Draw) in the left column, row for row with the right one's.
+            mCheckForUpdatesCheckbox.Resize(left, top, OPTIONS_CHECKBOX_W, first.mHeight);
+            mLazyLoadingCheckbox.Layout(LAY_STACK_BELOW, mCheckForUpdatesCheckbox, 0, 5, 0, 0);
+            mHighQualityPegsCheckbox.Layout(LAY_BESIDE | (int)LayoutFlags.LAY_SameHeight, mCheckForUpdatesCheckbox, 5, 0, 0, 0);
             mRandomMusicCheckbox.Layout(LAY_STACK_BELOW, mHighQualityPegsCheckbox, 0, 5, 0, 0);
             mPCControlsCheckbox?.Layout(LAY_STACK_BELOW, mRandomMusicCheckbox, 0, 5, 0, 0);
-            // Stick Aim is a row of its own under the checkboxes, placed and sized as the Options dialog's volume
-            // sliders (its plate reaches left of it, under the label).
+            // Stick Aim is a row of its own under the checkboxes and the restart note (whichever ends lower),
+            // placed and sized as the Options dialog's volume sliders (its plate reaches left of it, under the label).
             ThunderCheckbox aLast = mPCControlsCheckbox ?? mRandomMusicCheckbox;
-            mPadAimSlider.Resize(OPTIONS_SFX_SLIDER_X + aGutter, aLast.mY + aLast.mHeight + 5 - THUNDER_BUTTON_SLIDER_Y,
+            int aBottom = Math.Max(aLast.mY + aLast.mHeight,
+                mLazyLoadingCheckbox.mY + mLazyLoadingCheckbox.mHeight + Res.FONT_SMALL.GetHeight() + 2);
+            mPadAimSlider.Resize(OPTIONS_SFX_SLIDER_X + aGutter, aBottom + 5 - THUNDER_BUTTON_SLIDER_Y,
                 OPTIONS_SFX_SLIDER_OFFSET_W + Res.IMAGE_DLG_SLIDERHILIGHT.mWidth, OPTIONS_SFX_SLIDER_H);
             if (mAppIconChecks != null)
             {
@@ -550,6 +563,10 @@ namespace Sexy
             else if (theId == PortOptions_LazyLoading)
             {
                 mApp.SetLazyLoading(@checked);
+            }
+            else if (theId == PortOptions_CheckForUpdates)
+            {
+                mApp.SetCheckForUpdates(@checked);
             }
             else if (theId == PortOptions_HighQualityPegs)
             {

@@ -29,18 +29,31 @@ The latest release for each platform. Newer automatic builds are on the [Release
 
 | Platform | Peggle HD | Peggle | Notes |
 |---|---|---|---|
+| Android | [Download](../../releases/latest/download/PeggleHD-android.apk) | ⭐[Download](../../releases/latest/download/Peggle-android.apk) | Android 6.0 or later. |
+| iOS / iPadOS | [Download](../../releases/latest/download/PeggleHD-unsigned.ipa) | ⭐[Download](../../releases/latest/download/Peggle-unsigned.ipa) | iOS 15 or later. Install with AltStore, SideStore, Sideloadly or TrollStore, or add the [AltStore / SideStore source](https://aidrum.github.io/peggle-enhanced/ios/) to get updates. |
 | Windows (x64) | [Download](../../releases/latest/download/PeggleHD-windows-x64.zip) | [Download](../../releases/latest/download/Peggle-windows-x64.zip) | Extract, then run `PeggleHD.exe` / `Peggle.exe`. |
 | macOS (Apple Silicon) | [Download](../../releases/latest/download/PeggleHD-macOS-osx-arm64.zip) | [Download](../../releases/latest/download/Peggle-macOS-osx-arm64.zip) | The first time, right-click the app and choose **Open**. |
 | macOS (Intel) | [Download](../../releases/latest/download/PeggleHD-macOS-osx-x64.zip) | [Download](../../releases/latest/download/Peggle-macOS-osx-x64.zip) | The first time, right-click the app and choose **Open**. |
 | Linux (x64, AppImage) | [Download](../../releases/latest/download/PeggleHD-x86_64.AppImage) | [Download](../../releases/latest/download/Peggle-x86_64.AppImage) | Make it executable, then run it. |
 | Linux (x64, .tar.gz) | [Download](../../releases/latest/download/PeggleHD-linux-x64.tar.gz) | [Download](../../releases/latest/download/Peggle-linux-x64.tar.gz) | Extract, then run `PeggleHD` / `Peggle`. |
-| Android | [Download](../../releases/latest/download/PeggleHD-android.apk) | [Download](../../releases/latest/download/Peggle-android.apk) | Android 6.0 or later. |
-| iOS / iPadOS | [Download](../../releases/latest/download/PeggleHD-unsigned.ipa) | [Download](../../releases/latest/download/Peggle-unsigned.ipa) | iOS 15 or later. Install with AltStore, SideStore, Sideloadly or TrollStore, or add the [AltStore / SideStore source](https://aidrum.github.io/peggle-enhanced/ios/) to get updates. |
+
 
 - **Peggle HD** is the iPad version (4:3), best on tablets and PCs.
 - **Peggle** is the iPhone version, with widescreen and ultrawide support, best on phones.
 
 The two editions are separate apps, so both can be installed side by side. See [BUILDING.md](BUILDING.md) for more on installing each platform, and for building the game yourself.
+
+## Custom Level Packs
+
+Peggle Enhanced supports Nights custom level packs! To install them, place the .pak files in the respective folder depending on your platform:
+
+| Platform | Location |
+|---|---|
+| Android | ``Android/media/com.aidrum.peggle/levelpacks`` |
+| iOS / iPadOS | ``Documents/levelpacks`` under On My iPhone -> Peggle (accessible from the Files app) |
+| Windows (x64) | ``/levelpacks`` next to the exe |
+| macOS (Apple Silicon) | ``~/Library/Application Support/Peggle Enhanced/levelpacks`` |
+| Linux | ``~/.local/share/Peggle Enhanced/levelpacks`` or ``levelpacks`` next to the executable |
 
 ## FAQ
 
@@ -50,7 +63,7 @@ The two editions are separate apps, so both can be installed side by side. See [
 
 - **Will any other PopCap Games get the same treatment?**
 
-  Bookworm is highly likely, the rest probably not. The reason being that there's already great ways of playing nearly all of the PopCap games that ever received an iOS port on modern Android. You can find these on the "MORE GAMES" button in-game.
+  [Bookworm got it!](https://github.com/aidrum/bookworm-enhanced/) Any other iOS PopCap games will probably not. The reason being that there's already great ways of playing nearly all of the PopCap games that ever received an iOS port on modern devices. You can find these on the "MORE GAMES" button in-game.
 
 - **What devices are supported?**
 
@@ -62,7 +75,8 @@ The two editions are separate apps, so both can be installed side by side. See [
   - Huawei MediaPad T3 10 (Android 7): Great performance, briefly tested in a few levels.
   - Samsung Galaxy J2 Prime (Android 6): Great performance, relatively long initial loading time but the game itself runs well. Briefly tested in a few levels.
   - Samsung Galaxy Tab S10 FE+ (Android 16): Great performance.
-  - iPhone 17 (iOS 27.0.1): Great performance. Peggle HD displays in 4:3, as on the iPad.
+  - iPhone 17 (iOS 27.0.1): Great performance.
+  - Asus TUF Gaming F15: Great performance (expected).
 
 - **Does it support controllers?**
 

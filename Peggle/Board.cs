@@ -2094,6 +2094,8 @@ namespace Sexy
             mGenericBackground = true;
             Clear(false);
             mLevelName = "";
+            // Port addition: a custom level pack's level uses the pack's art (CustomLevelPacks).
+            CustomLevelPacks.SetActiveLevel(aFileName);
             string aName = SexyUtil.GetFileName(aFileName, false);
             List<PhysObj> aBaseObjs = new List<PhysObj>();
             List<PhysObj> aLevelObjs = new List<PhysObj>();

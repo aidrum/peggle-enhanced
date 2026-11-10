@@ -31,6 +31,11 @@ namespace Peggle.iOS
         {
             string saveDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             Directory.CreateDirectory(saveDir);
+            // Port addition: custom level packs (.pak, CustomLevelPacks) go in Documents/levelpacks, which the
+            // Files app shows under On My iPhone > Peggle (UIFileSharingEnabled, LSSupportsOpeningDocumentsInPlace).
+            string levelPackDir = Path.Combine(saveDir, "levelpacks");
+            Directory.CreateDirectory(levelPackDir);
+            CustomLevelPacks.sFolders.Add(levelPackDir);
 
             // Text fields open the system keyboard prompt, as the original showed its keyboard.
             EditManager.TextPromptHandler = (theText, theDone) =>

@@ -187,6 +187,14 @@ namespace Sexy
             int aRight = mWidth - mContentInsets.mRight - 2;
             // Port: the Peggle page can have the web demo rows under its stages.
             int aRows = Math.Max(NUM_STAGES_NIGHTS, mThumbnails.GetNumPeggleRows()) + 1;
+            if (HasBonusPages())
+            {
+                // Port: a bonus page with more stages than Nights (the Custom Levels page can have any number).
+                for (int i = 0; i < StageMgr.GetNumBonusPages(); i++)
+                {
+                    aRows = Math.Max(aRows, StageMgr.GetBonusPageAt(i).mNumStages + 1);
+                }
+            }
             if (mNewGame && ThunderballApp.mGameLevelPack == 0)
             {
                 aRows = Math.Max(NUM_STAGES_NIGHTS, NUM_STAGES_PEGGLE);

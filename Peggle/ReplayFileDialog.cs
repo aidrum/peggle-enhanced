@@ -594,6 +594,13 @@ namespace Sexy
                 theInfo.mLevelDesc = SexyAppBase.Loc("Challenge: ") + aTrophy.mName;
                 return true;
             }
+            string aCustomStage = mApp.mStageMgr.GetStageInfo(aLevel.mStage)?.mCustomName;
+            if (aCustomStage != null)
+            {
+                // Port addition: a custom level pack's level goes by its stage's name, as on the level screen.
+                theInfo.mLevelDesc = (isDuel ? SexyAppBase.Loc("Duel: ") : "") + aCustomStage + ": " + aLevel.mDisplayName;
+                return true;
+            }
             int aStageNum = StageMgr.GetStageNumberInPack(aLevel.mStage);
             string aFormat = isDuel ? SexyAppBase.Loc("Duel: Stage %d-%d: %S") : SexyAppBase.Loc("Stage %d-%d: %S");
             theInfo.mLevelDesc = CFormat.StrFormat(aFormat.Replace("%S", "%s"), aStageNum, aLevel.mLevel + 1, aLevel.mDisplayName);

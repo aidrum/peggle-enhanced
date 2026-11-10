@@ -58,6 +58,12 @@ namespace Sexy
 
 		private static readonly object mIndexLock = new object();
 
+		/// <summary>
+		/// Port addition: files that aren't in the content source but are read like its own (the custom
+		/// level packs' files, CustomLevelPacks), by relative path; each gives its data when read.
+		/// </summary>
+		private static readonly Dictionary<string, Func<byte[]>> mVirtualFiles = new Dictionary<string, Func<byte[]>>(StringComparer.OrdinalIgnoreCase);
+
 		private static readonly string[] ImageExts = { ".png", ".jpg", ".gif" };
 
 		private static readonly string[] SoundExts = { ".wav", ".ogg" };
@@ -134,8 +140,50 @@ namespace Sexy
 			return p.TrimStart('/');
 		}
 
+		/// <summary>Port addition: adds (or replaces) a file at a relative content path, read by theReader.</summary>
+		public static void AddVirtualFile(string theRelPath, Func<byte[]> theReader)
+		{
+			lock (mVirtualFiles)
+			{
+				mVirtualFiles[Normalize(theRelPath)] = theReader;
+			}
+		}
+
+		/// <summary>Port addition: removes every virtual file whose relative path starts with thePrefix.</summary>
+		public static void RemoveVirtualFiles(string thePrefix)
+		{
+			string aPrefix = Normalize(thePrefix);
+			lock (mVirtualFiles)
+			{
+				List<string> aRemoved = new List<string>();
+				foreach (string aKey in mVirtualFiles.Keys)
+				{
+					if (aKey.StartsWith(aPrefix, StringComparison.OrdinalIgnoreCase))
+					{
+						aRemoved.Add(aKey);
+					}
+				}
+				foreach (string aKey in aRemoved)
+				{
+					mVirtualFiles.Remove(aKey);
+				}
+			}
+		}
+
+		private static Func<byte[]> GetVirtualFile(string theRelPath)
+		{
+			lock (mVirtualFiles)
+			{
+				return mVirtualFiles.TryGetValue(theRelPath, out Func<byte[]> aReader) ? aReader : null;
+			}
+		}
+
 		private static string Lookup(string rel)
 		{
+			if (GetVirtualFile(rel) != null)
+			{
+				return Root + "/" + rel;
+			}
 			Dictionary<string, string> anIndex = GetIndex();
 			// Port: More Games content (net_content/) is not localized; it lives at the content root.
 			if (!rel.StartsWith("net_content/", StringComparison.OrdinalIgnoreCase)
@@ -242,7 +290,18 @@ namespace Sexy
 			{
 				throw new FileNotFoundException("Not a resolved content path: " + theFullPath);
 			}
-			return Source.OpenRead(theFullPath.Substring(Root.Length + 1));
+			string aRel = theFullPath.Substring(Root.Length + 1);
+			Func<byte[]> aVirtual = GetVirtualFile(aRel);
+			if (aVirtual != null)
+			{
+				byte[] aData = aVirtual();
+				if (aData == null)
+				{
+					throw new FileNotFoundException("Unreadable file: " + theFullPath);
+				}
+				return new MemoryStream(aData, false);
+			}
+			return Source.OpenRead(aRel);
 		}
 
 		/// <summary>Reads a whole file by a path returned by Resolve.</summary>

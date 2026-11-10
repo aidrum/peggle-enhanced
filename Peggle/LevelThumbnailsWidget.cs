@@ -301,6 +301,12 @@ namespace Sexy
         private void DrawStageLabel(Graphics g, Font theLabelFont, int theLabelX, int theLabelWidth, int theRowY, int theStage, BonusPage theBonusPage = null,
             int theAlpha = 0xff)
         {
+            if (theBonusPage != null && StageMgr.IsCustomStage(theBonusPage.mFirstStage + theStage))
+            {
+                // Port addition: the custom level pack stages under the Nights DLC page's own.
+                DrawCustomStageLabel(g, theLabelFont, theLabelX, theRowY, theBonusPage.mFirstStage + theStage, theAlpha);
+                return;
+            }
             string aTop = SexyAppBase.Loc("Stage");
             string aBottom = (theStage + 1).ToString();
             if (theBonusPage != null && theBonusPage.mLogoCel == GameArrowButton.LOGO_NIGHTSDLC && theStage < NIGHTSDLC_STAGE_NAMES.Length)
@@ -333,6 +339,68 @@ namespace Sexy
             g.SetFont(Res.FONT_OVERLOAD16OUTLINE);
             y += g.GetFont().GetMaxCharHeight();
             g.DrawString(aBottom, theLabelX - g.GetFont().StringWidth(aBottom) / 2, y);
+        }
+
+        /// <summary>
+        /// Port addition: a custom level pack stage is labelled with its name from the pack, word-wrapped to
+        /// the label column in up to three lines (the last cut short with "..." if it still doesn't fit) and
+        /// centred on the row.
+        /// </summary>
+        private void DrawCustomStageLabel(Graphics g, Font theFont, int theLabelX, int theRowY, int theStage, int theAlpha)
+        {
+            string aName = mApp.mStageMgr.GetStageInfo(theStage)?.mCustomName ?? "";
+            int aMaxWidth = System.Math.Max(40, ((Widget)mParent).mWidth - THUMB_STAGE_WIDTH - 8);
+            List<string> aLines = WrapLabel(theFont, aName, aMaxWidth, 3);
+            int aLineHeight = theFont.GetMaxCharHeight();
+            g.SetColor(new Color(0xff, 0xff, 0xff, theAlpha));
+            g.SetFont(theFont);
+            int y = theRowY + ROW_HEIGHT / 2 - aLineHeight * aLines.Count / 2 + theFont.GetAscent();
+            foreach (string aLine in aLines)
+            {
+                g.DrawString(aLine, theLabelX - theFont.StringWidth(aLine) / 2, y);
+                y += aLineHeight;
+            }
+        }
+
+        private static List<string> WrapLabel(Font theFont, string theText, int theMaxWidth, int theMaxLines)
+        {
+            List<string> aLines = new List<string>();
+            string aLine = "";
+            foreach (string aWord in theText.Split(' ', System.StringSplitOptions.RemoveEmptyEntries))
+            {
+                string aTry = aLine.Length == 0 ? aWord : aLine + " " + aWord;
+                if (aLine.Length == 0 || theFont.StringWidth(aTry) <= theMaxWidth)
+                {
+                    aLine = aTry;
+                }
+                else
+                {
+                    aLines.Add(aLine);
+                    aLine = aWord;
+                }
+            }
+            if (aLine.Length > 0)
+            {
+                aLines.Add(aLine);
+            }
+            if (aLines.Count > theMaxLines)
+            {
+                aLines[theMaxLines - 1] = string.Join(" ", aLines.GetRange(theMaxLines - 1, aLines.Count - theMaxLines + 1));
+                aLines.RemoveRange(theMaxLines, aLines.Count - theMaxLines);
+            }
+            for (int i = 0; i < aLines.Count; i++)
+            {
+                if (theFont.StringWidth(aLines[i]) > theMaxWidth)
+                {
+                    string aCut = aLines[i];
+                    while (aCut.Length > 1 && theFont.StringWidth(aCut + "...") > theMaxWidth)
+                    {
+                        aCut = aCut.Substring(0, aCut.Length - 1);
+                    }
+                    aLines[i] = aCut.TrimEnd() + "...";
+                }
+            }
+            return aLines;
         }
 
         public override void Draw(Graphics g)

@@ -385,6 +385,13 @@ namespace Sexy
             return LoadResizedImage(anImage, aWidth, aHeight);
         }
 
+        /// <summary>Port addition: loads an image file resampled to theWidth x theHeight. Null when missing.</summary>
+        public static Image LoadSizedImage(string thePath, int theWidth, int theHeight)
+        {
+            ImageLibImage anImage = ImageLib.GetImage(thePath, false);
+            return anImage == null ? null : LoadResizedImage(anImage, theWidth, theHeight);
+        }
+
         /// <summary>Port addition: loads an image file resampled by theScale. Null when missing.</summary>
         public static Image LoadScaledImage(string thePath, double theScale)
         {
@@ -450,12 +457,27 @@ namespace Sexy
         {
             Image anImage;
             int anIndex;
+            if (StageMgr.IsCustomStage(theStage))
+            {
+                // Port addition: a custom level pack's level, its thumbnail from the pack.
+                TRect aCel = Res.IMAGE_LS_THUMBNAILS_PEGGLE.GetCelRect(0);
+                LevelInfo aLevel = GlobalStaticVars.gSexyAppBase is ThunderballApp anApp
+                    ? anApp.mStageMgr.GetStageInfo(theStage)?.GetLevelInfo(theLevel) : null;
+                Image aThumb = CustomLevelPacks.GetThumbnail(aLevel, aCel.mWidth, aCel.mHeight);
+                g.SetColor(new Color(0, 0, 0));
+                g.FillRect(theRect);
+                if (aThumb != null)
+                {
+                    g.DrawImage(aThumb, theRect, new TRect(0, 0, aThumb.mWidth, aThumb.mHeight));
+                }
+                return;
+            }
             if (StageMgr.IsBonusStage(theStage))
             {
                 Image aSheet = GetBonusThumbnails();
                 if (aSheet != null)
                 {
-                    g.DrawImageCel(aSheet, theRect, theLevel, theStage - StageMgr.BONUS_FIRST_STAGE);
+                    g.DrawImageCel(aSheet, theRect, theLevel, StageMgr.BonusThumbnailRow(theStage));
                 }
                 return;
             }

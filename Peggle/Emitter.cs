@@ -590,6 +590,16 @@ namespace Sexy
             if (mParticleImage == null)
             {
                 ImageMgr anImageMgr = GetImageMgr();
+                // Port addition: a custom level pack's own particle image (CustomLevelPacks), before the
+                // name loses its folder.
+                if (CustomLevelPacks.GetActivePackImage(mParticleImageName) != null)
+                {
+                    mParticleImage = anImageMgr.GetImage(mParticleImageName, out mImageCached, true);
+                }
+            }
+            if (mParticleImage == null)
+            {
+                ImageMgr anImageMgr = GetImageMgr();
                 mParticleImageName = mParticleImageName.Substring(mParticleImageName.LastIndexOfAny(new[] { '/', '\\' }) + 1);
                 if (mParticleImageName.IndexOf('/') == -1 && mParticleImageName.IndexOf('\\') == -1)
                 {

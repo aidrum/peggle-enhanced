@@ -204,6 +204,9 @@ namespace Sexy
         /// </summary>
         public bool mRandomMusic;
 
+        /// <summary>Port addition: the Check for Updates option: UpdateChecker asks GitHub for a newer release. On by default; saved in the registry.</summary>
+        public bool mCheckForUpdates = true;
+
         /// <summary>
         /// Port addition (controller): the Stick Aim option, 0 to 100: how fast the left stick turns the gun, from
         /// 0.4 to 2.5 times the standard speed (50). Saved in the registry.
@@ -519,6 +522,7 @@ namespace Sexy
             bool aHighQualityPegs = !Main.IsMobile;
             RegistryReadBoolean("HighQualityPegs", ref aHighQualityPegs);
             RegistryReadBoolean("RandomMusic", ref mRandomMusic);
+            RegistryReadBoolean("CheckForUpdates", ref mCheckForUpdates);
             RegistryReadInteger("PadAimSpeed", ref mPadAimSpeed);
             mPadAimSpeed = Math.Clamp(mPadAimSpeed, 0, 100);
             mPCControls = !Main.IsMobile;
@@ -605,7 +609,10 @@ namespace Sexy
             }
             CheckMaxStage();
             ShowLoadingScreen();
-            UpdateChecker.Start();
+            if (mCheckForUpdates)
+            {
+                UpdateChecker.Start();
+            }
         }
 
         private void LoadLanguageStrings()
@@ -653,6 +660,7 @@ namespace Sexy
             { "Main Menu Sound", new[] { "Son du menu principal", "Hauptmenü-Sound", "Sonido del menú principal", "Suono del menu principale" } },
             { "Ambience", new[] { "Ambiance", "Atmosphäre", "Ambiente", "Atmosfera" } },
             { "Music", new[] { "Musique", "Musik", "Música", "Musica" } },
+            { "Check for Updates", new[] { "Mises à jour auto", "Nach Updates suchen", "Buscar actualizaciones", "Cerca aggiornamenti" } },
             { "Random Music", new[] { "Musique aléatoire", "Zufällige Musik", "Música aleatoria", "Musica casuale" } },
             // Pegs as the game's own strings call them: taquets, Spielsteine, fichas, tondini.
             { "High Quality Pegs", new[] { "Taquets haute qualité", "Hochwertige Spielsteine", "Fichas de alta calidad", "Tondini in alta qualità" } },
@@ -823,6 +831,20 @@ namespace Sexy
         {
             mRandomMusic = theOn;
             RegistryWriteBoolean("RandomMusic", theOn);
+        }
+
+        /// <summary>
+        /// Port addition: sets the Check for Updates option and saves it. Turned on, the check runs now if it
+        /// hasn't this launch; turned off, a found update is no longer offered.
+        /// </summary>
+        public void SetCheckForUpdates(bool theOn)
+        {
+            mCheckForUpdates = theOn;
+            RegistryWriteBoolean("CheckForUpdates", theOn);
+            if (theOn)
+            {
+                UpdateChecker.Start();
+            }
         }
 
         /// <summary>Port addition (controller): sets the Stick Aim option (0 to 100) and saves it; it applies at once.</summary>
@@ -1268,7 +1290,7 @@ namespace Sexy
             {
                 UpdateResultsMusic();
             }
-            if (UpdateChecker.HasUpdate)
+            if (mCheckForUpdates && UpdateChecker.HasUpdate)
             {
                 CheckUpdatePrompt();
             }

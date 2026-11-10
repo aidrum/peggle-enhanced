@@ -26,6 +26,7 @@ namespace Peggle.Desktop
             // Debug aid: SEXY_STORAGE_DIR points saves/profiles at another folder (scripted test runs).
             string storage = Environment.GetEnvironmentVariable("SEXY_STORAGE_DIR") ?? GetDefaultStorageDir();
             Directory.CreateDirectory(storage);
+            SetUpLevelPackFolders();
             Sexy.Main.AppFactory = game => new ThunderballApp(game);
             using (Sexy.Main game = new Sexy.Main())
             {
@@ -70,6 +71,52 @@ namespace Peggle.Desktop
             }
             ImportOldSaves(AppContext.BaseDirectory);
             return AppContext.BaseDirectory;
+        }
+
+        /// <summary>
+        /// Port addition: where custom level packs (.pak) are found (CustomLevelPacks); the first folder is
+        /// created so it's there to drop packs into. Shared by both editions.
+        /// <list type="bullet">
+        /// <item>Windows: "levelpacks" next to the executable.</item>
+        /// <item>macOS: ~/Library/Application Support/Peggle Enhanced/levelpacks (a .app bundle is read-only).</item>
+        /// <item>Linux: $XDG_DATA_HOME (~/.local/share)/Peggle Enhanced/levelpacks, and also "levelpacks" next to
+        /// the executable when that folder exists (portable installs).</item>
+        /// </list>
+        /// SEXY_LEVELPACKS_DIR replaces them with one folder.
+        /// </summary>
+        private static void SetUpLevelPackFolders()
+        {
+            string anOverride = Environment.GetEnvironmentVariable("SEXY_LEVELPACKS_DIR");
+            string aBesideExe = Path.Combine(AppContext.BaseDirectory, "levelpacks");
+            if (!string.IsNullOrEmpty(anOverride))
+            {
+                CustomLevelPacks.sFolders.Add(anOverride);
+            }
+            else if (OperatingSystem.IsMacOS())
+            {
+                CustomLevelPacks.sFolders.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "Library", "Application Support", "Peggle Enhanced", "levelpacks"));
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                CustomLevelPacks.sFolders.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData,
+                    Environment.SpecialFolderOption.Create), "Peggle Enhanced", "levelpacks"));
+                if (Directory.Exists(aBesideExe))
+                {
+                    CustomLevelPacks.sFolders.Add(aBesideExe);
+                }
+            }
+            else
+            {
+                CustomLevelPacks.sFolders.Add(aBesideExe);
+            }
+            try
+            {
+                Directory.CreateDirectory(CustomLevelPacks.sFolders[0]);
+            }
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+            {
+            }
         }
 
         /// <summary>

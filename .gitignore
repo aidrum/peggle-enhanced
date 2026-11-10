@@ -11,3 +11,7 @@ com.popcap.Peggle-iOS5.1.1-(Clutch-2.0.4).ipa
 /distribution/out/
 /tools
 .idea/
+
+# Custom level packs are user content, never part of the repo
+levelpacks/
+*.pak
