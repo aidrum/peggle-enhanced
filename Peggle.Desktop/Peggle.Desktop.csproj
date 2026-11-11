@@ -7,9 +7,20 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <AssemblyName>PeggleHD</AssemblyName>
     <ApplicationIcon>Icons\$(PeggleEdition)\icon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Win32 version info (NativeAOT copies it into the exe). Antivirus heuristics distrust unsigned exes
+         with blank or placeholder metadata, so give it a real product name, description and copyright. -->
+    <Product>Peggle Enhanced</Product>
+    <Company>Peggle Enhanced</Company>
+    <AssemblyTitle>Peggle Enhanced (HD edition)</AssemblyTitle>
+    <Description>Peggle Enhanced (HD edition)</Description>
+    <Copyright>Peggle Enhanced contributors</Copyright>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
   <PropertyGroup Condition="'$(PeggleEdition)' == 'iPhone'">
     <AssemblyName>Peggle</AssemblyName>
+    <AssemblyTitle>Peggle Enhanced</AssemblyTitle>
+    <Description>Peggle Enhanced</Description>
   </PropertyGroup>
   <ItemGroup>
     <!-- Window/taskbar icon: MonoGame's SDL window loads the embedded "Icon.bmp" (tools/convert_icons.py). -->
