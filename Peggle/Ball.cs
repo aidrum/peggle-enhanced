@@ -265,7 +265,8 @@ namespace Sexy
             theSync.SyncBoolBit(ref hasHoleOutObj);
             theSync.SyncBoolBit(ref mFireball);
             theSync.EndBit();
-            bool newFormat = (reading && mSyncType == 1 && theSync.GetVersion() > 0x51) || theSync.GetVersion() > 0x54;
+            bool newFormat = (reading && mSyncType == 1 && theSync.GetVersion() > 0x51) || theSync.GetVersion() > 0x54 ||
+                theSync.PCVersionAbove(0x51);
             if (newFormat)
             {
                 theSync.SyncBoolBit(ref hasCount104);
@@ -329,8 +330,10 @@ namespace Sexy
                     theSync.SyncBoolBit(ref mIsHatBall);
                     theSync.SyncBoolBit(ref hasValue138);
                     theSync.SyncBoolBit(ref mFlag124);
-                    if (theSync.GetVersion() > 0x54)
+                    if (theSync.GetVersion() > 0x54 || theSync.PCVersionAbove(0x42))
                     {
+                        // (PC Nights writes it at every version, PeggleNights.exe 0x491dc0; PC Peggle's 0x42
+                        // streams, which already load, are left as they were.)
                         theSync.SyncBoolBit(ref mElectrified);
                     }
                     theSync.EndBit();
@@ -375,6 +378,12 @@ namespace Sexy
                 if (mHasHat)
                 {
                     mHatBall = theSync.SyncRefCount(mHatBall, () => new Ball(false));
+                }
+                if (theSync.PCVersionAbove(0x42))
+                {
+                    // Port addition: PC's super swirl counter (Ball +0x1a4), which the iOS editions dropped.
+                    int aSuperSwirl = 0;
+                    theSync.SyncLong(ref aSuperSwirl);
                 }
                 if (theSync.GetVersion() > 0x4a)
                 {
@@ -549,7 +558,40 @@ namespace Sexy
 
         public void SetFireballRadius()
         {
-            mRadius = 10.0f;
+            // Port: with PC Peg Size, the PC fireball radius (11, PeggleNights.exe 0x4926c0) instead of the mobile 10.
+            mRadius = PegInfo.mPCSized ? PC_FIREBALL_RADIUS : 10.0f;
+        }
+
+        /// <summary>The PC fireball's radius (PeggleNights.exe 0x4926c0); the mobile builds use 10.</summary>
+        public const float PC_FIREBALL_RADIUS = 11.0f;
+
+        // Port addition (PC Peg Size): how much of each cel the visible ball/fireball covers (area-equivalent
+        // diameter over cel width, measured from the atlases), so they can be drawn 2r board units across like
+        // the PC art (ball.gif: 11.9 of 14 px for r 6; Fireball.gif: 22.0 of 24 px for r 11).
+#if PEGGLE_IPHONE
+        private const float BALL_ART_FILL = 18.41f / 26.0f;
+
+        private const float FIREBALL_ART_FILL = 27.56f / 34.0f;
+#else
+        private const float BALL_ART_FILL = 1.0f;
+
+        private const float FIREBALL_ART_FILL = 33.80f / 38.0f;
+#endif
+
+        /// <summary>The PC ball shadow's offset in board units: left and down (PeggleNights.exe 0x4943b1).</summary>
+        private const float PC_BALL_SHADOW_OFFSET = 2.0f;
+
+        /// <summary>A uniform scale (and rotation) that draws theImage's visible part 2 * mRadius board units across.</summary>
+        private Transform GetPCSizeTransform(Image theImage, float theFill, float theRot)
+        {
+            float s = mRadius * 2.0f * SexyUtil.gPhysicalDisplayHeight / 600.0f / (theImage.mWidth * theFill);
+            Transform aTransform = new Transform();
+            aTransform.Scale(s, s);
+            if (theRot != 0.0f)
+            {
+                aTransform.RotateRad(theRot);
+            }
+            return aTransform;
         }
 
         public void SetElectrified(bool on, int theSoundDelay)
@@ -1137,6 +1179,11 @@ namespace Sexy
 
         public override void DrawShadow(Graphics g)
         {
+            // Port addition: the PC peg shadow, with the PC Peg Size option (PC: pegs with mShadow only).
+            if (PegInfo.mPCSized && mShadow && mShapeType == SHAPE_CIRCLE && mPegInfo != null)
+            {
+                mPegInfo.DrawShadow(this, g);
+            }
         }
 
         public void DrawHat(Graphics g)
@@ -1146,10 +1193,33 @@ namespace Sexy
             float rot = Math.Clamp(mVelX / 3.0f, -1.0f, 1.0f) * 0.7853982f;
             Image image = mHatBall != null ? Res.IMAGE_MAGICHAT : Res.IMAGE_HAT;
             float scale = SexyUtil.gPhysicalDisplayHeight;
+            if (PegInfo.mPCSized)
+            {
+                // Port addition: PC draws the hat 20 board units (not 20 px) above the ball (PeggleNights.exe 0x494110),
+                // at its own art's size: Hat.gif 27 px, MagicHat 83 px wide, in board units.
+                float aWidth = mHatBall != null ? PC_MAGICHAT_WIDTH : PC_HAT_WIDTH;
+                float s = aWidth * scale / 600.0f / image.mWidth;
+                Transform aTransform = new Transform();
+                aTransform.Scale(s, s);
+                aTransform.RotateRad(rot);
+                g.DrawImageTransformF(image, aTransform, (float)((hx * scale) / 600.0), (float)(((hy - 20.0f) * scale) / 600.0));
+                return;
+            }
             float x = (float)((hx * scale) / 600.0 - image.mWidth / 2);
             float y = (float)((hy * scale) / 600.0 - image.mHeight / 2 - 20.0);
             g.DrawImageRotatedF(image, x, y, rot);
         }
+
+        // Port addition (PC Peg Size): PC art widths in board units (PeggleNights images/game).
+        private const float PC_HAT_WIDTH = 27.0f;
+
+        private const float PC_MAGICHAT_WIDTH = 83.0f;
+
+        /// <summary>The PC lightning spark cel's width (BOLTOLITE.jpg, 4 cels of 20 px).</summary>
+        private const float PC_SPARK_WIDTH = 20.0f;
+
+        /// <summary>How far from the ball the PC sparks circle, in board units (PeggleNights.exe 0x4945b3).</summary>
+        private const float PC_SPARK_ORBIT = 9.0f;
 
         public override void Draw(Graphics g)
         {
@@ -1193,15 +1263,25 @@ namespace Sexy
                     {
                         DrawHat(g);
                     }
-                    x -= mRadius + 5.0f;
-                    y -= mRadius + 5.0f;
                     float rot = 0.0f;
                     Board board = GetBoard();
                     if (board != null)
                     {
                         rot = board.mGameUpdateCnt * 0.05f;
                     }
-                    g.DrawImageRotatedF(Res.IMAGE_FIREBALL, (float)((x * scale) / 600.0), (float)((y * scale) / 600.0), rot);
+                    if (PegInfo.mPCSized)
+                    {
+                        // Port addition: the fireball at the PC size (2r), centred on the ball.
+                        Image aFireball = Res.IMAGE_FIREBALL;
+                        g.DrawImageTransformF(aFireball, GetPCSizeTransform(aFireball, FIREBALL_ART_FILL, rot),
+                            (float)((x * scale) / 600.0), (float)((y * scale) / 600.0));
+                    }
+                    else
+                    {
+                        x -= mRadius + 5.0f;
+                        y -= mRadius + 5.0f;
+                        g.DrawImageRotatedF(Res.IMAGE_FIREBALL, (float)((x * scale) / 600.0), (float)((y * scale) / 600.0), rot);
+                    }
                 }
             }
             else
@@ -1216,9 +1296,23 @@ namespace Sexy
                 bool colorize = g.GetColorizeImages();
                 g.SetColorizeImages(true);
                 g.SetColor(SexyUtil.MakeColor(0, 0x60));
-                g.DrawImageF(Res.IMAGE_BALLSHADOW, dx - 2.0f, dy + 2.0f);
-                g.SetColorizeImages(false);
-                g.DrawImageF(ball, dx, dy);
+                if (PegInfo.mPCSized)
+                {
+                    // Port addition: the ball and its shadow at the PC size (2r), the shadow 2 units left and down.
+                    Transform aTransform = GetPCSizeTransform(ball, BALL_ART_FILL, 0.0f);
+                    float cx = (float)((x * scale) / 600.0);
+                    float cy = (float)((y * scale) / 600.0);
+                    float anOffset = PC_BALL_SHADOW_OFFSET * scale / 600.0f;
+                    g.DrawImageTransformF(Res.IMAGE_BALLSHADOW, aTransform, cx - anOffset, cy + anOffset);
+                    g.SetColorizeImages(false);
+                    g.DrawImageTransformF(ball, aTransform, cx, cy);
+                }
+                else
+                {
+                    g.DrawImageF(Res.IMAGE_BALLSHADOW, dx - 2.0f, dy + 2.0f);
+                    g.SetColorizeImages(false);
+                    g.DrawImageF(ball, dx, dy);
+                }
                 if (mElectrified)
                 {
                     g.SetColorizeImages(true);
@@ -1236,6 +1330,21 @@ namespace Sexy
                                 TRect cel = spark.GetCelRect(frame);
                                 g.SetDrawMode(Graphics.DrawMode.DRAWMODE_ADDITIVE);
                                 g.SetColor(SexyUtil.MakeColor(0xffffff, 200));
+                                if (PegInfo.mPCSized)
+                                {
+                                    // Port addition: PC circles the sparks 9 board units around the ball's
+                                    // middle (its image's, drawn from x - r: the 7 is half the 14 px ball), at
+                                    // the PC cel size.
+                                    float s = PC_SPARK_WIDTH * scale / 600.0f / cel.mWidth;
+                                    Transform aTransform = new Transform();
+                                    aTransform.Scale(s, s);
+                                    aTransform.RotateRad(a);
+                                    g.DrawImageTransformF(spark, aTransform, cel,
+                                        (float)(((x + Math.Sin(a) * PC_SPARK_ORBIT) * scale) / 600.0),
+                                        (float)(((y + Math.Cos(a) * PC_SPARK_ORBIT) * scale) / 600.0));
+                                    g.SetDrawMode(Graphics.DrawMode.DRAWMODE_NORMAL);
+                                    continue;
+                                }
                                 double sx = (x * scale) / 600.0 - cel.mWidth / 2 + (scale * 7) / 600.0 + Math.Sin(a) * 9.0;
                                 double sy = (y * scale) / 600.0 - cel.mHeight / 2 + (scale * 7) / 600.0 + Math.Cos(a) * 9.0;
                                 g.DrawImageRotatedF(spark, (float)sx, (float)sy, a, cel);

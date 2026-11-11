@@ -535,6 +535,8 @@ namespace Sexy
             theSync.SyncLong(ref aVersion);
             theSync.SyncBool(ref aCanSyncPointers);
             theSync.SetVersion(aVersion);
+            // Port addition: only PC-era versions are read the PC way (PC Nights writes 0x52; the port 0x57).
+            theSync.mPCFormat &= aVersion < 0x55;
             if (aVersion > 0x14)
             {
                 int aTrophyLevel = mTrophyLevelIdx;
@@ -1114,6 +1116,8 @@ namespace Sexy
             }
             DataSync aSync = new DataSync();
             aSync.StartReadMemory(theWriter.GetDataPtr(), theWriter.GetDataLen(), false);
+            // Port addition: snapshots from a PC replay file are read with the PC games' layout.
+            aSync.mPCFormat = mReplayFromPC;
             SyncState(aSync);
             if (withClickTimes && aSync.GetVersion() > 5 && aSync.GetReader().CanReadBytes(1))
             {
@@ -1159,6 +1163,10 @@ namespace Sexy
         /// <summary>Saves a replay snapshot for this shot, keeping only the latest one.</summary>
         public void GetReplayPoint()
         {
+            // Port addition: the PC Peg Size mode the shot is played in (it changes the fireball's radius), and
+            // the snapshot is the port's own.
+            mReplayPCSized = PegInfo.mPCSized;
+            mReplayFromPC = false;
             mReplayWriters.Add(GetSyncPoint());
             if (mReplayWriters.Count > 1)
             {
@@ -1649,6 +1657,10 @@ namespace Sexy
             DataReader aReader = new DataReader();
             aReader.OpenMemory(aBuffer.GetDataPtr(), aBuffer.GetDataLen(), false);
             int aVersion = aReader.ReadLong();
+            // Port addition: PC replays (see IsPCReplay) play in PC Peg Size mode, original iOS ones at the mobile
+            // size; the port's own files say which in their trailer (ReadReplayTrailer, below).
+            mReplayPCSized = IsPCReplay(theFileName, aVersion);
+            mReplayFromPC = mReplayPCSized;
             if (aVersion < 0x32)
             {
                 DataWriter aWriter = new DataWriter();
@@ -1660,6 +1672,11 @@ namespace Sexy
             if (aVersion > 0x53)
             {
                 aReader.ReadString();
+                aReader.ReadLong();
+            }
+            else if (HasNightsReplayHeader(theFileName, aVersion))
+            {
+                // Port addition: Peggle Nights/WoW files have a long here before the count.
                 aReader.ReadLong();
             }
             int aCount = aReader.ReadShort() & 0xffff;
@@ -1675,7 +1692,72 @@ namespace Sexy
                 aWriter.WriteBytes(aReader.ReadBytesFromMem(aLen), 0, aLen);
                 mReplayWriters.Add(aWriter);
             }
+            ReadReplayTrailer(aReader);
             return true;
+        }
+
+        /// <summary>
+        /// Port addition: the PC Peg Size mode the replay was recorded in (Board.mReplayPCSized). It goes after the
+        /// replay snapshots, where the original game stops reading (Board::LoadReplayFile reads the header and the
+        /// counted snapshots only; ReplayFileDialog reads the header and the first snapshot's start), so the file
+        /// still loads in the original iOS game.
+        /// </summary>
+        private const int REPLAY_TRAILER_MAGIC = 0x45474550;    // "PEGE"
+
+        /// <summary>
+        /// Port addition: whether a replay file comes from a PC game. The PC games' own extensions (.pegn Peggle
+        /// Nights, .pegw Peggle WoW, .pex Peggle Extreme) always are; a .peg is when it has no description/time
+        /// header (file version below 0x54: PC Peggle writes 0x42, Nights/WoW 0x52, the iOS editions 0x57).
+        /// </summary>
+        public static bool IsPCReplay(string theFileName, int theVersion)
+        {
+            string anExt = System.IO.Path.GetExtension(theFileName).ToLowerInvariant();
+            return anExt == ".pegn" || anExt == ".pegw" || anExt == ".pex" || theVersion < 0x54;
+        }
+
+        /// <summary>
+        /// Port addition: Peggle Nights and WoW replay files (.pegn/.pegw, version 0x52) have a long between the
+        /// version and the snapshot count that PC Peggle/Extreme and iOS files don't; what it holds is unknown.
+        /// </summary>
+        public static bool HasNightsReplayHeader(string theFileName, int theVersion)
+        {
+            string anExt = System.IO.Path.GetExtension(theFileName).ToLowerInvariant();
+            return anExt == ".pegn" || anExt == ".pegw" || (theVersion >= 0x52 && theVersion < 0x54);
+        }
+
+        private const int REPLAY_TRAILER_VERSION = 1;
+
+        private const int REPLAY_FLAG_PC_SIZED = 1;
+
+        /// <summary>The snapshots were written by a PC game (kept when the port saves a PC replay again).</summary>
+        private const int REPLAY_FLAG_PC_FORMAT = 2;
+
+        /// <summary>Whether the replay snapshots in mReplayWriters were recorded with PC Peg Size on.</summary>
+        public bool mReplayPCSized;
+
+        /// <summary>Whether the replay snapshots in mReplayWriters were written by a PC game (DataSync.mPCFormat).</summary>
+        public bool mReplayFromPC;
+
+        private void WriteReplayTrailer(DataWriter theWriter)
+        {
+            theWriter.WriteLong(REPLAY_TRAILER_MAGIC);
+            theWriter.WriteLong(REPLAY_TRAILER_VERSION);
+            theWriter.WriteLong((mReplayPCSized ? REPLAY_FLAG_PC_SIZED : 0) | (mReplayFromPC ? REPLAY_FLAG_PC_FORMAT : 0));
+        }
+
+        private void ReadReplayTrailer(DataReader theReader)
+        {
+            if (!theReader.CanReadBytes(12) || theReader.ReadLong() != REPLAY_TRAILER_MAGIC)
+            {
+                return;
+            }
+            if (theReader.ReadLong() < 1)
+            {
+                return;
+            }
+            int aFlags = theReader.ReadLong();
+            mReplayPCSized = (aFlags & REPLAY_FLAG_PC_SIZED) != 0;
+            mReplayFromPC = (aFlags & REPLAY_FLAG_PC_FORMAT) != 0;
         }
 
         public bool SaveReplayFile(int theId, string theDescription)
@@ -1696,6 +1778,7 @@ namespace Sexy
                 }
                 aWriter.WriteLong(aReplay.GetDataLen());
                 aWriter.WriteBytes(aReplay.GetDataPtr(), 0, aReplay.GetDataLen());
+                WriteReplayTrailer(aWriter);
             }
             return mApp.WriteBytesToFile(aFileName, aWriter.GetDataPtr(), aWriter.GetDataLen());
         }
@@ -2818,6 +2901,8 @@ namespace Sexy
         /// <summary>
         /// Port addition (PC Controls): aims at the board point under the mouse. Zoomed in, the point is mapped back
         /// through DoZoom's transform, so the gun points at the cursor there too (touch zoom turns it by drags).
+        /// Zoomed, the point keeps its fraction, so the aim follows the zoomed view's finer grid instead of
+        /// snapping to the PC pixels; unzoomed it snaps as before.
         /// </summary>
         private void PCAimAt(int x, int y)
         {
@@ -2827,8 +2912,8 @@ namespace Sexy
                 double aScale = mZoom + 1.0;
                 double cx = mZoomX * aH / 600.0 + mX;
                 double cy = mZoomY * aH / 600.0;
-                x = (int)((x + mX - cx) / aScale + cx) - mX;
-                y = (int)((y - cy) / aScale + cy);
+                mLogicMgr.MouseDragFine((x + mX - cx) / aScale + cx - mX, (y - cy) / aScale + cy);
+                return;
             }
             mLogicMgr.MouseDrag(x, y);
         }
@@ -3191,7 +3276,17 @@ namespace Sexy
 #if PEGGLE_IPHONE
             mDialWidget.PressButton();
 #else
+            // MouseDown moves the aim point to the raw click, which is off zoomed in (and drops the sub-pixel
+            // part), so keep the one PCAimAt just set.
+            int aMouseX = mLogicMgr.mMouseX;
+            int aMouseY = mLogicMgr.mMouseY;
+            float aFracX = mLogicMgr.mMouseFracX;
+            float aFracY = mLogicMgr.mMouseFracY;
             mLogicMgr.MouseDown(theX, theY, 1, false, false);
+            mLogicMgr.mMouseX = aMouseX;
+            mLogicMgr.mMouseY = aMouseY;
+            mLogicMgr.mMouseFracX = aFracX;
+            mLogicMgr.mMouseFracY = aFracY;
 #endif
         }
 
@@ -3565,6 +3660,15 @@ namespace Sexy
             mEffectMgr.Draw(gBoard, -1);
             g.Is3D();
             DrawShadow(g);
+            // Port addition: the PC shadow pass (Board::Draw 0x40c530: every shadow-list object's DrawShadow after
+            // the effects behind the board objects, before the objects), with the PC Peg Size option.
+            if (PegInfo.mPCSized)
+            {
+                foreach (PhysObj anObj in mMainLayer)
+                {
+                    anObj.DrawShadow(gClip);
+                }
+            }
             foreach (PhysObj anObj in mMainLayer)
             {
                 anObj.Draw(gClip);

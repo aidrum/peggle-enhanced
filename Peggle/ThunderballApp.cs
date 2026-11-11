@@ -521,6 +521,10 @@ namespace Sexy
             // Port: High Quality Pegs is on by default on PCs, off on phones.
             bool aHighQualityPegs = !Main.IsMobile;
             RegistryReadBoolean("HighQualityPegs", ref aHighQualityPegs);
+            // Port: PC Peg Size is on by default on PCs, off on phones.
+            bool aPCPegSize = !Main.IsMobile;
+            RegistryReadBoolean("PCPegSize", ref aPCPegSize);
+            PegInfo.mPCSizedOption = aPCPegSize;
             RegistryReadBoolean("RandomMusic", ref mRandomMusic);
             RegistryReadBoolean("CheckForUpdates", ref mCheckForUpdates);
             RegistryReadInteger("PadAimSpeed", ref mPadAimSpeed);
@@ -664,6 +668,7 @@ namespace Sexy
             { "Random Music", new[] { "Musique aléatoire", "Zufällige Musik", "Música aleatoria", "Musica casuale" } },
             // Pegs as the game's own strings call them: taquets, Spielsteine, fichas, tondini.
             { "High Quality Pegs", new[] { "Taquets haute qualité", "Hochwertige Spielsteine", "Fichas de alta calidad", "Tondini in alta qualità" } },
+            { "PC Peg Size", new[] { "Taille des taquets PC", "PC-Spielsteingröße", "Tamaño de fichas PC", "Dimensione tondini PC" } },
             { "More Adventures", new[] { "Plus d'aventures", "Weitere Abenteuer", "Más aventuras", "Altre avventure" } },
             { "Main Adventures", new[] { "Principales", "Hauptstory", "Aventuras base", "Avventure base" } },
             // The update prompt (UpdateChecker).
@@ -824,6 +829,13 @@ namespace Sexy
         {
             PegInfo.mHighQualityPegs = theOn;
             RegistryWriteBoolean("HighQualityPegs", theOn);
+        }
+
+        /// <summary>Port addition: sets the PC Peg Size option and saves it; it applies at once.</summary>
+        public void SetPCPegSize(bool theOn)
+        {
+            PegInfo.mPCSizedOption = theOn;
+            RegistryWriteBoolean("PCPegSize", theOn);
         }
 
         /// <summary>Port addition: sets the Random Music option and saves it; it applies from the next level start.</summary>

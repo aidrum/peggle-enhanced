@@ -5,7 +5,7 @@ namespace Sexy
 {
     /// <summary>
     /// Port addition: the port's own options, opened from the main-menu Options dialog and laid out
-    /// in its two columns, on two pages. The first holds Check for Updates, Low Memory Mode (lazy loading), High Quality Pegs,
+    /// in its two columns, on two pages. The first holds Check for Updates, Low Memory Mode (lazy loading), PC Peg Size, High Quality Pegs,
     /// Random Music, (desktop only) PC Controls and the controller's Stick Aim speed;
     /// the second, Theme Settings, holds the Menu Theme choice (left), and the Nights Menu and Main
     /// Menu Theme ones (right); the third, App Icon (Android, or SEXY_APP_ICONS=1 to preview it), the
@@ -28,6 +28,8 @@ namespace Sexy
         public const int PortOptions_PadAimSpeed = 14;
 
         public const int PortOptions_CheckForUpdates = 15;
+
+        public const int PortOptions_PCPegSize = 16;
 
         /// <summary>Ids 20-21 are the Nights Menu radio buttons: Mobile, then PC.</summary>
         public const int PortOptions_NightsMenu = 20;
@@ -129,6 +131,9 @@ namespace Sexy
 
         public ThunderCheckbox mHighQualityPegsCheckbox;
 
+        /// <summary>PC Peg Size (PegInfo.mPCSized), under Low Memory Mode's restart note.</summary>
+        public ThunderCheckbox mPCPegSizeCheckbox;
+
         public ThunderCheckbox mRandomMusicCheckbox;
 
         /// <summary>PC Controls; desktop only (null on Android).</summary>
@@ -199,6 +204,9 @@ namespace Sexy
             mHighQualityPegsCheckbox = SexyUtil.MakeCheckbox2(PortOptions_HighQualityPegs, this, SexyAppBase.Loc("High Quality Pegs"), 0);
             mHighQualityPegsCheckbox.mChecked = PegInfo.mHighQualityPegs;
             AddWidget(mHighQualityPegsCheckbox);
+            mPCPegSizeCheckbox = SexyUtil.MakeCheckbox2(PortOptions_PCPegSize, this, SexyAppBase.Loc("PC Peg Size"), 0);
+            mPCPegSizeCheckbox.mChecked = PegInfo.mPCSizedOption;
+            AddWidget(mPCPegSizeCheckbox);
             mRandomMusicCheckbox = SexyUtil.MakeCheckbox2(PortOptions_RandomMusic, this, SexyAppBase.Loc("Random Music"), 0);
             mRandomMusicCheckbox.mChecked = mApp.mRandomMusic;
             AddWidget(mRandomMusicCheckbox);
@@ -296,6 +304,7 @@ namespace Sexy
             mLazyLoadingCheckbox.SetVisible(general);
             mCheckForUpdatesCheckbox.SetVisible(general);
             mHighQualityPegsCheckbox.SetVisible(general);
+            mPCPegSizeCheckbox.SetVisible(general);
             mRandomMusicCheckbox.SetVisible(general);
             mPCControlsCheckbox?.SetVisible(general);
             mPadAimSlider.SetVisible(general);
@@ -375,11 +384,12 @@ namespace Sexy
             mHighQualityPegsCheckbox.Layout(LAY_BESIDE | (int)LayoutFlags.LAY_SameHeight, mCheckForUpdatesCheckbox, 5, 0, 0, 0);
             mRandomMusicCheckbox.Layout(LAY_STACK_BELOW, mHighQualityPegsCheckbox, 0, 5, 0, 0);
             mPCControlsCheckbox?.Layout(LAY_STACK_BELOW, mRandomMusicCheckbox, 0, 5, 0, 0);
-            // Stick Aim is a row of its own under the checkboxes and the restart note (whichever ends lower),
+            // PC Peg Size goes under Low Memory Mode's restart note.
+            mPCPegSizeCheckbox.Layout(LAY_STACK_BELOW, mLazyLoadingCheckbox, 0, 5 + Res.FONT_SMALL.GetHeight() + 2, 0, 0);
+            // Stick Aim is a row of its own under both columns' checkboxes (whichever ends lower),
             // placed and sized as the Options dialog's volume sliders (its plate reaches left of it, under the label).
             ThunderCheckbox aLast = mPCControlsCheckbox ?? mRandomMusicCheckbox;
-            int aBottom = Math.Max(aLast.mY + aLast.mHeight,
-                mLazyLoadingCheckbox.mY + mLazyLoadingCheckbox.mHeight + Res.FONT_SMALL.GetHeight() + 2);
+            int aBottom = Math.Max(aLast.mY + aLast.mHeight, mPCPegSizeCheckbox.mY + mPCPegSizeCheckbox.mHeight);
             mPadAimSlider.Resize(OPTIONS_SFX_SLIDER_X + aGutter, aBottom + 5 - THUNDER_BUTTON_SLIDER_Y,
                 OPTIONS_SFX_SLIDER_OFFSET_W + Res.IMAGE_DLG_SLIDERHILIGHT.mWidth, OPTIONS_SFX_SLIDER_H);
             if (mAppIconChecks != null)
@@ -571,6 +581,10 @@ namespace Sexy
             else if (theId == PortOptions_HighQualityPegs)
             {
                 mApp.SetHighQualityPegs(@checked);
+            }
+            else if (theId == PortOptions_PCPegSize)
+            {
+                mApp.SetPCPegSize(@checked);
             }
             else if (theId == PortOptions_RandomMusic)
             {

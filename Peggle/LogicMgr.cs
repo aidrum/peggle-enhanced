@@ -179,6 +179,14 @@ namespace Sexy
 
         public int mMouseY;                                       // 0x90
 
+        /// <summary>
+        /// Port addition (PC Controls): the sub-pixel part of mMouseX/Y, in [0, 1) PC px. Only aiming at the
+        /// cursor while zoomed in sets it (MouseDragFine); everything else snaps to the PC pixel grid as before.
+        /// </summary>
+        public float mMouseFracX;
+
+        public float mMouseFracY;
+
         public float mWheelMoveRad;                               // 0x94
 
         public int mInt98;                                        // 0x98
@@ -428,6 +436,8 @@ namespace Sexy
             mWheelMoveRad = SexyUtil.DegToRad(mWheelMove);
             mMouseX = 400;
             mMouseY = 300;
+            mMouseFracX = 0;
+            mMouseFracY = 0;
             mGunAngle = 0;
             mFloatD0 = 0;
             mIntD4 = 0;
@@ -612,6 +622,16 @@ namespace Sexy
                     theSync.SyncLong(ref mInt1c8);
                 }
             }
+            // Port addition (PC streams, PeggleNights.exe 0x4670c0): the gravity, as a double, after 0x50.
+            if (theSync.PCVersionAbove(0x50))
+            {
+                double aGravity = Ball.mGravity;
+                theSync.SyncDouble(ref aGravity);
+                if (theSync.IsReading)
+                {
+                    Ball.mGravity = (float)aGravity;
+                }
+            }
             theSync.SyncLong(ref mInt24);
             theSync.SyncFloat(ref mGunAngle);
             theSync.SyncLong(ref mShotScore);
@@ -703,9 +723,20 @@ namespace Sexy
             {
                 theSync.SyncLong(ref mInt1b4);
             }
+            if (theSync.PCVersionAbove(0x42))
+            {
+                // Port addition: a PC value (LogicMgr +0x1e0) the iOS editions dropped.
+                int anUnused = 0;
+                theSync.SyncLong(ref anUnused);
+            }
             if (theSync.GetVersion() < 0x17)
             {
                 mCornerText = "";
+            }
+            else if (theSync.mPCFormat)
+            {
+                // Port addition: PC keeps the corner text as a narrow string.
+                theSync.SyncString(ref mCornerText);
             }
             else
             {
@@ -722,7 +753,8 @@ namespace Sexy
                 theSync.SyncLong(ref mInt48);
                 theSync.SyncList(mPegHits, (ds, p) => p.SyncState(ds), () => new PegHitInfo());
             }
-            if (theSync.GetVersion() > 0x54)
+            // (PC streams have the orb after 0x4b, without the iOS editions' last two values.)
+            if (theSync.GetVersion() > 0x54 || theSync.PCVersionAbove(0x4b))
             {
                 LightningOrb anOrb = mLightningOrb;
                 theSync.SyncLong(ref anOrb.mState);
@@ -737,8 +769,11 @@ namespace Sexy
                 theSync.SyncLong(ref anOrb.mPulseCount);
                 theSync.SyncLong(ref anOrb.mRingCounter);
                 theSync.SyncIntList(anOrb.mRings);
-                theSync.SyncBoolBit(ref mZenThinking);
-                theSync.SyncLong(ref mInt6c);
+                if (theSync.GetVersion() > 0x54)
+                {
+                    theSync.SyncBoolBit(ref mZenThinking);
+                    theSync.SyncLong(ref mInt6c);
+                }
             }
             if (theSync.GetVersion() < 0x1f)
             {
@@ -878,16 +913,41 @@ namespace Sexy
             {
                 theSync.SyncLong(ref mBucketBonusCount);
             }
-            if (theSync.GetVersion() > 0x54)
+            if (theSync.PCVersionAbove(0x42))
+            {
+                // Port addition: two PC bytes (LogicMgr +0x58/+0x5c, one per player) the iOS editions dropped.
+                for (int i = 0; i < 2; i++)
+                {
+                    int anUnused = 0;
+                    theSync.SyncByte(ref anUnused);
+                }
+            }
+            // (PC streams: a counted list after 0x46, 23 values in 0x45-0x46.)
+            if (theSync.GetVersion() > 0x54 || theSync.PCVersionAbove(0x46))
             {
                 int aCount = 0x18;
                 theSync.SyncLong(ref aCount);
                 for (int i = 0; i < aCount; i++)
                 {
+                    if (i < mStyleShotsLeft.Length)
+                    {
+                        theSync.SyncLong(ref mStyleShotsLeft[i]);
+                    }
+                    else
+                    {
+                        int anExtra = 0;
+                        theSync.SyncLong(ref anExtra);
+                    }
+                }
+            }
+            else if (theSync.PCVersionAbove(0x44))
+            {
+                for (int i = 0; i < 0x17; i++)
+                {
                     theSync.SyncLong(ref mStyleShotsLeft[i]);
                 }
             }
-            if (theSync.GetVersion() > 0x54)
+            if (theSync.GetVersion() > 0x54 || theSync.PCVersionAbove(0x4d))
             {
                 theSync.SyncIntList(mStyleShotCounts);
                 theSync.SyncLong(ref mInt16c);
@@ -905,8 +965,9 @@ namespace Sexy
                 {
                     aNumPowerups = 7;
                 }
-                else if (theSync.GetVersion() < 0x55)
+                else if (theSync.GetVersion() < 0x55 && !theSync.PCVersionAbove(0x43))
                 {
+                    // (PC streams have the 15th count from 0x44.)
                     aNumPowerups = 0xe;
                 }
                 for (int j = 0; j < aNumPowerups; j++)
@@ -974,6 +1035,13 @@ namespace Sexy
                                 anInfo.mId = (uint)anId;
                                 anInfo.mX = aReader.ReadFloat();
                                 anInfo.mY = aReader.ReadFloat();
+                                if (theSync.PCVersionAbove(0x4e))
+                                {
+                                    // Port addition: PC records two more floats per position after 0x4e
+                                    // (PeggleNights.exe 0x467bb0); the iOS editions don't use them.
+                                    aReader.ReadFloat();
+                                    aReader.ReadFloat();
+                                }
                                 aSet.Add(anInfo);
                             }
                         }
@@ -1380,8 +1448,8 @@ namespace Sexy
             }
             float cx = aGun.mCenterX;
             float cy = aGun.mCenterY;
-            float mx = (float)SexyUtil.ScreenToBoardX(mMouseX);
-            float my = (float)SexyUtil.ScreenToBoardY(mMouseY);
+            float mx = (float)SexyUtil.ScreenToBoardX(mMouseX) + mMouseFracX;
+            float my = (float)SexyUtil.ScreenToBoardY(mMouseY) + mMouseFracY;
             float anAngle = (float)Math.Atan2(cy - my, mx - cx);
             SexyVector2 aDelta = new SexyVector2(mx - cx, my - cy);
             float aLead = (float)Math.Abs((double)(float)Math.Atan2(aDelta.x, aDelta.y));

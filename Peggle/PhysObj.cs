@@ -333,7 +333,8 @@ namespace Sexy
                 theSync.SyncBoolBit(ref hasFlipperFlags);
                 theSync.SyncBoolBit(ref mDrawFloat);
                 theSync.SyncBoolBit(ref mFlag30);
-                if ((reading && mSyncType == 1 && theSync.GetVersion() > 0x4f) || theSync.GetVersion() > 0x54)
+                if ((reading && mSyncType == 1 && theSync.GetVersion() > 0x4f) || theSync.GetVersion() > 0x54 ||
+                    theSync.PCVersionAbove(0x4f))
                 {
                     theSync.SyncBoolBit(ref mShadow);
                 }

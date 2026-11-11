@@ -613,6 +613,11 @@ namespace Sexy
                 string aFullPath = Path.Combine(GlobalStaticVars.gSexyAppBase.applicationStoragePath, theInfo.mPath);
                 theInfo.mTime = (int)new DateTimeOffset(File.GetLastWriteTimeUtc(aFullPath)).ToUnixTimeSeconds();
                 theInfo.mCaption = SexyUtil.GetFileName(theFileName, true);
+                if (aVersion >= 0x32 && Board.HasNightsReplayHeader(theFileName, aVersion))
+                {
+                    // Port addition: the Peggle Nights/WoW header's extra long.
+                    aReader.ReadLong();
+                }
             }
             else
             {

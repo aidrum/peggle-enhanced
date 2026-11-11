@@ -28,6 +28,34 @@ namespace Sexy
         /// <summary>Port addition: the High Quality Pegs option: pegs always use the large images the zoom uses.</summary>
         public static bool mHighQualityPegs;
 
+        /// <summary>
+        /// Port addition: the PC Peg Size option. The PC games draw a peg's 20x20 cel (ballpeg.jpg) unscaled at
+        /// (x - r, y - r) (PegInfo draw, 0x49e1b0 in PeggleNights.exe), so a radius-10 peg is 20 board units across,
+        /// as wide as its hitbox. The mobile cels are ~24 board units across (HD 31 px at 1.28 px per unit, iPhone
+        /// 26 px at 1.067). With this on, the mobile art is drawn at the PC size. The hitbox is the level's radius
+        /// on every platform (same level files and collision code), so it doesn't change.
+        /// </summary>
+        public static bool mPCSized
+        {
+            get
+            {
+                // While a replay is watched (a replay file, or an instant replay with a restore point to go back
+                // to), the mode it was recorded in, so its physics (the fireball radius) and art match.
+                Board aBoard = SexyUtil.GetBoard();
+                if (aBoard != null && (aBoard.mIsReplay || aBoard.mReplayRestorePoint != null))
+                {
+                    return aBoard.mReplayPCSized;
+                }
+                return mPCSizedOption;
+            }
+        }
+
+        /// <summary>The PC Peg Size option as set (saved as "PCPegSize"); mPCSized is what applies right now.</summary>
+        public static bool mPCSizedOption;
+
+        /// <summary>The PC peg cel's size in board units.</summary>
+        public const float PC_PEG_SIZE = 20.0f;
+
         private static readonly ResourceId[] NormalIds =
         {
             ResourceId.IMAGE_BALLPEG0_ID, ResourceId.IMAGE_BALLPEG1_ID, ResourceId.IMAGE_BALLPEG2_ID, ResourceId.IMAGE_BALLPEG3_ID,
@@ -213,7 +241,16 @@ namespace Sexy
                 index = mType + 3;
             }
             float scale = SexyUtil.gPhysicalDisplayHeight / 600.0f;
-            if (!mFullSized)
+            if (mPCSized)
+            {
+                // Port addition: the edition's art (large under the zoom or High Quality Pegs) at the PC's size.
+                Image image = GetPegImage(index, mFullSized);
+                int size = (int)(PC_PEG_SIZE * scale + 0.5f);
+                int left = (int)Math.Floor(theBall.mX * scale - size / 2.0f + 0.5f);
+                int top = (int)Math.Floor(theBall.mY * scale - size / 2.0f + 0.5f);
+                g.DrawImage(image, new TRect(left, top, size, size), new TRect(0, 0, image.mWidth, image.mHeight));
+            }
+            else if (!mFullSized)
             {
                 Image image = GetPegImage(index, mFullSized);
                 float x = (float)(theBall.mX * scale - image.mWidth / 2);
@@ -267,6 +304,39 @@ namespace Sexy
                 mSparks.Draw(g, (int)(theBall.mX + 0.0f), (int)(theBall.mY + 0.0f));
             }
         }
+
+        /// <summary>
+        /// Port addition (PC Peg Size): the PC peg shadow (Ball::DrawShadow, 0x493f10 in PeggleNights.exe). PC draws
+        /// IMAGE_PEGSHADOW, a black disc 20 units across (a circle of the peg's radius when it isn't 10), at alpha
+        /// 0x90, centred 3 units left of and 3 units below the peg. Here the peg's own texture is drawn as that
+        /// silhouette (colorized black).
+        /// </summary>
+        public void DrawShadow(Ball theBall, Graphics g)
+        {
+            int index = mType - 1;
+            if (mHit)
+            {
+                index = mType + 3;
+            }
+            if (index < 0 || index >= 8)
+            {
+                return;
+            }
+            float scale = SexyUtil.gPhysicalDisplayHeight / 600.0f;
+            Image image = GetPegImage(index, mFullSized);
+            int size = (int)(theBall.mRadius * 2.0f * scale + 0.5f);
+            int left = (int)Math.Floor((theBall.mX - PC_SHADOW_OFFSET) * scale - size / 2.0f + 0.5f);
+            int top = (int)Math.Floor((theBall.mY + PC_SHADOW_OFFSET) * scale - size / 2.0f + 0.5f);
+            Microsoft.Xna.Framework.Color aColor = g.GetColor();
+            g.SetColorizeImages(true);
+            g.SetColor(SexyUtil.MakeColor(0x000000, 0x90));
+            g.DrawImage(image, new TRect(left, top, size, size), new TRect(0, 0, image.mWidth, image.mHeight));
+            g.SetColorizeImages(false);
+            g.SetColor(aColor);
+        }
+
+        /// <summary>The PC peg shadow's offset in board units: left and down.</summary>
+        public const float PC_SHADOW_OFFSET = 3.0f;
 
         public void DrawBrick(Brick theBrick, Graphics g, bool glowPass)
         {

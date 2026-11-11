@@ -12,6 +12,8 @@ namespace Sexy
                 double aH = (double)SexyUtil.gPhysicalDisplayHeight;
                 mMouseX = (int)((double)x * 600.0 / aH);
                 mMouseY = (int)((double)y * 600.0 / aH);
+                mMouseFracX = 0;
+                mMouseFracY = 0;
                 mWheelMove = GetBaseMouseWheelMove();
                 mBoard.mGun.mFirstHitDeflect = 1000.0f;
                 mFlag1F = true;
@@ -24,10 +26,40 @@ namespace Sexy
             double aH = (double)SexyUtil.gPhysicalDisplayHeight;
             int aX = (int)((double)x * 600.0 / aH);
             int aY = (int)((double)y * 600.0 / aH);
-            if (mIntD4 == 0 && !mIsComputer[mCurPlayer] && (aX != mMouseX || aY != mMouseY))
+            // Port: a leftover sub-pixel part (MouseDragFine) counts as a move, so it's dropped.
+            if (mIntD4 == 0 && !mIsComputer[mCurPlayer] && (aX != mMouseX || aY != mMouseY || mMouseFracX != 0 || mMouseFracY != 0))
             {
                 mMouseX = aX;
                 mMouseY = aY;
+                mMouseFracX = 0;
+                mMouseFracY = 0;
+                mWheelMove = GetBaseMouseWheelMove();
+                mBoard.mGun.mFirstHitDeflect = 1000.0f;
+                mFlag1F = true;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Port addition (PC Controls, zoomed in): MouseDrag at a fractional display point, keeping the
+        /// sub-pixel part of the PC position (mMouseFracX/Y) so aiming isn't locked to the PC pixel grid.
+        /// </summary>
+        public bool MouseDragFine(double x, double y)
+        {
+            double aH = (double)SexyUtil.gPhysicalDisplayHeight;
+            double aPX = x * 600.0 / aH;
+            double aPY = y * 600.0 / aH;
+            int aX = (int)Math.Floor(aPX);
+            int aY = (int)Math.Floor(aPY);
+            float aFracX = (float)(aPX - aX);
+            float aFracY = (float)(aPY - aY);
+            if (mIntD4 == 0 && !mIsComputer[mCurPlayer] &&
+                (aX != mMouseX || aY != mMouseY || aFracX != mMouseFracX || aFracY != mMouseFracY))
+            {
+                mMouseX = aX;
+                mMouseY = aY;
+                mMouseFracX = aFracX;
+                mMouseFracY = aFracY;
                 mWheelMove = GetBaseMouseWheelMove();
                 mBoard.mGun.mFirstHitDeflect = 1000.0f;
                 mFlag1F = true;
@@ -44,6 +76,8 @@ namespace Sexy
             double aH = (double)SexyUtil.gPhysicalDisplayHeight;
             mMouseX = (int)((double)x * 600.0 / aH);
             mMouseY = (int)((double)y * 600.0 / aH);
+            mMouseFracX = 0;
+            mMouseFracY = 0;
             bool ai = isAI;
             if (theButton < 0 && mState != STATE_INIT_LEVEL)
             {

@@ -73,6 +73,19 @@ namespace Sexy
             mVersion = theVersion;
         }
 
+        /// <summary>
+        /// Port addition: the stream was written by a PC game (a PC replay; Board.mReplayFromPC). The iOS editions
+        /// moved some version gates and dropped some fields after branching from PC Peggle Nights (version 0x52),
+        /// so the classes read those the PC way (PCVersionAbove).
+        /// </summary>
+        public bool mPCFormat;
+
+        /// <summary>Port addition: the PC games' gate (version > theVersion) when reading a PC stream, else false.</summary>
+        public bool PCVersionAbove(int theVersion)
+        {
+            return mPCFormat && mVersion > theVersion;
+        }
+
         public bool GetCanSyncPointers()
         {
             return mCanSyncPointers;
