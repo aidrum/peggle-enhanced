@@ -402,7 +402,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           TAG: ${{ needs.prepare.outputs.tag }}
           NOTES: ${{ needs.prepare.outputs.notes }}
-        run: distribution/release_upload.sh dist/*
+        run: bash distribution/release_upload.sh dist/*
 
   release-apple:
     name: Add iOS and macOS to the release
@@ -459,7 +459,7 @@ jobs:
         env:
           TAG: ${{ needs.prepare.outputs.tag }}
           NOTES: ${{ needs.prepare.outputs.notes }}
-        run: distribution/release_upload.sh dist/*
+        run: bash distribution/release_upload.sh dist/*
 
   pages:
     name: AltStore / SideStore source (GitHub Pages)
